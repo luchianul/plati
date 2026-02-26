@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Management Plăți | VerTech</title>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<style>
-    :root { --primary: #4f46e5; --success: #10b981; --danger: #ef4444; --bg: #f1f5f9; }
-    body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
-    .main-wrapper { width: 100%; max-width: 450px; padding: 15px; }
-    .brand-card-header { background: white; padding: 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; width: 100%; }
-    .month-pill { display: inline-block; padding: 6px 15px; border-radius: 12px; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-top: 10px; border: 2px solid var(--primary); color: var(--primary); }
-    .add-slim { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
-    .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; font-size: 14px; }
-    .add-slim button { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; cursor: pointer; }
-    .item-card { background: white; padding: 10px 12px; border-radius: 18px; margin-bottom: 8px; display: grid; grid-template-columns: auto 1fr 90px 80px; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    .controls { display: flex; gap: 4px; }
-    .btn-ctrl { background: #f8fafc; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
-    .item-name-text { font-weight: 600; font-size: 13px; color: #0f172a; word-break: break-word; }
-    .total-box { margin-top: 20px; padding: 20px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; align-items: center; width: 100%; }
-    .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 16px; }
-    h3 { font-size: 11px; text-transform: uppercase; color: #64748b; margin: 15px 0 10px 5px; align-self: flex-start; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Management Plăți | VerTech</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --primary: #4f46e5; --success: #10b981; --danger: #ef4444; --bg: #f1f5f9; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
+        .main-wrapper { width: 100%; max-width: 450px; padding: 15px; }
+        .brand-card-header { background: white; padding: 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; width: 100%; }
+        .month-pill { display: inline-block; padding: 6px 15px; border-radius: 12px; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-top: 10px; border: 2px solid var(--primary); color: var(--primary); }
+        .add-slim { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
+        .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; font-size: 14px; }
+        .add-slim button { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; cursor: pointer; }
+        .item-card { background: white; padding: 10px 12px; border-radius: 18px; margin-bottom: 8px; display: grid; grid-template-columns: auto 1fr 90px 80px; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .controls { display: flex; gap: 4px; }
+        .btn-ctrl { background: #f8fafc; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+        .item-name-text { font-weight: 600; font-size: 13px; color: #0f172a; word-break: break-word; }
+        .total-box { margin-top: 20px; padding: 20px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; align-items: center; width: 100%; }
+        .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 16px; }
+        h3 { font-size: 11px; text-transform: uppercase; color: #64748b; margin: 15px 0 10px 5px; align-self: flex-start; }
+    </style>
 </head>
 <body>
 
@@ -51,88 +51,94 @@
     </div>
 
     <button class="btn-sync" onclick="trimiteDate()">Sincronizează TOT în Cloud</button>
-    <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; background:none; border:none; color:red; font-size:10px; cursor:pointer;">RESETEAZĂ MEMORIA LOCALĂ</button>
+    <button onclick="localStorage.clear(); location.reload();" style="margin-top:30px; background:none; border:none; color:red; font-size:10px; opacity:0.5; cursor:pointer; width:100%;">Golește Memoria Locală (Reset)</button>
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbxkGwmuCHil-hXV9cw8710PS-tOhsiRNsXkc7kSN1rWcyAIxHaZBQeB8g01VYEACi7c2w/exec";
-let facturi = [];
-let editIndex = -1;
+    // URL-ul tău de Google Script
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxHTgTZrZnnPM0xnNaHRVkJQdT4DjmzMLZ6kefXgY2QZJCm38plxUaO7lXvvjftqKDLxQ/exec"; 
+    let facturi = [];
+    let editIndex = -1;
 
-async function incarcaDateDinCloud() {
-    Swal.fire({ title: 'Sincronizare...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-    try {
-        const response = await fetch(scriptURL + "?t=" + new Date().getTime());
-        const dateCloud = await response.json();
-        facturi = (dateCloud && dateCloud.length > 0) ? dateCloud : [];
-        render();
-        Swal.close();
-    } catch (e) {
-        facturi = JSON.parse(localStorage.getItem("facturi_final_v1")) || [];
-        render();
-        Swal.fire('Info', 'Date locale', 'info');
+    async function incarcaDateDinCloud() {
+        Swal.fire({ title: 'Sincronizare...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        try {
+            const response = await fetch(scriptURL + "?t=" + new Date().getTime());
+            const dateCloud = await response.json();
+            // Preluăm DOAR dacă avem date valide
+            facturi = Array.isArray(dateCloud) ? dateCloud : [];
+            render();
+            Swal.close();
+        } catch (e) {
+            facturi = JSON.parse(localStorage.getItem("facturi_v5")) || [];
+            render();
+            Swal.fire('Info', 'Mod Local activat', 'info');
+        }
     }
-}
 
-window.onload = () => {
-    const acum = new Date();
-    document.getElementById('headerMonth').innerText = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
-    incarcaDateDinCloud();
-};
+    window.onload = () => {
+        const acum = new Date();
+        document.getElementById('headerMonth').innerText = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+        incarcaDateDinCloud();
+    };
 
-function render() {
-    const neplatiteDiv = document.getElementById("containerNeplatite");
-    const platiteDiv = document.getElementById("containerPlatite");
-    neplatiteDiv.innerHTML = ""; platiteDiv.innerHTML = "";
-    let total = 0;
+    function render() {
+        const neDiv = document.getElementById("containerNeplatite");
+        const plDiv = document.getElementById("containerPlatite");
+        neDiv.innerHTML = ""; plDiv.innerHTML = "";
+        let total = 0;
 
-    facturi.forEach((f, index) => {
-        const html = `
-            <div class="item-card">
-                <div class="controls">
-                    <div class="btn-ctrl" style="color:var(--danger)" onclick="stergeFactura(${index})">✕</div>
-                    <div class="btn-ctrl" style="color:var(--primary)" onclick="pregatesteEditare(${index})">✏️</div>
-                </div>
-                <div class="item-name-text">${f.nume}</div>
-                <div style="background:#f1f5f9; border-radius:8px; display:flex; align-items:center; padding:0 5px;">
-                    <input type="number" style="width:100%; border:none; background:transparent; padding:6px; text-align:center; font-weight:700; font-size:12px;" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
-                    <span style="font-size:10px; font-weight:bold; color:#64748b;">€</span>
-                </div>
-                <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
-            </div>`;
-        if(!f.status) neplatiteDiv.innerHTML += html;
-        else { platiteDiv.innerHTML += html; total += parseFloat(f.suma) || 0; }
-    });
-    document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
-    localStorage.setItem("facturi_final_v1", JSON.stringify(facturi));
-}
-
-function adaugaFactura(){
-    const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
-    if(!n.value.trim()) return;
-    if(editIndex > -1) {
-        facturi[editIndex].nume = n.value; facturi[editIndex].suma = parseFloat(s.value) || 0;
-        editIndex = -1; document.getElementById("addBtn").innerText = "+";
-    } else {
-        facturi.push({nume: n.value, suma: parseFloat(s.value)||0, status:false});
+        facturi.forEach((f, index) => {
+            const html = `
+                <div class="item-card">
+                    <div class="controls">
+                        <div class="btn-ctrl" onclick="stergeFactura(${index})">✕</div>
+                        <div class="btn-ctrl" onclick="pregatesteEditare(${index})">✏️</div>
+                    </div>
+                    <div class="item-name-text">${f.nume}</div>
+                    <div style="background:#f1f5f9; border-radius:8px; display:flex; align-items:center; padding:0 5px;">
+                        <input type="number" style="width:100%; border:none; background:transparent; padding:6px; text-align:center; font-weight:700;" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
+                        <span style="font-size:10px; font-weight:bold; color:#64748b;">€</span>
+                    </div>
+                    <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; cursor:pointer; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
+                </div>`;
+            if(!f.status) neDiv.innerHTML += html;
+            else { plDiv.innerHTML += html; total += parseFloat(f.suma) || 0; }
+        });
+        document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
+        localStorage.setItem("facturi_v5", JSON.stringify(facturi));
     }
-    n.value = ""; s.value = ""; render();
-}
 
-function updateSuma(index, val) { facturi[index].suma = parseFloat(val) || 0; render(); }
-function toggleStatus(index) { facturi[index].status = !facturi[index].status; render(); }
-function pregatesteEditare(index) {
-    editIndex = index;
-    document.getElementById("newFactura").value = facturi[index].nume;
-    document.getElementById("newSuma").value = facturi[index].suma;
-    document.getElementById("addBtn").innerText = "✓";
-}
-function stergeFactura(index) { facturi.splice(index, 1); render(); }
-function trimiteDate() {
-    Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
-    fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
-    .then(() => Swal.fire({ icon: 'success', title: 'Salvat!', timer: 1000 }));
-}
+    function adaugaFactura(){
+        const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
+        if(!n.value.trim()) return;
+        if(editIndex > -1) {
+            facturi[editIndex].nume = n.value; 
+            facturi[editIndex].suma = parseFloat(s.value) || 0;
+            editIndex = -1; 
+            document.getElementById("addBtn").innerText = "+";
+        } else {
+            // AICI ERA EROAREA: Am scos orice referință la dată adăugată numelui
+            facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status:false});
+        }
+        n.value = ""; s.value = ""; render();
+    }
+
+    function updateSuma(i, v) { facturi[i].suma = parseFloat(v) || 0; render(); }
+    function toggleStatus(i) { facturi[i].status = !facturi[i].status; render(); }
+    function pregatesteEditare(i) {
+        editIndex = i;
+        document.getElementById("newFactura").value = facturi[i].nume;
+        document.getElementById("newSuma").value = facturi[i].suma;
+        document.getElementById("addBtn").innerText = "✓";
+    }
+    function stergeFactura(i) { facturi.splice(i, 1); render(); }
+
+    function trimiteDate() {
+        Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
+        fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
+        .then(() => Swal.fire({ icon: 'success', title: 'Salvat în Cloud!', timer: 1000 }));
+    }
 </script>
 </body>
 </html>
