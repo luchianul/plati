@@ -54,7 +54,7 @@
 
     <div class="add-slim">
         <input type="text" id="newFactura" placeholder="Nume factură...">
-        <input type="number" id="newSuma" placeholder="Suma">
+        <input type="number" id="newSuma" placeholder="Suma (€)">
         <button id="addBtn" onclick="adaugaFactura()">+</button>
     </div>
 
@@ -66,7 +66,7 @@
 
     <div class="total-box">
         <span style="font-size:11px; opacity:0.8;">TOTAL ACHITAT</span>
-        <span id="totalSumaPlatita" style="color:var(--success); font-weight:800; font-size:18px;">0.00 RON</span>
+        <span id="totalSumaPlatita" style="color:var(--success); font-weight:800; font-size:18px;">0.00 €</span>
     </div>
 
     <button class="btn-sync" onclick="trimiteDate()">Sincronizează în Cloud</button>
@@ -91,16 +91,17 @@ window.onload = function() {
     document.getElementById('headerMonth').innerText = azi.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
     verificaResetLuna();
     render();
-    
-    // --- FUNCTIA DE REFRESH AUTOMAT ---
+    setupAutoRefresh();
+};
+
+function setupAutoRefresh() {
     setInterval(() => {
         const acum = new Date();
-        // Daca e ora 3:00 dimineata, da refresh la pagina
         if(acum.getHours() === 3 && acum.getMinutes() === 0) {
             location.reload(); 
         }
-    }, 60000); // Verifica in fiecare minut
-};
+    }, 60000); 
+}
 
 function salveaza() { localStorage.setItem("facturi_v3", JSON.stringify(facturi)); }
 
@@ -120,14 +121,17 @@ function render() {
                 <div class="item-name-text">
                     ${f.status ? (f.trimis ? '✅ ' : '☁️ ') : ''}${f.nume}
                 </div>
-                <input type="number" style="width:100%; border:none; background:#f1f5f9; padding:6px; border-radius:6px; text-align:center; font-size:12px; font-weight:700;" value="${f.suma}" onchange="updateSuma(${index}, this.value)" ${f.status ? 'disabled' : ''}>
+                <div style="display:flex; align-items:center; background:#f1f5f9; border-radius:6px; padding:0 4px;">
+                   <input type="number" style="width:100%; border:none; background:transparent; padding:6px; text-align:center; font-size:12px; font-weight:700;" value="${f.suma}" onchange="updateSuma(${index}, this.value)" ${f.status ? 'disabled' : ''}>
+                   <span style="font-size:10px; font-weight:bold; color:var(--text-muted); margin-right:2px;">€</span>
+                </div>
                 <button style="width:100%; padding:8px 0; border-radius:10px; border:1px solid #e2e8f0; font-size:10px; font-weight:800; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : 'var(--text-muted)'};" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
             </div>`;
         
         if(!f.status) neplatiteDiv.innerHTML += html;
         else { platiteDiv.innerHTML += html; total += f.suma; }
     });
-    document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " RON";
+    document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
 }
 
 function pregatesteEditare(index) {
