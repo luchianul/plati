@@ -2,7 +2,6 @@
 <html lang="ro">
 <head>
 <meta charset="UTF-8">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Management Plăți | VerTech</title>
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -52,6 +51,7 @@
     </div>
 
     <button class="btn-sync" onclick="trimiteDate()">Sincronizează TOT în Cloud</button>
+    <button onclick="localStorage.clear(); location.reload();" style="margin-top:20px; background:none; border:none; color:red; font-size:10px; cursor:pointer;">RESETEAZĂ MEMORIA LOCALĂ</button>
 </div>
 
 <script>
@@ -59,47 +59,26 @@ const scriptURL = "https://script.google.com/macros/s/AKfycbxkGwmuCHil-hXV9cw871
 let facturi = [];
 let editIndex = -1;
 
-const culoriLuni = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316", "#14b8a6", "#3b82f6", "#6366f1", "#d946ef"];
-
 async function incarcaDateDinCloud() {
     Swal.fire({ title: 'Sincronizare...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
         const response = await fetch(scriptURL + "?t=" + new Date().getTime());
         const dateCloud = await response.json();
-        // Ne asigurăm că datele din Cloud sunt curate
         facturi = (dateCloud && dateCloud.length > 0) ? dateCloud : [];
-        verificaResetLunar(); 
         render();
         Swal.close();
     } catch (e) {
-        facturi = JSON.parse(localStorage.getItem("facturi_v3")) || [];
-        verificaResetLunar();
+        facturi = JSON.parse(localStorage.getItem("facturi_final_v1")) || [];
         render();
-        Swal.fire('Info', 'Date încărcate local.', 'info');
+        Swal.fire('Info', 'Date locale', 'info');
     }
 }
 
-function verificaResetLunar() {
+window.onload = () => {
     const acum = new Date();
-    const ID_Luna = (acum.getMonth() + 1) + "-" + acum.getFullYear();
-    const ultimaLunaSincronizata = localStorage.getItem("last_month_id_v4");
-    
-    const pill = document.getElementById('headerMonth');
-    pill.innerText = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
-    pill.style.borderColor = culoriLuni[acum.getMonth()];
-    pill.style.color = culoriLuni[acum.getMonth()];
-
-    // Resetare automată pe data de 1
-    if (ultimaLunaSincronizata && ultimaLunaSincronizata !== ID_Luna) {
-        facturi.forEach(f => { f.status = false; }); 
-        localStorage.setItem("last_month_id_v4", ID_Luna);
-        trimiteDateSilentios();
-    } else if (!ultimaLunaSincronizata) {
-        localStorage.setItem("last_month_id_v4", ID_Luna);
-    }
-}
-
-window.onload = incarcaDateDinCloud;
+    document.getElementById('headerMonth').innerText = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+    incarcaDateDinCloud();
+};
 
 function render() {
     const neplatiteDiv = document.getElementById("containerNeplatite");
@@ -119,53 +98,40 @@ function render() {
                     <input type="number" style="width:100%; border:none; background:transparent; padding:6px; text-align:center; font-weight:700; font-size:12px;" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
                     <span style="font-size:10px; font-weight:bold; color:#64748b;">€</span>
                 </div>
-                <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; cursor:pointer; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
+                <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
             </div>`;
         if(!f.status) neplatiteDiv.innerHTML += html;
         else { platiteDiv.innerHTML += html; total += parseFloat(f.suma) || 0; }
     });
     document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
-    localStorage.setItem("facturi_v3", JSON.stringify(facturi));
+    localStorage.setItem("facturi_final_v1", JSON.stringify(facturi));
 }
-
-function updateSuma(index, val) { facturi[index].suma = parseFloat(val) || 0; render(); }
-function toggleStatus(index) { facturi[index].status = !facturi[index].status; render(); }
 
 function adaugaFactura(){
     const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
     if(!n.value.trim()) return;
     if(editIndex > -1) {
-        facturi[editIndex].nume = n.value; 
-        facturi[editIndex].suma = parseFloat(s.value) || 0;
-        editIndex = -1; 
-        document.getElementById("addBtn").innerText = "+";
+        facturi[editIndex].nume = n.value; facturi[editIndex].suma = parseFloat(s.value) || 0;
+        editIndex = -1; document.getElementById("addBtn").innerText = "+";
     } else {
         facturi.push({nume: n.value, suma: parseFloat(s.value)||0, status:false});
     }
     n.value = ""; s.value = ""; render();
 }
 
+function updateSuma(index, val) { facturi[index].suma = parseFloat(val) || 0; render(); }
+function toggleStatus(index) { facturi[index].status = !facturi[index].status; render(); }
 function pregatesteEditare(index) {
     editIndex = index;
     document.getElementById("newFactura").value = facturi[index].nume;
     document.getElementById("newSuma").value = facturi[index].suma;
     document.getElementById("addBtn").innerText = "✓";
 }
-
-function stergeFactura(index) {
-    Swal.fire({ title: 'Ștergi?', text: facturi[index].nume, icon: 'warning', showCancelButton: true }).then(r => {
-        if(r.isConfirmed) { facturi.splice(index, 1); render(); }
-    });
-}
-
+function stergeFactura(index) { facturi.splice(index, 1); render(); }
 function trimiteDate() {
-    Swal.fire({ title: 'Se salvează...', didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
     fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
-    .then(() => Swal.fire({ icon: 'success', title: 'Salvat în Cloud!', timer: 1500 }));
-}
-
-function trimiteDateSilentios() {
-    fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) });
+    .then(() => Swal.fire({ icon: 'success', title: 'Salvat!', timer: 1000 }));
 }
 </script>
 </body>
