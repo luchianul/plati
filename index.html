@@ -11,17 +11,18 @@
     :root { --primary: #4f46e5; --success: #10b981; --danger: #ef4444; --bg: #f1f5f9; }
     body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
     .main-wrapper { width: 100%; max-width: 450px; padding: 15px; }
-    .brand-card-header { background: white; padding: 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
-    .month-pill { display: inline-block; padding: 6px 15px; border-radius: 12px; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-top: 10px; border: 2px solid var(--primary); color: var(--primary); transition: all 0.3s; }
-    .add-slim { display: flex; gap: 8px; margin-bottom: 20px; }
-    .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; }
-    .add-slim button { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; }
+    .brand-card-header { background: white; padding: 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; width: 100%; }
+    .month-pill { display: inline-block; padding: 6px 15px; border-radius: 12px; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-top: 10px; border: 2px solid var(--primary); color: var(--primary); }
+    .add-slim { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
+    .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; font-size: 14px; }
+    .add-slim button { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; cursor: pointer; }
     .item-card { background: white; padding: 10px 12px; border-radius: 18px; margin-bottom: 8px; display: grid; grid-template-columns: auto 1fr 80px 75px; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     .controls { display: flex; gap: 4px; }
-    .btn-ctrl { background: #f8fafc; border: 1px solid #e2e8f0; width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; cursor: pointer; }
-    .total-box { margin-top: 20px; padding: 18px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; align-items: center; }
-    .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; }
-    h3 { font-size: 11px; text-transform: uppercase; color: #64748b; margin: 15px 0 10px 5px; }
+    .btn-ctrl { background: #f8fafc; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
+    .item-name-text { font-weight: 600; font-size: 13px; color: #0f172a; }
+    .total-box { margin-top: 20px; padding: 20px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; align-items: center; width: 100%; }
+    .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 16px; }
+    h3 { font-size: 11px; text-transform: uppercase; color: #64748b; margin: 15px 0 10px 5px; align-self: flex-start; }
 </style>
 </head>
 <body>
@@ -40,14 +41,14 @@
     </div>
 
     <h3>De achitat acum</h3>
-    <div id="containerNeplatite"></div>
+    <div id="containerNeplatite" style="width:100%"></div>
 
     <h3>Istoric Lună Curentă</h3>
-    <div id="containerPlatite"></div>
+    <div id="containerPlatite" style="width:100%"></div>
 
     <div class="total-box">
-        <span style="font-size:11px; opacity:0.8;">TOTAL ACHITAT</span>
-        <span id="totalSumaPlatita" style="color:var(--success); font-weight:800; font-size:18px;">0.00 €</span>
+        <span style="font-size:12px; font-weight:700; opacity:0.8;">TOTAL ACHITAT</span>
+        <span id="totalSumaPlatita" style="color:var(--success); font-weight:800; font-size:20px;">0.00 €</span>
     </div>
 
     <button class="btn-sync" onclick="trimiteDate()">Sincronizează TOT în Cloud</button>
@@ -61,7 +62,7 @@ let editIndex = -1;
 const culoriLuni = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#f97316", "#14b8a6", "#3b82f6", "#6366f1", "#d946ef"];
 
 async function incarcaDateDinCloud() {
-    Swal.fire({ title: 'Se conectează...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    Swal.fire({ title: 'Sincronizare...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
         const response = await fetch(scriptURL + "?t=" + new Date().getTime());
         const dateCloud = await response.json();
@@ -73,7 +74,7 @@ async function incarcaDateDinCloud() {
         facturi = JSON.parse(localStorage.getItem("facturi_v3")) || [];
         verificaResetLunar();
         render();
-        Swal.fire('Atenție', 'Mod Offline: Se folosesc datele locale.', 'warning');
+        Swal.fire('Info', 'Date încărcate local.', 'info');
     }
 }
 
@@ -82,18 +83,15 @@ function verificaResetLunar() {
     const ID_Luna = acum.getMonth() + "-" + acum.getFullYear();
     const ultimaLunaSincronizata = localStorage.getItem("last_month_id");
     
-    // SCHIMBARE CULOARE HEADER
     const pill = document.getElementById('headerMonth');
     pill.innerText = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
     pill.style.borderColor = culoriLuni[acum.getMonth()];
     pill.style.color = culoriLuni[acum.getMonth()];
 
-    // LOGICA DE RESET PE DATA DE 1 (sau când se schimbă luna)
     if (ultimaLunaSincronizata && ultimaLunaSincronizata !== ID_Luna) {
-        facturi.forEach(f => { f.status = false; }); // Toate devin "neplătite"
+        facturi.forEach(f => { f.status = false; }); 
         localStorage.setItem("last_month_id", ID_Luna);
-        // Salvăm automat starea resetată în Cloud
-        fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) });
+        trimiteDateSilentios();
     } else if (!ultimaLunaSincronizata) {
         localStorage.setItem("last_month_id", ID_Luna);
     }
@@ -119,7 +117,7 @@ function render() {
                     <input type="number" style="width:100%; border:none; background:transparent; padding:6px; text-align:center; font-weight:700; font-size:12px;" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
                     <span style="font-size:10px; font-weight:bold; color:#64748b;">€</span>
                 </div>
-                <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
+                <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; cursor:pointer; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
             </div>`;
         if(!f.status) neplatiteDiv.innerHTML += html;
         else { platiteDiv.innerHTML += html; total += parseFloat(f.suma) || 0; }
@@ -128,8 +126,8 @@ function render() {
     localStorage.setItem("facturi_v3", JSON.stringify(facturi));
 }
 
-function toggleStatus(index) { facturi[index].status = !facturi[index].status; render(); }
 function updateSuma(index, val) { facturi[index].suma = parseFloat(val) || 0; render(); }
+function toggleStatus(index) { facturi[index].status = !facturi[index].status; render(); }
 
 function adaugaFactura(){
     const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
@@ -148,7 +146,6 @@ function pregatesteEditare(index) {
     document.getElementById("newFactura").value = facturi[index].nume;
     document.getElementById("newSuma").value = facturi[index].suma;
     document.getElementById("addBtn").innerText = "✓";
-    window.scrollTo({top: 0, behavior: 'smooth'});
 }
 
 function stergeFactura(index) {
@@ -160,7 +157,11 @@ function stergeFactura(index) {
 function trimiteDate() {
     Swal.fire({ title: 'Se salvează...', didOpen: () => Swal.showLoading() });
     fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
-    .then(() => Swal.fire({ icon: 'success', title: 'Sincronizat cu succes!', timer: 1500 }));
+    .then(() => Swal.fire({ icon: 'success', title: 'Salvat în Cloud!', timer: 1500 }));
+}
+
+function trimiteDateSilentios() {
+    fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) });
 }
 </script>
 </body>
