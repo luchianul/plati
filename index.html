@@ -78,7 +78,6 @@
 </div>
 
 <script>
-// Păstrăm logica ta intactă
 const scriptURL = "https://script.google.com/macros/s/AKfycbz4ej8crC23AS2kHADjLtLEaF-DuQE8cO9Xc9n78L1z8wYGHkBx441k9UJdJwjEATLdtQ/exec";
 let facturi = JSON.parse(localStorage.getItem("facturi_v3")) || [
     {nume:"Energie Electrică", suma: 0, status:false, trimis: false},
@@ -92,6 +91,15 @@ window.onload = function() {
     document.getElementById('headerMonth').innerText = azi.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
     verificaResetLuna();
     render();
+    
+    // --- FUNCTIA DE REFRESH AUTOMAT ---
+    setInterval(() => {
+        const acum = new Date();
+        // Daca e ora 3:00 dimineata, da refresh la pagina
+        if(acum.getHours() === 3 && acum.getMinutes() === 0) {
+            location.reload(); 
+        }
+    }, 60000); // Verifica in fiecare minut
 };
 
 function salveaza() { localStorage.setItem("facturi_v3", JSON.stringify(facturi)); }
