@@ -12,18 +12,19 @@
     .main-wrapper { width: 100%; max-width: 450px; padding: 15px; }
     .brand-card-header { background: white; padding: 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; }
     .add-slim { display: flex; gap: 8px; margin-bottom: 20px; }
-    .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; }
-    .add-slim button { background: var(--primary); color: white; border: none; width: 45px; border-radius: 12px; font-size: 20px; }
-    .item-card { background: white; padding: 10px; border-radius: 18px; margin-bottom: 8px; display: grid; grid-template-columns: auto 1fr 60px 75px; align-items: center; gap: 8px; }
-    .total-box { margin-top: 20px; padding: 18px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; }
-    .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; }
+    .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; font-size: 14px; }
+    .add-slim button { background: var(--primary); color: white; border: none; width: 45px; border-radius: 12px; font-size: 20px; cursor: pointer; }
+    .item-card { background: white; padding: 12px; border-radius: 18px; margin-bottom: 8px; display: grid; grid-template-columns: 30px 1fr 60px 80px; align-items: center; gap: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    .total-box { margin-top: 20px; padding: 18px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; font-weight: bold; }
+    .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 16px; }
+    h3 { font-size: 12px; color: #64748b; text-transform: uppercase; margin-left: 5px; }
 </style>
 </head>
 <body>
 
 <div class="main-wrapper">
     <div class="brand-card-header">
-        <h1>Management Plăți</h1>
+        <h1 style="margin:0; font-size: 22px;">Management Plăți</h1>
         <div style="font-family:'Caveat'; color:var(--primary); font-size:20px;">powered by VerTech</div>
     </div>
 
@@ -33,7 +34,9 @@
         <button onclick="adaugaFactura()">+</button>
     </div>
 
+    <h3>De achitat</h3>
     <div id="containerNeplatite"></div>
+    <h3>Achitate</h3>
     <div id="containerPlatite"></div>
 
     <div class="total-box">
@@ -41,32 +44,38 @@
         <span id="totalSumaPlatita">0.00 €</span>
     </div>
 
-    <button class="btn-sync" onclick="trimiteDate()">Sincronizează în Cloud</button>
+    <button class="btn-sync" onclick="trimiteDate()">Sincronizează TOT în Cloud</button>
 </div>
 
 <script>
-// Pune aici noul link de la Deployment-ul tau!
-const scriptURL = "https://script.google.com/macros/s/AKfycbx0wgue3sE9Fhux1SG6RYBDLb3XWdukeg7PdOjfCxQ57IFCZfdfrRXVP9j_E-9MGUoRmw/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbxkGwmuCHil-hXV9cw8710PS-tOhsiRNsXkc7kSN1rWcyAIxHaZBQeB8g01VYEACi7c2w/exec";
 
-let facturi = JSON.parse(localStorage.getItem("facturi_v3")) || [];
+let facturi = [];
 
 async function incarcaDateDinCloud() {
+    Swal.fire({ title: 'Sincronizare Cloud...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
     try {
-        const response = await fetch(scriptURL);
+        const response = await fetch(scriptURL + "?t=" + new Date().getTime());
         const dateCloud = await response.json();
-        // Aici am putea integra datele din cloud direct in lista
-        console.log("Date primite din Cloud:", dateCloud);
-    } catch (e) { console.log("Eroare la incarcare cloud"); }
+        if(dateCloud && dateCloud.length > 0) {
+            facturi = dateCloud;
+            render();
+            Swal.close();
+        } else {
+            Swal.fire('Info', 'Cloud-ul este gol.', 'info');
+        }
+    } catch (e) {
+        Swal.fire('Eroare', 'Nu am putut prelua datele din Cloud.', 'error');
+    }
 }
 
-window.onload = function() {
-    incarcaDateDinCloud();
-    render();
-    setInterval(() => {
-        const acum = new Date();
-        if(acum.getHours() === 3 && acum.getMinutes() === 0) location.reload();
-    }, 60000);
-};
+window.onload = incarcaDateDinCloud;
+
+// Auto-refresh la ora 03:00 dimineața
+setInterval(() => {
+    const acum = new Date();
+    if(acum.getHours() === 3 && acum.getMinutes() === 0) location.reload();
+}, 60000);
 
 function render() {
     const neplatiteDiv = document.getElementById("containerNeplatite");
@@ -77,10 +86,10 @@ function render() {
     facturi.forEach((f, index) => {
         const html = `
             <div class="item-card">
-                <button onclick="stergeFactura(${index})">✕</button>
-                <div style="font-weight:600;">${f.nume}</div>
-                <div style="text-align:right;">${f.suma} €</div>
-                <button style="background:${f.status?'var(--success)':'#eee'}" onclick="toggleStatus(${index})">${f.status?'OK':'ACHITĂ'}</button>
+                <span onclick="stergeFactura(${index})" style="color:red; cursor:pointer; font-weight:bold;">✕</span>
+                <div style="font-weight:600; font-size:14px;">${f.nume}</div>
+                <div style="text-align:right; font-weight:bold;">${f.suma}€</div>
+                <button style="border:none; border-radius:10px; padding:8px; color:white; font-size:10px; font-weight:bold; background:${f.status?'var(--success)':'var(--primary)'}" onclick="toggleStatus(${index})">${f.status?'ACHITAT':'ACHITĂ'}</button>
             </div>`;
         if(!f.status) neplatiteDiv.innerHTML += html;
         else { platiteDiv.innerHTML += html; total += f.suma; }
@@ -93,20 +102,25 @@ function adaugaFactura(){
     if(!n.value) return;
     facturi.push({nume: n.value, suma: parseFloat(s.value)||0, status:false});
     n.value = ""; s.value = "";
-    localStorage.setItem("facturi_v3", JSON.stringify(facturi));
     render();
 }
 
 function toggleStatus(index) {
     facturi[index].status = !facturi[index].status;
-    localStorage.setItem("facturi_v3", JSON.stringify(facturi));
+    render();
+}
+
+function stergeFactura(index) {
+    facturi.splice(index, 1);
     render();
 }
 
 function trimiteDate() {
-    const deTrimis = facturi.filter(f => f.status);
-    fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(deTrimis) })
-    .then(() => Swal.fire('Succes', 'Sincronizat!', 'success'));
+    Swal.fire({ title: 'Se salvează...', didOpen: () => Swal.showLoading() });
+    fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
+    .then(() => {
+        Swal.fire({ icon: 'success', title: 'Salvat în Cloud!', timer: 1500 });
+    });
 }
 </script>
 </body>
