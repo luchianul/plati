@@ -4,58 +4,236 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Management Plăți | VerTech</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --primary: #4f46e5; --success: #10b981; --danger: #ef4444; --bg: #f1f5f9; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; }
-        .main-wrapper { width: 100%; max-width: 450px; padding: 15px; }
-        .brand-card-header { background: white; padding: 20px; border-radius: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.05); margin-bottom: 20px; width: 100%; }
-        .month-pill { display: inline-block; padding: 6px 15px; border-radius: 12px; font-size: 11px; text-transform: uppercase; font-weight: 800; margin-top: 10px; border: 2px solid var(--primary); color: var(--primary); }
-        .add-slim { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
-        .add-slim input { background: white; border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; flex: 1; outline: none; font-size: 14px; }
-        .add-slim button { background: var(--primary); color: white; border: none; width: 45px; height: 45px; border-radius: 12px; font-size: 20px; cursor: pointer; }
-        .item-card { background: white; padding: 10px 12px; border-radius: 18px; margin-bottom: 8px; display: grid; grid-template-columns: auto 1fr 90px 80px; align-items: center; gap: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        :root { 
+            --primary: #5865f2; 
+            --bg-gradient: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #2d3436;
+            --soft-shadow: 0 10px 25px rgba(0,0,0,0.07);
+            --accent-purple: #a29bfe;
+            --mint: #00d2d3;
+        }
+
+        body { 
+            margin: 0; 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg-gradient); 
+            min-height: 100vh;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        .main-wrapper { 
+            width: 100%; 
+            max-width: 450px; 
+            padding: 15px; 
+            box-sizing: border-box; 
+        }
+
+        /* Header Optimizat Mobil */
+        .brand-card-header { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 28px; 
+            text-align: center; 
+            box-shadow: var(--soft-shadow); 
+            margin-bottom: 20px;
+        }
+
+        .month-pill { 
+            display: inline-block; 
+            padding: 6px 16px; 
+            border-radius: 12px; 
+            font-size: 11px; 
+            text-transform: uppercase; 
+            font-weight: 800; 
+            margin-top: 10px; 
+            border: 2px solid var(--mint);
+            color: var(--mint);
+            background: rgba(0, 210, 211, 0.05);
+        }
+
+        /* Formular Adaugare Adaptat */
+        .add-slim { 
+            display: flex; 
+            gap: 8px; 
+            margin-bottom: 25px; 
+        }
+        .add-slim input { 
+            background: white; 
+            border: none; 
+            padding: 12px; 
+            border-radius: 15px; 
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03), 0 4px 10px rgba(0,0,0,0.02);
+            font-size: 14px;
+            outline: none;
+            min-width: 0; /* Important pentru flex pe mobil */
+        }
+        #newFactura { flex: 2; }
+        #newSuma { flex: 1; }
+        
+        .add-slim button { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            width: 50px; 
+            height: 50px;
+            border-radius: 15px; 
+            font-size: 22px; 
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.35);
+            flex-shrink: 0;
+        }
+
+        /* Carduri Facturi Optimizate pentru Ecrane mici */
+        .item-card { 
+            background: white; 
+            padding: 12px; 
+            border-radius: 20px; 
+            margin-bottom: 10px; 
+            display: grid; 
+            grid-template-columns: auto 1fr 75px 80px; 
+            align-items: center; 
+            gap: 10px; 
+            box-shadow: var(--soft-shadow);
+        }
+
         .controls { display: flex; gap: 4px; }
-        .btn-ctrl { background: #f8fafc; border: 1px solid #e2e8f0; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; }
-        .item-name-text { font-weight: 600; font-size: 13px; color: #0f172a; word-break: break-word; }
-        .total-box { margin-top: 20px; padding: 20px; background: #0f172a; border-radius: 20px; display: flex; justify-content: space-between; color: white; align-items: center; width: 100%; }
-        .btn-sync { width: 100%; margin-top: 20px; padding: 15px; background: #5850ec; color: white; border: none; border-radius: 15px; font-weight: 700; cursor: pointer; font-size: 16px; }
-        h3 { font-size: 11px; text-transform: uppercase; color: #64748b; margin: 15px 0 10px 5px; align-self: flex-start; }
+        .btn-ctrl { 
+            background: #fdfdfd; 
+            border: 1px solid #f1f2f6; 
+            width: 32px; height: 32px; 
+            border-radius: 10px; 
+            display: flex; align-items: center; justify-content: center; 
+            font-size: 14px;
+        }
+
+        .item-name-text { 
+            font-weight: 700; 
+            font-size: 13px; 
+            color: #444; 
+            word-break: break-word;
+            line-height: 1.2;
+        }
+
+        .sum-input-wrapper {
+            background: #f8f9fa; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 5px;
+        }
+        .sum-input-wrapper input {
+            width: 100%; 
+            border: none; 
+            background: transparent; 
+            padding: 6px 2px; 
+            text-align: center; 
+            font-weight: 800; 
+            color: #2d3436;
+            font-size: 13px;
+        }
+
+        .btn-pay {
+            width: 100%; 
+            padding: 10px 0; 
+            border-radius: 12px; 
+            border: none; 
+            font-size: 10px; 
+            font-weight: 800; 
+            text-transform: uppercase;
+        }
+        .unpaid { background: white; color: #b2bec3; border: 1px solid #eee; }
+        .paid { background: var(--primary); color: white; box-shadow: 0 3px 8px rgba(88, 101, 242, 0.25); }
+
+        /* Total & Sync */
+        .total-box { 
+            margin-top: 25px; 
+            padding: 18px; 
+            background: #1a1c23; 
+            border-radius: 24px; 
+            display: flex; 
+            justify-content: space-between; 
+            color: white; 
+            align-items: center; 
+        }
+
+        .btn-sync { 
+            width: 100%; 
+            margin-top: 15px; 
+            padding: 16px; 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 18px; 
+            font-weight: 800; 
+            font-size: 15px; 
+            box-shadow: 0 6px 15px rgba(88, 101, 242, 0.3);
+        }
+
+        .btn-reset {
+            margin-top: 40px;
+            margin-bottom: 20px;
+            background: none;
+            border: none;
+            color: #ff7675;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            width: 100%;
+            opacity: 0.6;
+        }
+
+        h3 { font-size: 11px; text-transform: uppercase; color: #7f8c8d; letter-spacing: 1px; margin: 20px 0 12px 8px; align-self: flex-start; }
+
+        /* Ajustări specifice pentru ecrane foarte mici */
+        @media (max-width: 360px) {
+            .item-card { grid-template-columns: auto 1fr 65px 70px; gap: 6px; padding: 10px; }
+            .item-name-text { font-size: 12px; }
+            .btn-pay { font-size: 9px; }
+        }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
     <div class="brand-card-header">
-        <h1 style="margin:0; font-size: 24px;">Management Plăți</h1>
-        <div style="font-family:'Caveat'; color:var(--primary); font-size:20px;">powered by VerTech</div>
+        <h1 style="margin:0; font-size: 24px; font-weight: 800;">Management Plăți</h1>
+        <div style="font-family:'Caveat'; color:var(--accent-purple); font-size:20px; margin-top:2px;">powered by VerTech</div>
         <span id="headerMonth" class="month-pill">--</span>
     </div>
 
     <div class="add-slim">
-        <input type="text" id="newFactura" placeholder="Nume factură...">
+        <input type="text" id="newFactura" placeholder="Factură...">
         <input type="number" id="newSuma" placeholder="€">
         <button id="addBtn" onclick="adaugaFactura()">+</button>
     </div>
 
     <h3>De achitat acum</h3>
-    <div id="containerNeplatite" style="width:100%"></div>
+    <div id="containerNeplatite"></div>
 
     <h3>Istoric Lună Curentă</h3>
-    <div id="containerPlatite" style="width:100%"></div>
+    <div id="containerPlatite"></div>
 
     <div class="total-box">
-        <span style="font-size:12px; font-weight:700; opacity:0.8;">TOTAL ACHITAT</span>
-        <span id="totalSumaPlatita" style="color:var(--success); font-weight:800; font-size:20px;">0.00 €</span>
+        <span style="font-size:11px; font-weight:800; opacity:0.5;">TOTAL ACHITAT</span>
+        <span id="totalSumaPlatita" style="color:var(--mint); font-weight:900; font-size:22px;">0.00 €</span>
     </div>
 
-    <button class="btn-sync" onclick="trimiteDate()">Sincronizează TOT în Cloud</button>
-    <button onclick="localStorage.clear(); location.reload();" style="margin-top:30px; background:none; border:none; color:red; font-size:10px; opacity:0.5; cursor:pointer; width:100%;">Golește Memoria Locală (Reset)</button>
+    <button class="btn-sync" onclick="trimiteDate()">Sincronizează în Cloud</button>
+    
+    <button class="btn-reset" onclick="resetareLocala()">Resetare Memorie Locală</button>
 </div>
 
 <script>
-    // URL-ul tău de Google Script
     const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec"; 
     let facturi = [];
     let editIndex = -1;
@@ -65,14 +243,13 @@
         try {
             const response = await fetch(scriptURL + "?t=" + new Date().getTime());
             const dateCloud = await response.json();
-            // Preluăm DOAR dacă avem date valide
             facturi = Array.isArray(dateCloud) ? dateCloud : [];
             render();
             Swal.close();
         } catch (e) {
-            facturi = JSON.parse(localStorage.getItem("facturi_v5")) || [];
+            facturi = JSON.parse(localStorage.getItem("facturi_v7")) || [];
             render();
-            Swal.fire('Info', 'Mod Local activat', 'info');
+            Swal.fire({ icon: 'info', title: 'Mod Local', timer: 1000, showConfirmButton: false });
         }
     }
 
@@ -92,33 +269,32 @@
             const html = `
                 <div class="item-card">
                     <div class="controls">
-                        <div class="btn-ctrl" onclick="stergeFactura(${index})">✕</div>
-                        <div class="btn-ctrl" onclick="pregatesteEditare(${index})">✏️</div>
+                        <div class="btn-ctrl" onclick="stergeFactura(${index})" style="color:#ff7675">✕</div>
+                        <div class="btn-ctrl" onclick="pregatesteEditare(${index})" style="color:#fab1a0">✏️</div>
                     </div>
                     <div class="item-name-text">${f.nume}</div>
-                    <div style="background:#f1f5f9; border-radius:8px; display:flex; align-items:center; padding:0 5px;">
-                        <input type="number" style="width:100%; border:none; background:transparent; padding:6px; text-align:center; font-weight:700;" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
-                        <span style="font-size:10px; font-weight:bold; color:#64748b;">€</span>
+                    <div class="sum-input-wrapper">
+                        <input type="number" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
+                        <span style="font-size:9px; font-weight:900; color:#b2bec3;">€</span>
                     </div>
-                    <button style="width:100%; padding:10px 0; border-radius:12px; border:none; font-size:10px; font-weight:800; cursor:pointer; background:${f.status ? 'var(--success)' : 'white'}; color:${f.status ? 'white' : '#64748b'}; border:${f.status?'none':'1px solid #e2e8f0'}" onclick="toggleStatus(${index})">${f.status ? 'OK' : 'ACHITĂ'}</button>
+                    <button class="btn-pay ${f.status ? 'paid' : 'unpaid'}" onclick="toggleStatus(${index})">
+                        ${f.status ? '✓ OK' : 'ACHITĂ'}
+                    </button>
                 </div>`;
             if(!f.status) neDiv.innerHTML += html;
             else { plDiv.innerHTML += html; total += parseFloat(f.suma) || 0; }
         });
         document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
-        localStorage.setItem("facturi_v5", JSON.stringify(facturi));
+        localStorage.setItem("facturi_v7", JSON.stringify(facturi));
     }
 
     function adaugaFactura(){
         const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
         if(!n.value.trim()) return;
         if(editIndex > -1) {
-            facturi[editIndex].nume = n.value; 
-            facturi[editIndex].suma = parseFloat(s.value) || 0;
-            editIndex = -1; 
-            document.getElementById("addBtn").innerText = "+";
+            facturi[editIndex].nume = n.value; facturi[editIndex].suma = parseFloat(s.value) || 0;
+            editIndex = -1; document.getElementById("addBtn").innerText = "+";
         } else {
-            // AICI ERA EROAREA: Am scos orice referință la dată adăugată numelui
             facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status:false});
         }
         n.value = ""; s.value = ""; render();
@@ -131,13 +307,45 @@
         document.getElementById("newFactura").value = facturi[i].nume;
         document.getElementById("newSuma").value = facturi[i].suma;
         document.getElementById("addBtn").innerText = "✓";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    function stergeFactura(i) { facturi.splice(i, 1); render(); }
+
+    function stergeFactura(i) { 
+        Swal.fire({
+            title: 'Ștergi factura?',
+            text: facturi[i].nume,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#5865f2',
+            cancelButtonColor: '#ff7675',
+            confirmButtonText: 'Da',
+            cancelButtonText: 'Nu'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                facturi.splice(i, 1); render();
+            }
+        });
+    }
+
+    function resetareLocala() {
+        Swal.fire({
+            title: 'Resetezi tot?',
+            text: "Vei șterge memoria locală a aplicației!",
+            icon: 'danger',
+            showCancelButton: true,
+            confirmButtonText: 'Resetare'
+        }).then((r) => {
+            if(r.isConfirmed) {
+                localStorage.clear();
+                location.reload();
+            }
+        });
+    }
 
     function trimiteDate() {
         Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
         fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
-        .then(() => Swal.fire({ icon: 'success', title: 'Salvat în Cloud!', timer: 1000 }));
+        .then(() => Swal.fire({ icon: 'success', title: 'Salvat!', timer: 1000, showConfirmButton: false }));
     }
 </script>
 </body>
