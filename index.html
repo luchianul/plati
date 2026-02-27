@@ -8,12 +8,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { 
-            --primary-vibrant: #5865f2; 
-            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            --text-main: #2d3436;
-            --mint: #00d2d3;
-            --accent-purple: #a29bfe;
-        }
+    /* Am definit noul gradient: pleacă de jos (bottom) cu mov și urcă spre alb */
+    --bg-gradient: linear-gradient(to top, #a29bfe 0%, #f8faff 100%);
+    --primary-vibrant: #5865f2; 
+    --text-main: #2d3436;
+    --mint: #00d2d3;
+    --accent-purple: #6c5ce7;
+}
 
         .frost-panel {
             background: rgba(255, 255, 255, 0.45);
@@ -24,11 +25,20 @@
         }
 
         body { 
-            margin: 0; font-family: 'Inter', sans-serif; 
-            background: var(--bg-gradient); min-height: 100vh;
-            display: flex; flex-direction: column; align-items: center; 
-            color: var(--text-main); padding: 15px; box-sizing: border-box;
-        }
+    margin: 0; 
+    font-family: 'Inter', sans-serif; 
+    /* Folosim noul gradient */
+    background: var(--bg-gradient); 
+    /* Fixăm fundalul pentru a nu se repeta când dai scroll pe mobil */
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex; 
+    flex-direction: column; 
+    align-items: center; 
+    color: var(--text-main); 
+    padding: 15px; 
+    box-sizing: border-box;
+}
 
         .main-wrapper { width: 100%; max-width: 450px; }
 
