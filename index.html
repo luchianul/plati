@@ -3,305 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Management Plăți | VerTech</title>
+    <title>Management Plăți | Gabriel</title>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { 
-            --primary: #5865f2; 
-            --bg-gradient: linear-gradient(135deg, #cfd9df 0%, #e2ebf0 100%);
-            --card-bg: rgba(255, 255, 255, 0.9);
+            --primary-vibrant: #5865f2; 
+            --bg-gradient: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
             --text-main: #2d3436;
-            --soft-shadow: 0 10px 25px rgba(0,0,0,0.07);
-            --accent-purple: #a29bfe;
             --mint: #00d2d3;
+            --accent-purple: #a29bfe;
+        }
+
+        .frost-panel {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
         }
 
         body { 
-            margin: 0; 
-            font-family: 'Inter', sans-serif; 
-            background: var(--bg-gradient); 
-            min-height: 100vh;
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            color: var(--text-main);
-            overflow-x: hidden;
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background: var(--bg-gradient); min-height: 100vh;
+            display: flex; flex-direction: column; align-items: center; 
+            color: var(--text-main); padding: 15px; box-sizing: border-box;
         }
 
-        .main-wrapper { 
-            width: 100%; 
-            max-width: 450px; 
-            padding: 15px; 
-            box-sizing: border-box; 
-        }
+        .main-wrapper { width: 100%; max-width: 450px; }
 
-        /* Header Optimizat Mobil */
+        /* Header adaptiv mobil */
+        .mike-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; width: 100%;
+        }
+        .welcome-text { font-size: 13px; font-weight: 700; color: rgba(0,0,0,0.5); }
+
         .brand-card-header { 
-            background: white; 
-            padding: 20px; 
-            border-radius: 28px; 
-            text-align: center; 
-            box-shadow: var(--soft-shadow); 
-            margin-bottom: 20px;
+            padding: 20px; border-radius: 30px; text-align: center; margin-bottom: 20px;
+        }
+        
+        .app-icon-dynamic {
+            width: 55px; height: 55px; background: white; border-radius: 18px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 28px; font-weight: 900; color: var(--primary-vibrant);
+            margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            text-transform: uppercase;
         }
 
-        .month-pill { 
-            display: inline-block; 
-            padding: 6px 16px; 
-            border-radius: 12px; 
-            font-size: 11px; 
-            text-transform: uppercase; 
-            font-weight: 800; 
-            margin-top: 10px; 
-            border: 2px solid var(--mint);
-            color: var(--mint);
-            background: rgba(0, 210, 211, 0.05);
-        }
-
-        /* Formular Adaugare Adaptat */
-        .add-slim { 
-            display: flex; 
-            gap: 8px; 
-            margin-bottom: 25px; 
-        }
+        /* Formular Add corectat pentru ecrane mici */
+        .add-slim { display: flex; gap: 8px; margin-bottom: 25px; width: 100%; }
         .add-slim input { 
-            background: white; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 15px; 
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.03), 0 4px 10px rgba(0,0,0,0.02);
-            font-size: 14px;
-            outline: none;
-            min-width: 0; /* Important pentru flex pe mobil */
+            background: white; border: none; padding: 12px; 
+            border-radius: 15px; font-size: 14px; outline: none; min-width: 0;
         }
         #newFactura { flex: 2; }
         #newSuma { flex: 1; }
-        
         .add-slim button { 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            width: 50px; 
-            height: 50px;
-            border-radius: 15px; 
-            font-size: 22px; 
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.35);
-            flex-shrink: 0;
+            background: var(--primary-vibrant); color: white; border: none; 
+            width: 50px; height: 50px; border-radius: 15px; font-size: 22px; 
+            flex-shrink: 0; cursor: pointer;
         }
 
-        /* Carduri Facturi Optimizate pentru Ecrane mici */
+        /* Carduri facturi compacte */
         .item-card { 
-            background: white; 
-            padding: 12px; 
-            border-radius: 20px; 
-            margin-bottom: 10px; 
-            display: grid; 
-            grid-template-columns: auto 1fr 75px 80px; 
-            align-items: center; 
-            gap: 10px; 
-            box-shadow: var(--soft-shadow);
+            padding: 12px; border-radius: 20px; margin-bottom: 10px; 
+            display: grid; grid-template-columns: auto 1fr 65px 75px; 
+            align-items: center; gap: 8px; 
         }
 
         .controls { display: flex; gap: 4px; }
         .btn-ctrl { 
-            background: #fdfdfd; 
-            border: 1px solid #f1f2f6; 
-            width: 32px; height: 32px; 
-            border-radius: 10px; 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 14px;
+            background: white; border: 1px solid rgba(0,0,0,0.05); 
+            width: 30px; height: 30px; border-radius: 8px; 
+            display: flex; align-items: center; justify-content: center; font-size: 13px;
         }
+        .item-name-text { font-weight: 700; font-size: 13px; line-height: 1.2; word-break: break-word; }
 
-        .item-name-text { 
-            font-weight: 700; 
-            font-size: 13px; 
-            color: #444; 
-            word-break: break-word;
-            line-height: 1.2;
-        }
-
-        .sum-input-wrapper {
-            background: #f8f9fa; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            padding: 0 5px;
-        }
-        .sum-input-wrapper input {
-            width: 100%; 
-            border: none; 
-            background: transparent; 
-            padding: 6px 2px; 
-            text-align: center; 
-            font-weight: 800; 
-            color: #2d3436;
-            font-size: 13px;
-        }
-
-        .btn-pay {
-            width: 100%; 
-            padding: 10px 0; 
-            border-radius: 12px; 
-            border: none; 
-            font-size: 10px; 
-            font-weight: 800; 
-            text-transform: uppercase;
-        }
-        .unpaid { background: white; color: #b2bec3; border: 1px solid #eee; }
-        .paid { background: var(--primary); color: white; box-shadow: 0 3px 8px rgba(88, 101, 242, 0.25); }
-
-        /* Total & Sync */
-        .total-box { 
-            margin-top: 25px; 
-            padding: 18px; 
-            background: #1a1c23; 
-            border-radius: 24px; 
-            display: flex; 
-            justify-content: space-between; 
-            color: white; 
-            align-items: center; 
-        }
+        .summary-pan { border-radius: 25px; padding: 18px; margin-top: 20px; }
+        .score-num { font-weight: 900; font-size: 26px; color: #d4e157; letter-spacing: -1px; }
 
         .btn-sync { 
-            width: 100%; 
-            margin-top: 15px; 
-            padding: 16px; 
-            background: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 18px; 
-            font-weight: 800; 
-            font-size: 15px; 
-            box-shadow: 0 6px 15px rgba(88, 101, 242, 0.3);
+            width: 100%; padding: 16px; margin-top: 15px; 
+            background: rgba(88, 101, 242, 0.6); backdrop-filter: blur(10px); 
+            border: 1px solid rgba(255, 255, 255, 0.2); color: white; 
+            border-radius: 18px; font-weight: 800; text-transform: uppercase; 
         }
+        
+        .btn-reset { margin-top: 30px; background: none; border: none; color: #ff7675; font-size: 10px; font-weight: 800; opacity: 0.6; width: 100%; }
 
-        .btn-reset {
-            margin-top: 40px;
-            margin-bottom: 20px;
-            background: none;
-            border: none;
-            color: #ff7675;
-            font-size: 10px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            width: 100%;
-            opacity: 0.6;
-        }
-
-        h3 { font-size: 11px; text-transform: uppercase; color: #7f8c8d; letter-spacing: 1px; margin: 20px 0 12px 8px; align-self: flex-start; }
-
-        /* Ajustări specifice pentru ecrane foarte mici */
-        @media (max-width: 360px) {
-            .item-card { grid-template-columns: auto 1fr 65px 70px; gap: 6px; padding: 10px; }
-            .item-name-text { font-size: 12px; }
-            .btn-pay { font-size: 9px; }
-        }
+        h3 { font-size: 10px; text-transform: uppercase; color: #7f8c8d; margin: 15px 0 8px 5px; letter-spacing: 1px; }
+        .btn-pay { width: 100%; padding: 10px 0; border-radius: 10px; border: none; font-size: 10px; font-weight: 800; }
+        .unpaid { background: white; color: #b2bec3; border: 1px solid #eee; }
+        .paid { background: var(--primary-vibrant); color: white; }
+        
+        .nav-icon { cursor: pointer; padding: 5px; }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    <div class="brand-card-header">
-        <h1 style="margin:0; font-size: 24px; font-weight: 800;">Management Plăți</h1>
-        <div style="font-family:'Caveat'; color:var(--accent-purple); font-size:20px; margin-top:2px;">powered by VerTech</div>
-        <span id="headerMonth" class="month-pill">--</span>
+    <div class="mike-header">
+        <span class="welcome-text" id="welcomeUser">Welcome back, Gabriel!</span>
+        <div style="font-size: 18px; display: flex; gap: 10px;">
+            <span class="nav-icon" onclick="Swal.fire('Profil','Salut, Gabriel!','info')">👤</span>
+            <span class="nav-icon" onclick="schimbaNume()">⚙️</span>
+        </div>
+    </div>
+
+    <div class="brand-card-header frost-panel">
+        <div class="app-icon-dynamic" id="dynamicLetter">G</div>
+        <h1 style="margin:0; font-size: 22px; font-weight: 800;">Management Plăți</h1>
+        <div style="font-family:'Caveat'; color:var(--accent-purple); font-size:18px;">by VerTech</div>
+        <div id="headerMonth" style="font-size:10px; font-weight:800; text-transform:uppercase; margin-top:10px; color:var(--mint); border: 1px solid var(--mint); display: inline-block; padding: 3px 10px; border-radius: 8px;">--</div>
     </div>
 
     <div class="add-slim">
-        <input type="text" id="newFactura" placeholder="Factură...">
+        <input type="text" id="newFactura" placeholder="Nume...">
         <input type="number" id="newSuma" placeholder="€">
         <button id="addBtn" onclick="adaugaFactura()">+</button>
     </div>
 
-    <h3>De achitat acum</h3>
-    <div id="containerNeplatite"></div>
+    <div id="mainContent">
+        <h3>De achitat acum</h3>
+        <div id="containerNeplatite"></div>
+        <h3>Istoric Lună</h3>
+        <div id="containerPlatite"></div>
+    </div>
 
-    <h3>Istoric Lună Curentă</h3>
-    <div id="containerPlatite"></div>
-
-    <div class="total-box">
-        <span style="font-size:11px; font-weight:800; opacity:0.5;">TOTAL ACHITAT</span>
-        <span id="totalSumaPlatita" style="color:var(--mint); font-weight:900; font-size:22px;">0.00 €</span>
+    <div class="summary-pan frost-panel">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; font-weight:800; opacity:0.5;">TOTAL ACHITAT</span>
+            <div style="text-align:right;">
+                <div id="totalSumaPlatita" class="score-num">0.00 €</div>
+                <div style="height:4px; background:rgba(0,0,0,0.05); border-radius:2px; margin-top:5px; width: 80px; overflow:hidden; margin-left: auto;">
+                    <div id="totalFill" style="height:100%; background:#d4e157; width:0%; transition: 0.5s;"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <button class="btn-sync" onclick="trimiteDate()">Sincronizează în Cloud</button>
-    
-    <button class="btn-reset" onclick="resetareLocala()">Resetare Memorie Locală</button>
+    <button class="btn-reset" onclick="resetareLocala()">Resetare Memorie</button>
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec"; 
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
     let facturi = [];
     let editIndex = -1;
 
-    async function incarcaDateDinCloud() {
-        Swal.fire({ title: 'Sincronizare...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+    function schimbaNume() {
+        Swal.fire({
+            title: 'Personalizare',
+            input: 'text',
+            inputPlaceholder: 'Introdu numele tău',
+            inputValue: localStorage.getItem("userName") || "Gabriel",
+            confirmButtonColor: '#5865f2',
+            confirmButtonText: 'Salvează',
+            background: 'rgba(255,255,255,0.9)',
+            backdrop: 'blur(10px)'
+        }).then((result) => {
+            if (result.value) {
+                const nume = result.value.trim();
+                localStorage.setItem("userName", nume);
+                actualizeazaInterfataNume(nume);
+            }
+        });
+    }
+
+    function actualizeazaInterfataNume(nume) {
+        if(!nume) return;
+        document.getElementById('welcomeUser').innerText = `Welcome back, ${nume}!`;
+        document.getElementById('dynamicLetter').innerText = nume.charAt(0).toUpperCase();
+    }
+
+    async function incarcaDate() {
+        Swal.fire({ title: 'Sincronizare...', didOpen: () => Swal.showLoading(), background: 'rgba(255,255,255,0.8)', backdrop: 'blur(10px)' });
+        actualizeazaInterfataNume(localStorage.getItem("userName") || "Gabriel");
         try {
-            const response = await fetch(scriptURL + "?t=" + new Date().getTime());
-            const dateCloud = await response.json();
-            facturi = Array.isArray(dateCloud) ? dateCloud : [];
+            const r = await fetch(scriptURL + "?t=" + new Date().getTime());
+            const data = await r.json();
+            facturi = Array.isArray(data) ? data : [];
             render();
             Swal.close();
         } catch (e) {
-            facturi = JSON.parse(localStorage.getItem("facturi_v7")) || [];
+            facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
             render();
             Swal.fire({ icon: 'info', title: 'Mod Local', timer: 1000, showConfirmButton: false });
         }
     }
 
-    window.onload = () => {
-        const acum = new Date();
-        document.getElementById('headerMonth').innerText = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
-        incarcaDateDinCloud();
-    };
-
     function render() {
-        const neDiv = document.getElementById("containerNeplatite");
-        const plDiv = document.getElementById("containerPlatite");
-        neDiv.innerHTML = ""; plDiv.innerHTML = "";
+        const ne = document.getElementById("containerNeplatite"), pl = document.getElementById("containerPlatite");
+        ne.innerHTML = ""; pl.innerHTML = "";
         let total = 0;
-
-        facturi.forEach((f, index) => {
-            const html = `
-                <div class="item-card">
+        facturi.forEach((f, i) => {
+            const h = `
+                <div class="item-card frost-panel">
                     <div class="controls">
-                        <div class="btn-ctrl" onclick="stergeFactura(${index})" style="color:#ff7675">✕</div>
-                        <div class="btn-ctrl" onclick="pregatesteEditare(${index})" style="color:#fab1a0">✏️</div>
+                        <div class="btn-ctrl" onclick="sterge(${i})" style="color:#ff7675">✕</div>
+                        <div class="btn-ctrl" onclick="pregatesteEditare(${i})" style="color:#fab1a0">✏️</div>
                     </div>
                     <div class="item-name-text">${f.nume}</div>
-                    <div class="sum-input-wrapper">
-                        <input type="number" value="${f.suma}" onchange="updateSuma(${index}, this.value)">
-                        <span style="font-size:9px; font-weight:900; color:#b2bec3;">€</span>
-                    </div>
-                    <button class="btn-pay ${f.status ? 'paid' : 'unpaid'}" onclick="toggleStatus(${index})">
-                        ${f.status ? '✓ OK' : 'ACHITĂ'}
-                    </button>
+                    <div style="background:rgba(255,255,255,0.6); border-radius:8px; padding:4px; text-align:center; font-weight:800; font-size:12px;">${f.suma}€</div>
+                    <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'✓ OK':'ACHITĂ'}</button>
                 </div>`;
-            if(!f.status) neDiv.innerHTML += html;
-            else { plDiv.innerHTML += html; total += parseFloat(f.suma) || 0; }
+            if(!f.status) ne.innerHTML += h;
+            else { pl.innerHTML += h; total += parseFloat(f.suma) || 0; }
         });
         document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
-        localStorage.setItem("facturi_v7", JSON.stringify(facturi));
+        document.getElementById("totalFill").style.width = Math.min((total/2000)*100, 100) + "%";
+        localStorage.setItem("facturi_gabriel_final", JSON.stringify(facturi));
     }
 
-    function adaugaFactura(){
+    function adaugaFactura() {
         const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
         if(!n.value.trim()) return;
-        if(editIndex > -1) {
-            facturi[editIndex].nume = n.value; facturi[editIndex].suma = parseFloat(s.value) || 0;
-            editIndex = -1; document.getElementById("addBtn").innerText = "+";
-        } else {
-            facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status:false});
-        }
+        if(editIndex > -1) { facturi[editIndex].nume = n.value; facturi[editIndex].suma = parseFloat(s.value) || 0; editIndex = -1; document.getElementById("addBtn").innerText = "+"; }
+        else { facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status: false}); }
         n.value = ""; s.value = ""; render();
     }
 
-    function updateSuma(i, v) { facturi[i].suma = parseFloat(v) || 0; render(); }
-    function toggleStatus(i) { facturi[i].status = !facturi[i].status; render(); }
     function pregatesteEditare(i) {
         editIndex = i;
         document.getElementById("newFactura").value = facturi[i].nume;
@@ -310,43 +232,20 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function stergeFactura(i) { 
-        Swal.fire({
-            title: 'Ștergi factura?',
-            text: facturi[i].nume,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#5865f2',
-            cancelButtonColor: '#ff7675',
-            confirmButtonText: 'Da',
-            cancelButtonText: 'Nu'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                facturi.splice(i, 1); render();
-            }
-        });
-    }
-
-    function resetareLocala() {
-        Swal.fire({
-            title: 'Resetezi tot?',
-            text: "Vei șterge memoria locală a aplicației!",
-            icon: 'danger',
-            showCancelButton: true,
-            confirmButtonText: 'Resetare'
-        }).then((r) => {
-            if(r.isConfirmed) {
-                localStorage.clear();
-                location.reload();
-            }
-        });
-    }
+    function toggle(i) { facturi[i].status = !facturi[i].status; render(); }
+    function sterge(i) { Swal.fire({ title: 'Ștergi?', text: facturi[i].nume, icon: 'warning', showCancelButton: true }).then((r) => { if(r.isConfirmed) { facturi.splice(i, 1); render(); } }); }
+    function resetareLocala() { Swal.fire({ title: 'Resetare?', icon: 'error', showCancelButton: true }).then((r) => { if(r.isConfirmed) { localStorage.clear(); location.reload(); } }); }
 
     function trimiteDate() {
         Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
         fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
         .then(() => Swal.fire({ icon: 'success', title: 'Salvat!', timer: 1000, showConfirmButton: false }));
     }
+
+    window.onload = () => {
+        document.getElementById('headerMonth').innerText = new Date().toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+        incarcaDate();
+    };
 </script>
 </body>
 </html>
