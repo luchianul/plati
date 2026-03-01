@@ -46,11 +46,10 @@ body::before {
     content: "";
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    /* Un strat alb semi-transparent (0.3). 
-       Dacă vrei poza mai vizibilă, scade la 0.1 sau 0.2 */
-    background: rgba(255, 255, 255, 0.3); 
-    backdrop-filter: blur(3px); /* Adaugă un pic de blur pozei ca să nu obosească ochii */
-    -webkit-backdrop-filter: blur(3px);
+    /* Un strat negru transparent face panourile albe să "strălucească" */
+    background: rgba(0, 0, 0, 0.2); 
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
     z-index: -1;
 }
 
@@ -122,10 +121,18 @@ body::before {
 
         /* Carduri facturi compacte */
         .item-card { 
-            padding: 12px; border-radius: 20px; margin-bottom: 10px; 
-            display: grid; grid-template-columns: auto 1fr 65px 75px; 
-            align-items: center; gap: 8px; 
-        }
+    padding: 12px; 
+    border-radius: 20px; 
+    margin-bottom: 12px; 
+    display: grid; 
+    grid-template-columns: auto 1fr 65px 75px; 
+    align-items: center; 
+    gap: 8px;
+    /* Efect de sticlă mai solidă */
+    background: rgba(255, 255, 255, 0.85) !important; 
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Umbră fină */
+}
 
         .controls { display: flex; gap: 4px; }
         .btn-ctrl { 
@@ -173,7 +180,18 @@ body::before {
     opacity: 1;
 }
 
-        h3 { font-size: 10px; text-transform: uppercase; color: #7f8c8d; margin: 15px 0 8px 5px; letter-spacing: 1px; }
+        h3 { 
+    font-size: 11px; 
+    text-transform: uppercase; 
+    color: white; /* Alb pe fundalul întunecat de mai sus */
+    background: var(--primary-vibrant); 
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin: 20px 0 10px 5px; 
+    letter-spacing: 1.5px;
+    font-weight: 800;
+}
         .btn-pay { width: 100%; padding: 10px 0; border-radius: 10px; border: none; font-size: 10px; font-weight: 800; }
         .unpaid { background: white; color: #b2bec3; border: 1px solid #eee; }
         .paid { background: var(--primary-vibrant); color: white; }
