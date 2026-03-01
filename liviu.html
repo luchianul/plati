@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contrôle Flux | Liviu</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { 
+            --electric-yellow: #f1c40f; 
+            --dark-panel: #1e272e;
+            --copper: #e67e22;
+            --circuit-green: #2ecc71;
+            --danger-red: #e74c3c;
+            --text-main: #ecf0f1;
+        }
+
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background-color: #121212;
+            background-image: radial-gradient(circle, #333 1px, transparent 1px);
+            background-size: 25px 25px;
+            min-height: 100vh; display: flex; flex-direction: column; 
+            align-items: center; color: var(--text-main); padding: 15px; box-sizing: border-box;
+        }
+
+        .main-wrapper { width: 100%; max-width: 450px; }
+
+        .mike-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; width: 100%;
+        }
+
+        .welcome-text { font-size: 13px; font-weight: 700; color: var(--electric-yellow); text-transform: uppercase; }
+
+        .frost-panel {
+            background: rgba(30, 39, 46, 0.95); border: 1px solid #444;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); border-radius: 20px; overflow: hidden;
+        }
+
+        .brand-card-header { padding: 25px; text-align: center; border-top: 4px solid var(--electric-yellow); }
+
+        .app-icon-dynamic {
+            width: 65px; height: 65px; background: var(--electric-yellow); border-radius: 15px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 32px; font-weight: 900; color: #000; margin: 0 auto 15px auto;
+        }
+
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 18px; margin: 0; }
+
+        .add-slim { display: flex; gap: 8px; margin: 20px 0; }
+        .add-slim input { 
+            background: #2d3436; border: 1px solid #444; padding: 12px; 
+            border-radius: 10px; font-size: 14px; color: white; outline: none; flex: 1;
+        }
+
+        .add-slim button { 
+            background: var(--electric-yellow); color: #000; border: none; 
+            width: 50px; border-radius: 10px; font-size: 24px; font-weight: 900; cursor: pointer;
+        }
+
+        .item-card { 
+            padding: 15px; border-radius: 12px; margin-bottom: 12px; 
+            display: grid; grid-template-columns: auto 1fr 65px 95px; 
+            align-items: center; gap: 10px; background: #2d3436 !important;
+            border-left: 4px solid var(--copper);
+        }
+
+        .item-name-text { font-weight: 600; font-size: 14px; }
+        .item-suma-box {
+            background: #000; color: var(--electric-yellow);
+            border-radius: 5px; padding: 5px; text-align: center;
+            font-family: 'Orbitron', sans-serif; font-size: 12px;
+        }
+
+        .btn-pay { padding: 8px 0; border-radius: 6px; border: none; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer;}
+        .unpaid { background: #444; color: #bbb; }
+        .paid { background: var(--circuit-green); color: #000; }
+
+        .score-num { font-family: 'Orbitron', sans-serif; font-size: 28px; color: var(--electric-yellow); }
+
+        .btn-sync { 
+            width: 100%; padding: 16px; margin-top: 15px; 
+            background: transparent; border: 2px solid var(--electric-yellow); 
+            color: var(--electric-yellow); border-radius: 12px; font-weight: 800;
+            text-transform: uppercase; cursor: pointer;
+        }
+
+        .btn-reset {
+            margin-top: 30px; background: transparent; border: none;
+            color: var(--danger-red); font-size: 11px; cursor: pointer;
+            width: 100%; text-decoration: underline; opacity: 0.6;
+        }
+
+        h3 { font-size: 10px; color: var(--copper); text-transform: uppercase; letter-spacing: 2px; margin: 20px 0 10px 5px;}
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="mike-header">
+        <span class="welcome-text" id="welcomeUser">Statut: Connecté</span>
+        <span onclick="schimbaNume()" style="cursor:pointer; font-size:20px;">⚙️</span>
+    </div>
+
+    <div class="frost-panel">
+        <div class="brand-card-header">
+            <div class="app-icon-dynamic" id="dynamicLetter">L</div>
+            <h1>Tableau de Bord</h1>
+            <div id="headerMonth" style="font-size:12px; margin-top:10px; color:var(--electric-yellow); font-family:'Orbitron';">--</div>
+        </div>
+    </div>
+
+    <div class="add-slim">
+        <input type="text" id="newFactura" placeholder="Client / Chantier...">
+        <input type="number" id="newSuma" placeholder="€">
+        <button id="addBtn" onclick="adaugaFactura()">+</button>
+    </div>
+
+    <div id="mainContent">
+        <h3>Circuits Ouverts (À payer)</h3>
+        <div id="containerNeplatite"></div>
+        <h3>Historique (Payé)</h3>
+        <div id="containerPlatite"></div>
+    </div>
+
+    <div class="frost-panel" style="padding: 20px; margin-top: 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="font-size:10px; font-weight:800; color:var(--copper);">CHARGE TOTALE</span>
+            <div id="totalSumaPlatita" class="score-num">0.00 €</div>
+        </div>
+    </div>
+
+    <button class="btn-sync" onclick="trimiteDate()">⚡ Synchronisation Cloud</button>
+    <button class="btn-reset" onclick="resetareLocala()">Réinitialiser le Système</button>
+</div>
+
+<script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
+    let facturi = [];
+    let editIndex = -1;
+
+    function actualizeazaInterfataNume(nume) {
+        if(!nume) return;
+        document.getElementById('welcomeUser').innerText = `Équipe: ${nume}`;
+        document.getElementById('dynamicLetter').innerText = nume.charAt(0).toUpperCase();
+    }
+
+    function schimbaNume() {
+        Swal.fire({
+            title: 'Nom Électricien',
+            input: 'text',
+            inputValue: localStorage.getItem("userName") || "Liviu",
+            confirmButtonText: 'Sauver',
+            confirmButtonColor: '#f1c40f', background: '#1e272e', color: '#fff'
+        }).then((result) => {
+            if (result.value) {
+                localStorage.setItem("userName", result.value);
+                actualizeazaInterfataNume(result.value);
+            }
+        });
+    }
+
+    // Această funcție arată pop-up-ul de sincronizare la deschidere, exact ca la tine
+    async function incarcaDate() {
+        Swal.fire({ 
+            title: 'Synchronisation...', 
+            didOpen: () => Swal.showLoading(), 
+            background: '#1e272e', 
+            color: '#fff',
+            allowOutsideClick: false 
+        });
+        
+        actualizeazaInterfataNume(localStorage.getItem("userName") || "Liviu");
+        
+        try {
+            const r = await fetch(scriptURL + "?t=" + new Date().getTime());
+            const data = await r.json();
+            if (Array.isArray(data) && data.length > 0) {
+                facturi = data;
+            } else {
+                facturi = JSON.parse(localStorage.getItem("facturi_liviu")) || [];
+            }
+            render();
+            Swal.close();
+        } catch (e) {
+            facturi = JSON.parse(localStorage.getItem("facturi_liviu")) || [];
+            render();
+            Swal.fire({ icon: 'info', title: 'Mode Local', timer: 1000, showConfirmButton: false, background: '#1e272e', color: '#fff' });
+        }
+    }
+
+    function render() {
+        const ne = document.getElementById("containerNeplatite"), pl = document.getElementById("containerPlatite");
+        ne.innerHTML = ""; pl.innerHTML = "";
+        let total = 0;
+        facturi.forEach((f, i) => {
+            const h = `
+                <div class="item-card">
+                    <div style="display:flex; gap:5px;">
+                        <span onclick="confirmSterge(${i})" style="color:var(--danger-red); cursor:pointer; font-weight:bold;">✕</span>
+                        <span onclick="pregatesteEditare(${i})" style="cursor:pointer;">✏️</span>
+                    </div>
+                    <div class="item-name-text">${f.nume}</div>
+                    <div class="item-suma-box">${f.suma}€</div>
+                    <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'FERMÉ':'PAYER'}</button>
+                </div>`;
+            if(!f.status) ne.innerHTML += h;
+            else { pl.innerHTML += h; total += parseFloat(f.suma) || 0; }
+        });
+        document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
+        localStorage.setItem("facturi_liviu", JSON.stringify(facturi));
+    }
+
+    function trimiteDate() {
+        Swal.fire({ title: 'Sauvegarde...', background: '#1e272e', color: '#fff', didOpen: () => Swal.showLoading() });
+        fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
+        .then(() => Swal.fire({ icon: 'success', title: 'Mis à jour!', timer: 1000, showConfirmButton: false, background: '#1e272e', color: '#fff' }));
+    }
+
+    function adaugaFactura() {
+        const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
+        if(!n.value.trim()) return;
+        
+        if(editIndex > -1) { 
+            facturi[editIndex].nume = n.value; 
+            facturi[editIndex].suma = parseFloat(s.value) || 0; 
+            editIndex = -1; 
+            document.getElementById("addBtn").innerText = "+"; 
+        } else { 
+            facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status: false}); 
+        }
+        
+        n.value = ""; s.value = ""; 
+        render();
+        trimiteDate();
+    }
+
+    function pregatesteEditare(i) {
+        editIndex = i;
+        document.getElementById("newFactura").value = facturi[i].nume;
+        document.getElementById("newSuma").value = facturi[i].suma;
+        document.getElementById("addBtn").innerText = "✓";
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggle(i) { 
+        facturi[i].status = !facturi[i].status; 
+        render(); 
+        trimiteDate();
+    }
+
+    function confirmSterge(i) {
+        Swal.fire({
+            title: 'Supprimer?',
+            text: facturi[i].nume,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Oui',
+            cancelButtonText: 'Non',
+            background: '#1e272e', color: '#fff'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                facturi.splice(i, 1);
+                render();
+                trimiteDate();
+            }
+        });
+    }
+
+    function resetareLocala() {
+        Swal.fire({
+            title: 'Tout effacer?',
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonText: 'Reset',
+            background: '#1e272e', color: '#fff'
+        }).then((r) => {
+            if(r.isConfirmed) { localStorage.clear(); location.reload(); }
+        });
+    }
+
+    window.onload = () => {
+        const data = new Date();
+        document.getElementById('headerMonth').innerText = data.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
+        incarcaDate();
+    };
+</script>
+</body>
+</html>
