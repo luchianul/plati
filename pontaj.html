@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VerTech Pontaj Pro 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+/* ELIMINARE SAGETI INPUT */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+    :root {
+        --bg-color: #0f172a;
+        --bg-gradient: radial-gradient(circle at top right, #1e293b, #0f172a);
+        --card-bg: rgba(30, 41, 59, 0.7);
+        --text-main: #f1f5f9;
+        --text-dim: #94a3b8;
+        --glass-border: rgba(255, 255, 255, 0.1);
+        --accent-blue: #3b82f6;
+        --accent-emerald: #10b981;
+        --input-bg: rgba(255, 255, 255, 0.05);
+        --danger: #ef4444;
+    }
+
+    [data-theme="light"] { --bg-color: #f8fafc; --bg-gradient: linear-gradient(135deg, #f8fafc, #e2e8f0); --card-bg: rgba(255, 255, 255, 0.8); --text-main: #1e293b; --accent-blue: #3b82f6; --text-dim: #64748b; --glass-border: rgba(0,0,0,0.1); --input-bg: rgba(0,0,0,0.05); }
+    [data-theme="electrician"] { --bg-color: #1a1a1a; --bg-gradient: linear-gradient(135deg, #1a1a1a, #262626); --card-bg: rgba(38, 38, 38, 0.9); --accent-blue: #fbbf24; --text-main: #ffffff; }
+    [data-theme="constructii"] { --bg-color: #454545; --bg-gradient: linear-gradient(135deg, #454545, #262626); --card-bg: rgba(55, 65, 81, 0.9); --accent-blue: #f97316; --text-main: #ffffff; }
+    [data-theme="iarna"] { --bg-color: #e0f2fe; --bg-gradient: radial-gradient(circle at top right, #f0f9ff, #e0f2fe); --card-bg: rgba(255, 255, 255, 0.8); --text-main: #0369a1; --accent-blue: #0ea5e9; }
+    [data-theme="vara"] { --bg-color: #fefce8; --bg-gradient: radial-gradient(circle at top right, #fffbeb, #fefce8); --card-bg: rgba(255, 255, 255, 0.8); --text-main: #365314; --accent-blue: #84cc16; }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; transition: background 0.3s, color 0.3s; }
+    body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: var(--bg-gradient); background-attachment: fixed; color: var(--text-main); min-height: 100vh; }
+    
+    .theme-sidebar { position: fixed; left: 10px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 12px; z-index: 1000; }
+    .theme-dot { width: 38px; height: 38px; border-radius: 12px; border: 1px solid var(--glass-border); cursor: pointer; display: flex; align-items: center; justify-content: center; background: var(--card-bg); backdrop-filter: blur(5px); font-size: 18px; }
+
+    .container { max-width: 600px; margin: auto; padding: 15px; display: none; }
+    header { text-align: center; margin-bottom: 20px; position: relative; padding-top: 45px; }
+    .card { background: var(--card-bg); backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 24px; padding: 20px; margin-bottom: 15px; }
+    .btn-top { background: var(--input-bg); color: var(--text-main); border: 1px solid var(--glass-border); border-radius: 10px; width: 46px; height: 46px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    
+    .nav-tabs { display: flex; gap: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.1); padding: 5px; border-radius: 18px; }
+    .nav-btn { flex: 1; padding: 10px; border-radius: 14px; background: transparent; color: var(--text-dim); border: none; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .nav-btn.active { background: var(--accent-blue); color: white; }
+
+    .summary-item { background: var(--card-bg); padding: 15px; border-radius: 20px; border: 1px solid var(--glass-border); }
+    .total-val { font-size: 20px; font-weight: 800; color: var(--accent-blue); display: block; }
+    .total-label { font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+    .week-separator { margin: 25px 0 10px 5px; color: var(--accent-blue); font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; border-left: 3px solid var(--accent-blue); padding-left: 10px; }
+    .btn-action { background: var(--input-bg); color: var(--text-dim); border: 1px solid var(--glass-border); border-radius: 10px; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+    .sent { background: var(--accent-emerald); }
+    .pending { background: #f59e0b; }
+    
+    input { background: var(--input-bg); border: 1px solid var(--glass-border); border-radius: 12px; padding: 12px; color: var(--text-main); width: 100%; font-size: 14px; outline: none; margin-bottom: 10px; }
+    button { border-radius: 16px; padding: 14px; font-weight: 700; cursor: pointer; border: none; width: 100%; }
+
+    /* Stil pentru Bara de Căutare Fără Lupă */
+    .search-box { margin-bottom: 20px; }
+    .search-box input { 
+        padding-left: 16px; 
+        border: 1px solid var(--glass-border); 
+        background: rgba(255,255,255,0.06);
+        border-radius: 18px;
+        margin-bottom: 0;
+    }
+    .search-box input:focus {
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
+    }
+
+    @media (max-width: 480px) {
+    .theme-sidebar { flex-direction: row; bottom: 10px; top: auto; left: 50%; transform: translateX(-50%); background: var(--card-bg); padding: 8px; border-radius: 20px; }
+    .container { padding-left: 15px; padding-bottom: 80px; }
+}
+</style>
+</head>
+<body>
+
+<div class="theme-sidebar">
+    <div class="theme-dot" onclick="setTheme('dark')">🌙</div>
+    <div class="theme-dot" onclick="setTheme('electrician')">⚡</div>
+    <div class="theme-dot" onclick="setTheme('constructii')">🏗️</div>
+    <div class="theme-dot" onclick="setTheme('iarna')">❄️</div>
+    <div class="theme-dot" onclick="setTheme('vara')">☀️</div>
+</div>
+
+<div id="loginOverlay" style="position:fixed; inset:0; background:var(--bg-gradient); z-index:10000; display:flex; align-items:center; justify-content:center; padding:20px;">
+    <div class="card" style="width:100%; max-width:350px; text-align:center;">
+        <h1 style="font-size: 28px; margin: 0;">VerTech Pontaj Ore 2026</h1>
+        <div style="font-family: 'Caveat', cursive; font-size: 22px; color: var(--accent-blue); margin-top: 2px;">acces securizat VerTech</div>
+        <input type="password" id="passIn" placeholder="••••" style="text-align: center; font-size: 22px; margin: 20px 0;">
+        <button onclick="checkLogin()" style="background: var(--accent-blue); color:white;">CONECTARE</button>
+    </div>
+</div>
+
+<div class="container" id="mainApp">
+    <header>
+        <div style="display:flex; justify-content:space-between; position:absolute; top:0; width:100%">
+            <button id="themeToggle" class="btn-top" onclick="toggleMainTheme()"><i id="themeIcon" data-lucide="moon"></i></button>
+            <button onclick="logout()" class="btn-top"><i data-lucide="lock"></i></button>
+        </div>
+        <h1 id="mainTitle" style="font-size: 28px; font-weight: 800; margin: 0;">Pontaj Ore 2026</h1>
+        <span style="font-family: 'Caveat', cursive; font-size: 20px; color: var(--accent-blue);">powered by VerTech</span>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="nav-btn active" id="tabBtnLog" onclick="switchTab('log')">PANOU PONTAJ</button>
+        <button class="nav-btn" id="tabBtnStats" onclick="switchTab('stats')">STATISTICI</button>
+    </div>
+
+    <div id="viewLog">
+        <div class="card" style="display:flex; justify-content:space-around; text-align:center; padding: 12px;">
+            <div><label class="total-label">TARIF/H</label><input type="number" id="hourlyRate" value="30" oninput="render()" style="border:none; background:transparent; text-align:center; font-weight:800; width:60px; color:var(--text-main); margin:0;"></div>
+            <div style="width:1px; background:var(--glass-border);"></div>
+            <div><label class="total-label">TARIF/KM</label><input type="number" id="kmRate" value="0.45" oninput="render()" style="border:none; background:transparent; text-align:center; font-weight:800; width:60px; color:var(--text-main); margin:0;"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div class="summary-item"><span class="total-label">ORE TOTAL</span><span id="totalH" class="total-val">0h</span></div>
+            <div class="summary-item"><span class="total-label">KM TOTAL</span><span id="totalK" class="total-val" style="color:var(--accent-emerald)">0km</span></div>
+        </div>
+
+        <div class="card">
+            <input type="date" id="dateIn">
+            <div style="display: flex; gap: 10px;">
+                <input type="time" id="startIn" value="08:00">
+                <input type="time" id="endIn" value="17:00">
+            </div>
+            <input type="text" id="siteIn" placeholder="Nume Șantier">
+            <input type="number" id="kmIn" placeholder="Km Parcurși">
+            <button id="addBtn" onclick="addEntry()" style="background: var(--accent-blue); color: white;">SALVEAZĂ ZIUA</button>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px;">
+                <button onclick="sendToSheet()" style="background:var(--accent-emerald); color:white; font-size:11px;">TRIMITE ÎN CLOUD</button>
+                <button onclick="syncFromSheet()" style="background:rgba(255,255,255,0.05); color:var(--text-main); font-size:11px; border: 1px solid var(--glass-border);">🔄 SINCRONIZEAZĂ</button>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Caută șantier sau dată..." oninput="render()">
+        </div>
+
+        <div id="entriesList"></div>
+    </div>
+
+    <div id="viewStats" style="display:none">
+        <div class="card" style="padding:15px"><canvas id="mainChart" style="height:220px"></canvas></div>
+        <div class="card" style="padding:0; overflow: hidden;">
+            <table style="width:100%; border-collapse:collapse; font-size:13px; text-align:left;">
+                <thead style="background: rgba(0,0,0,0.2);">
+                    <tr style="color:var(--text-dim)">
+                        <th style="padding:12px;">SĂPT</th>
+                        <th style="padding:12px;">ORE</th>
+                        <th style="padding:12px;">KM</th>
+                        <th style="padding:12px; text-align:right;">VENIT</th>
+                    </tr>
+                </thead>
+                <tbody id="statsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="text-align: center; padding: 30px 10px;">
+        <button onclick="resetData()" style="background:transparent; color:var(--danger); font-size:11px; border: 1px solid var(--danger); width: auto; padding: 8px 20px; opacity: 0.6;">ȘTERGE TOATE DATELE (RESET)</button>
+        <div style="margin-top: 20px; font-family: 'Caveat', cursive; font-size: 20px; color: var(--text-dim);">powered by VerTech 2026</div>
+    </div>
+</div>
+
+<script>
+const ACCESS_SECRET = "ODkxMQ=="; 
+const scriptUrl = "https://script.google.com/macros/s/AKfycbyUx4mX8iMzIv4xAodepgyL8oKxF1EsRD6jk8pUhgaqx-mWGqtIdGj1jfn8YdKrtHbA/exec";
+let entries = JSON.parse(localStorage.getItem('workEntries')) || [];
+let editIndex = -1;
+let chart = null;
+
+function cleanTime(t) {
+    if(!t || typeof t !== 'string') return "08:00";
+    let parts = t.split(':');
+    if(parts.length >= 2) return parts[0].padStart(2, '0') + ":" + parts[1].padStart(2, '0');
+    return "08:00";
+}
+
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('userTheme', theme);
+    const titles = { 'electrician': 'VerTech Electric ⚡', 'constructii': 'VerTech Build 🏗️', 'iarna': 'VerTech Winter ❄️', 'vara': 'VerTech Summer ☀️', 'light': 'Pontaj Ore 2026', 'dark': 'Pontaj Ore 2026' };
+    document.getElementById('mainTitle').innerText = titles[theme] || 'Pontaj Ore 2026';
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        const isLight = ['light', 'iarna', 'vara'].includes(theme);
+        icon.setAttribute('data-lucide', isLight ? 'sun' : 'moon');
+        lucide.createIcons();
+    }
+}
+
+function toggleMainTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    (current === 'light') ? setTheme('dark') : setTheme('light');
+}
+
+function formatDateNice(dateStr) {
+    if(!dateStr) return "";
+    const date = new Date(dateStr);
+    if(isNaN(date)) return dateStr;
+    const days = ['Dum', 'Luni', 'Mar', 'Mie', 'Joi', 'Vin', 'Sâm'];
+    const months = ['ian.', 'feb.', 'mar.', 'apr.', 'mai', 'iun.', 'iul.', 'aug.', 'sept.', 'oct.', 'nov.', 'dec.'];
+    return `${days[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
+}
+
+function getWeek(d) {
+    let date = new Date(d); if(isNaN(date)) return 0;
+    date.setHours(0,0,0,0);
+    date.setDate(date.getDate() + 4 - (date.getDay()||7));
+    return Math.ceil((((date - new Date(date.getFullYear(),0,1))/8.64e7)+1)/7);
+}
+
+function checkLogin() {
+    const passValue = document.getElementById('passIn').value;
+    if(btoa(passValue) === ACCESS_SECRET) { 
+        localStorage.setItem('lastLogin', Date.now()); 
+        showApp(); 
+    } else { 
+        Swal.fire('Eroare', 'Parolă incorectă', 'error'); 
+    }
+}
+
+function showApp() { document.getElementById('loginOverlay').style.display = 'none'; document.getElementById('mainApp').style.display = 'block'; render(); }
+function logout() { localStorage.removeItem('lastLogin'); location.reload(); }
+
+function render() {
+    const list = document.getElementById('entriesList');
+    const searchVal = document.getElementById('searchInput').value.toLowerCase();
+    list.innerHTML = '';
+    let totalH = 0; let totalK = 0;
+    const hR = parseFloat(document.getElementById('hourlyRate').value) || 0;
+    const kR = parseFloat(document.getElementById('kmRate').value) || 0;
+    
+    const filtered = entries.filter(e => e.site.toLowerCase().includes(searchVal) || e.date.toLowerCase().includes(searchVal));
+    const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
+    let lastWeek = null;
+
+    sorted.forEach(e => {
+        let currentWeek = getWeek(e.date);
+        if(currentWeek !== lastWeek && currentWeek !== 0) {
+            list.innerHTML += `<div class="week-separator">Săptămâna ${currentWeek}</div>`;
+            lastWeek = currentWeek;
+        }
+        const hrs = parseFloat(e.hours) || 0;
+        const kms = parseFloat(e.km) || 0;
+        totalH += hrs; totalK += kms;
+        let v = parseFloat(e.venit) || (hrs * hR + kms * kR);
+        list.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; align-items:center; padding:15px; margin-bottom:10px;">
+            <div style="flex:1">
+                <div style="font-weight:700; font-size:14px;"><span class="status-dot ${e.sent ? 'sent' : 'pending'}"></span>${formatDateNice(e.date)}</div>
+                <div style="font-size:13px; font-weight:600;">${e.site}</div>
+                <div style="font-size:11px; color:var(--text-dim); opacity:0.7;">${cleanTime(e.start || e.startTime)} - ${cleanTime(e.end || e.endTime)}</div>
+            </div>
+            <div style="text-align:right;">
+                <div style="font-weight:800; color:var(--accent-blue); font-size:15px;">${hrs.toFixed(1)}h | ${kms}km</div>
+                <div style="font-weight:700; color:var(--accent-emerald); font-size:14px;">${v.toFixed(2)}€</div>
+                <div style="display:flex; gap:5px; justify-content:flex-end; margin-top:5px;">
+                    <button class="btn-action" onclick="editRow(${entries.indexOf(e)})">✏️</button>
+                    <button class="btn-action" onclick="deleteRow(${entries.indexOf(e)})">✕</button>
+                </div>
+            </div>
+        </div>`;
+    });
+    document.getElementById('totalH').innerText = totalH.toFixed(1) + 'h';
+    document.getElementById('totalK').innerText = totalK + 'km';
+}
+
+function addEntry() {
+    const d = document.getElementById('dateIn').value, s = document.getElementById('siteIn').value, st = document.getElementById('startIn').value, et = document.getElementById('endIn').value, k = parseFloat(document.getElementById('kmIn').value) || 0;
+    if(!d || !s) return;
+    let diff = (new Date(`2000-01-01T${et}`) - new Date(`2000-01-01T${st}`)) / 3600000;
+    if(diff < 0) diff += 24;
+    const v = (diff * parseFloat(document.getElementById('hourlyRate').value) + k * parseFloat(document.getElementById('kmRate').value)).toFixed(2);
+    const obj = { id: editIndex>-1?entries[editIndex].id:Date.now().toString(), date:d, site:s, start:st, end:et, hours:diff.toFixed(2), km:k, venit:v, sent:false };
+    if(editIndex > -1) entries[editIndex] = obj; else entries.push(obj);
+    localStorage.setItem('workEntries', JSON.stringify(entries));
+    editIndex = -1; document.getElementById('addBtn').innerText = "SALVEAZĂ ZIUA"; render();
+}
+
+async function sendToSheet() {
+    const toSend = entries.filter(e => !e.sent);
+    if(toSend.length === 0) return Swal.fire('Info', 'Nimic nou', 'info');
+    Swal.fire({title: 'Trimitere...', didOpen: () => Swal.showLoading()});
+    for(let e of toSend) {
+        const p = new URLSearchParams({ id:e.id, date:e.date, startTime:e.start, endTime:e.end, site:e.site, hoursWorked:e.hours, km:e.km, totalBani:e.venit });
+        await fetch(scriptUrl, { method: 'POST', body: p, mode: 'no-cors' });
+        e.sent = true;
+    }
+    localStorage.setItem('workEntries', JSON.stringify(entries)); render(); Swal.fire('Succes', 'Trimis!', 'success');
+}
+
+async function syncFromSheet() {
+    Swal.fire({title: 'Sincronizare...', didOpen: () => Swal.showLoading()});
+    try {
+        const resp = await fetch(scriptUrl + "?t=" + Date.now());
+        const data = await resp.json();
+        if (Array.isArray(data)) {
+            entries = data.map(e => ({ id: e.id, date: e.date, start: cleanTime(e.startTime || e.start), end: cleanTime(e.endTime || e.end), site: e.site, hours: e.hoursWorked || e.hours, km: e.km, venit: e.totalBani || e.venit, sent: true }));
+            localStorage.setItem('workEntries', JSON.stringify(entries)); render(); Swal.fire('Succes', 'Gata!', 'success');
+        }
+    } catch (e) { Swal.fire('Eroare', 'Eroare sincronizare', 'error'); }
+}
+
+function switchTab(t) {
+    document.getElementById('viewLog').style.display = t==='log'?'block':'none';
+    document.getElementById('viewStats').style.display = t==='stats'?'block':'none';
+    document.getElementById('tabBtnLog').classList.toggle('active', t==='log');
+    document.getElementById('tabBtnStats').classList.toggle('active', t==='stats');
+    if(t==='stats') renderStats();
+}
+
+function renderStats() {
+    let stats = {};
+    const hR = parseFloat(document.getElementById('hourlyRate').value) || 0;
+    const kR = parseFloat(document.getElementById('kmRate').value) || 0;
+    entries.forEach(e => {
+        let w = "S" + getWeek(e.date);
+        if(w === "S0") return;
+        if(!stats[w]) stats[w] = { h:0, k:0, v:0 };
+        const h = parseFloat(e.hours) || 0, k = parseFloat(e.km) || 0;
+        let v = parseFloat(e.venit) || (h * hR + k * kR);
+        stats[w].h += h; stats[w].k += k; stats[w].v += v;
+    });
+    const labels = Object.keys(stats).sort((a,b) => parseInt(a.slice(1)) - parseInt(b.slice(1)));
+    document.getElementById('statsBody').innerHTML = [...labels].reverse().map(l => `
+        <tr style="border-bottom: 1px solid var(--glass-border);">
+            <td style="padding:12px; font-weight:600;">${l}</td>
+            <td style="padding:12px;">${stats[l].h.toFixed(1)}h</td>
+            <td style="padding:12px;">${stats[l].k} km</td>
+            <td style="padding:12px; text-align:right; color:var(--accent-emerald); font-weight:700;">${Math.round(stats[l].v)} €</td>
+        </tr>`).join('');
+    const ctx = document.getElementById('mainChart').getContext('2d');
+    if(chart) chart.destroy();
+    chart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Ore', data: labels.map(l => stats[l].h), backgroundColor: '#3b82f6', borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
+}
+
+function editRow(i) {
+    const e = entries[i]; editIndex = i;
+    document.getElementById('dateIn').value = e.date; 
+    document.getElementById('siteIn').value = e.site; 
+    document.getElementById('startIn').value = cleanTime(e.start || e.startTime); 
+    document.getElementById('endIn').value = cleanTime(e.end || e.endTime); 
+    document.getElementById('kmIn').value = e.km;
+    document.getElementById('addBtn').innerText = "ACTUALIZEAZĂ"; window.scrollTo(0,0);
+}
+
+function deleteRow(i) {
+    Swal.fire({
+        title: 'Ștergi această zi?',
+        text: "Nu vei mai putea recupera datele!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        confirmButtonText: 'Da, șterge!',
+        cancelButtonText: 'Anulează'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            entries.splice(i, 1);
+            localStorage.setItem('workEntries', JSON.stringify(entries));
+            render();
+            Swal.fire('Șters!', 'Ziua a fost eliminată.', 'success');
+        }
+    });
+}
+
+function resetData() { 
+    Swal.fire({ title: 'Ștergi TOT?', text: "Vei pierde tot istoricul!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444' }).then(r => {
+        if(r.isConfirmed) { localStorage.clear(); location.reload(); }
+    });
+}
+
+window.onload = () => {
+    lucide.createIcons();
+    const last = localStorage.getItem('lastLogin');
+    if(last && (Date.now() - last < 1800000)) showApp();
+    setTheme(localStorage.getItem('userTheme') || 'dark');
+    document.getElementById('dateIn').valueAsDate = new Date();
+};
+</script>
+</body>
+</html>
