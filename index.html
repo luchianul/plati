@@ -50,8 +50,39 @@
         .welcome-text { font-size: 13px; font-weight: 700; color: rgba(0,0,0,0.5); }
 
         .brand-card-header { 
-            padding: 20px; border-radius: 30px; text-align: center; margin-bottom: 20px;
-        }
+    padding: 20px; 
+    border-radius: 30px; 
+    text-align: center; 
+    margin-bottom: 20px;
+    position: relative; /* Esențial pentru fundal */
+    overflow: hidden;   /* Să nu iasă simbolurile din card */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#patternSezon {
+    position: absolute; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    opacity: 0.07; /* Foarte discret, să nu deranjeze pe mobil */
+    font-size: 18px; 
+    overflow: hidden; 
+    pointer-events: none; 
+    line-height: 1.8;
+    word-break: break-all;
+    user-select: none;
+    z-index: 0; /* Stă în spatele textului */
+}
+
+/* Ne asigurăm că restul elementelor stau deasupra fundalului */
+.brand-card-header > *:not(#patternSezon) {
+    position: relative;
+    z-index: 1;
+}
         
         .app-icon-dynamic {
             width: 55px; height: 55px; background: white; border-radius: 18px;
@@ -151,11 +182,11 @@
     </div>
 
     <div class="brand-card-header frost-panel">
-        <div class="app-icon-dynamic" id="dynamicLetter">G</div>
-        <h1 style="margin:0; font-size: 22px; font-weight: 800;">Management Plăți</h1>
-        <div style="font-family:'Caveat'; color:var(--accent-purple); font-size:18px;">by VerTech</div>
-        <div id="headerMonth" style="font-size:10px; font-weight:800; text-transform:uppercase; margin-top:10px; color:var(--mint); border: 1px solid var(--mint); display: inline-block; padding: 3px 10px; border-radius: 8px;">--</div>
-    </div>
+    <div id="patternSezon"></div> <div class="app-icon-dynamic" id="dynamicLetter">G</div>
+    <h1 style="margin:0; font-size: 22px; font-weight: 800;">Management Plăți</h1>
+    <div style="font-family:'Caveat'; color:var(--accent-purple); font-size:18px;">by VerTech</div>
+    <div id="headerMonth" style="font-size:10px; font-weight:800; text-transform:uppercase; margin-top:10px; color:var(--mint); border: 1px solid var(--mint); display: inline-block; padding: 3px 10px; border-radius: 8px; background: rgba(255,255,255,0.5);">--</div>
+</div>
 
     <div class="add-slim">
         <input type="text" id="newFactura" placeholder="Nume...">
@@ -187,9 +218,42 @@
 </div>
 
 <script>
-    const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
     let facturi = [];
     let editIndex = -1;
+
+    // Lista ta fixă - pune sumele aici dacă le știi
+    const platiFixeDefault = [
+        { nume: "Internet", suma: 0 },
+        { nume: "Factura GSM", suma: 0 },
+        { nume: "Garaj Trimestru", suma: 0 },
+        { nume: "Rata Impozit", suma: 0 },
+        { nume: "Chirie", suma: 0 },
+        { nume: "Electricitate și Gaz", suma: 0 },
+        { nume: "Factura Apa", suma: 0 }
+    ];
+
+    function verificaSiAdaugaPlatiRecurente() {
+        const lunaCurenta = new Date().getMonth();
+        const ultimaLunaSalvata = localStorage.getItem("ultimaLunaVerificata");
+
+        // Adăugăm dacă e lună nouă SAU dacă lista e complet goală
+        if (ultimaLunaSalvata === null || parseInt(ultimaLunaSalvata) !== lunaCurenta || facturi.length === 0) {
+            
+            platiFixeDefault.forEach(plataFixa => {
+                const existaDeja = facturi.some(f => f.nume.toLowerCase() === plataFixa.nume.toLowerCase());
+                if (!existaDeja) {
+                    facturi.push({
+                        nume: plataFixa.nume,
+                        suma: plataFixa.suma,
+                        status: false
+                    });
+                }
+            });
+
+            localStorage.setItem("ultimaLunaVerificata", lunaCurenta);
+        }
+    }
 
     function schimbaNume() {
         Swal.fire({
@@ -222,11 +286,22 @@
         try {
             const r = await fetch(scriptURL + "?t=" + new Date().getTime());
             const data = await r.json();
-            facturi = Array.isArray(data) ? data : [];
+            
+            // Dacă primim date valide, le încărcăm
+            if (Array.isArray(data) && data.length > 0) {
+                facturi = data;
+            } else {
+                // Dacă Cloud-ul e gol, luăm din LocalStorage sau pornim de la zero
+                facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
+            }
+
+            // Aplicăm regula de lună nouă/listă default
+            verificaSiAdaugaPlatiRecurente();
             render();
             Swal.close();
         } catch (e) {
             facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
+            verificaSiAdaugaPlatiRecurente();
             render();
             Swal.fire({ icon: 'info', title: 'Mod Local', timer: 1000, showConfirmButton: false });
         }
@@ -272,8 +347,18 @@
     }
 
     function toggle(i) { facturi[i].status = !facturi[i].status; render(); }
-    function sterge(i) { Swal.fire({ title: 'Ștergi?', text: facturi[i].nume, icon: 'warning', showCancelButton: true }).then((r) => { if(r.isConfirmed) { facturi.splice(i, 1); render(); } }); }
-    function resetareLocala() { Swal.fire({ title: 'Resetare?', icon: 'error', showCancelButton: true }).then((r) => { if(r.isConfirmed) { localStorage.clear(); location.reload(); } }); }
+    
+    function sterge(i) { 
+        Swal.fire({ title: 'Ștergi?', text: facturi[i].nume, icon: 'warning', showCancelButton: true }).then((r) => { 
+            if(r.isConfirmed) { facturi.splice(i, 1); render(); } 
+        }); 
+    }
+
+    function resetareLocala() { 
+        Swal.fire({ title: 'Resetare?', icon: 'error', showCancelButton: true }).then((r) => { 
+            if(r.isConfirmed) { localStorage.clear(); location.reload(); } 
+        }); 
+    }
 
     function trimiteDate() {
         Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
@@ -282,7 +367,32 @@
     }
 
     window.onload = () => {
-        document.getElementById('headerMonth').innerText = new Date().toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+        const data = new Date();
+        const luna = data.getMonth(); // 0 = Ian, 1 = Feb... 2 = Martie etc.
+        const numeLuna = data.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
+        
+        const elLuna = document.getElementById('headerMonth');
+        elLuna.innerText = numeLuna;
+
+        // Alegem culoarea în funcție de lună
+        let culoareSezon;
+        if (luna >= 2 && luna <= 4) { // Primăvara (Martie, Aprilie, Mai)
+            culoareSezon = "#00b894"; // Verde crud
+        } else if (luna >= 5 && luna <= 7) { // Vara (Iunie, Iulie, August)
+            culoareSezon = "#fdcb6e"; // Galben solar
+        } else if (luna >= 8 && luna <= 10) { // Toamna (Septembrie, Octombrie, Noiembrie)
+            culoareSezon = "#e17055"; // Portocaliu tomnatic
+        } else { // Iarna (Decembrie, Ianuarie, Februarie)
+            culoareSezon = "#0984e3"; // Albastru înghețat
+        }
+
+        // Aplicăm culoarea pe tag-ul lunii
+        elLuna.style.color = culoareSezon;
+        elLuna.style.borderColor = culoareSezon;
+        
+        // Opțional: Schimbăm și culoarea butonului "+" și a iconiței dinamice
+        document.documentElement.style.setProperty('--primary-vibrant', culoareSezon);
+
         incarcaDate();
     };
 </script>
