@@ -281,11 +281,48 @@
         });
     }
 
+function verificaAlertaRecurenta() {
+    const facturiNeplatite = facturi.filter(f => !f.status);
+    
+    // Dacă nu are nimic neplătit, nu îl batem la cap
+    if (facturiNeplatite.length === 0) return;
+
+    const ultimaAlerta = localStorage.getItem('ultimaAlertaData');
+    const acum = new Date().getTime();
+    const zeceZileInMs = 10 * 24 * 60 * 60 * 1000; // 10 zile transformate în milisecunde
+
+    // Dacă nu a mai primit alerta NICIODATĂ sau au trecut mai mult de 10 zile
+    if (!ultimaAlerta || (acum - ultimaAlerta > zeceZileInMs)) {
+        
+        Swal.fire({
+            title: 'Attention! ⚡',
+            text: `Vous avez ${facturiNeplatite.length} circuits encore ouverts (impayés). N'oubliez pas de les vérifier!`,
+            icon: 'warning',
+            confirmButtonText: 'D\'accord',
+            confirmButtonColor: '#f1c40f',
+            background: '#1e272e',
+            color: '#fff'
+        });
+
+        // Salvăm data actuală ca fiind "ultima alertă trimisă"
+        localStorage.setItem('ultimaAlertaData', acum);
+    }
+}
+
     window.onload = () => {
-        const data = new Date();
-        document.getElementById('headerMonth').innerText = data.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
-        incarcaDate();
-    };
+    const data = new Date();
+    document.getElementById('headerMonth').innerText = data.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
+    
+    // 1. Încarcă datele
+    incarcaDate().then(() => {
+        // 2. După ce s-au încărcat datele, verifică dacă trebuie să dea alerta
+        // O verificăm imediat la deschidere
+        verificaAlertaRecurenta();
+        
+        // 3. Verificăm și la fiecare 1 oră dacă aplicația e lăsată deschisă
+        setInterval(verificaAlertaRecurenta, 3600000); 
+    });
+};
 </script>
 </body>
 
