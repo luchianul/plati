@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DiazElectricite - Management System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <style>
+        :root {
+            --primary: #007AFF;
+            --danger: #FF3B30;
+            --bg-page: #D9E9F9; 
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --sidebar-width: 260px;
+        }
+
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            margin: 0; height: 100vh; width: 100vw;
+            background: var(--bg-page);
+            display: flex; flex-direction: column; align-items: center;
+            padding: 20px 0; box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        #login-screen {
+            position: fixed; inset: 0; background: var(--bg-page);
+            z-index: 9999; display: flex; align-items: center; justify-content: center;
+        }
+        .login-card {
+            background: white; padding: 40px; border-radius: 30px;
+            width: 350px; box-shadow: 0 20px 50px rgba(0,0,0,0.1); text-align: center;
+        }
+
+        .top-navbar {
+            width: 95vw; height: 80px;
+            background: var(--glass-bg); backdrop-filter: blur(30px);
+            border-radius: 25px; border: 1px solid rgba(255,255,255,0.6);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 20px; box-sizing: border-box; flex-shrink: 0;
+        }
+
+        .search-wrapper input {
+            width: 350px; padding: 12px 20px; border-radius: 14px;
+            border: none; background: rgba(255,255,255,0.9); outline: none;
+        }
+
+        .btn-add-pro {
+            background: var(--primary); color: white; border: none;
+            padding: 12px 24px; border-radius: 14px; font-weight: 700;
+            cursor: pointer; transition: 0.3s;
+        }
+
+        .main-container { width: 95vw; flex: 1; display: flex; gap: 20px; overflow: hidden; }
+
+        .sidebar {
+            width: var(--sidebar-width); background: var(--glass-bg);
+            backdrop-filter: blur(30px); border-radius: 30px;
+            padding: 25px; display: flex; flex-direction: column; gap: 8px;
+        }
+
+        .nav-item {
+            padding: 14px 18px; border-radius: 15px; cursor: pointer;
+            font-weight: 600; color: #666; display: flex; align-items: center; gap: 12px;
+        }
+        .nav-item.active { background: #000; color: #fff; }
+
+        .main-view {
+            flex: 1; background: var(--glass-bg); backdrop-filter: blur(30px);
+            border-radius: 30px; padding: 30px; overflow-y: auto;
+        }
+
+        .view-section { display: none; flex-direction: column; gap: 25px; }
+        .view-section.active { display: flex; }
+
+        .content-card { background: rgba(255,255,255,0.4); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.4); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px; font-size: 11px; color: #888; text-transform: uppercase; }
+        td { padding: 15px 12px; border-bottom: 1px solid rgba(0,0,0,0.03); font-size: 14px; }
+
+        .role-badge { padding: 6px 12px; border-radius: 10px; font-size: 11px; font-weight: 700; }
+        .admin { background: #E3F2FD; color: #0D47A1; }
+        .worker { background: #F3E5F5; color: #7B1FA2; }
+
+        .btn-logout {
+            margin-top: 10px; background: none; border: 1px solid rgba(255,59,48,0.2);
+            color: var(--danger); padding: 10px; border-radius: 12px;
+            font-size: 12px; font-weight: 700; cursor: pointer;
+        }
+
+        #modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.1); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
+        .modal-content { background: white; width: 450px; padding: 35px; border-radius: 30px; }
+        input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #eee; margin-bottom: 10px; }
+        .flex-row { display: flex; gap: 10px; }
+
+        #gantt_chart { width: 100%; height: 350px; border-radius: 15px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <h2 style="margin-top:0">Vibiz Pro Login</h2>
+            <input type="email" id="l-email" placeholder="Email">
+            <input type="password" id="l-pass" placeholder="Parolă">
+            <button class="btn-add-pro" style="width:100%" onclick="handleLogin()">Intră în cont</button>
+        </div>
+    </div>
+
+    <div class="top-navbar">
+        <div style="display:flex; align-items:center; gap:12px;">
+            <div id="main-logo-icon" style="width:38px; height:38px; background:#000; border-radius:12px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900;">G</div>
+            <h1 id="nav-title">Vibiz Pro</h1>
+        </div>
+        <div class="search-wrapper"><input type="text" id="pc-search" placeholder="Caută în bază..." oninput="renderTable()"></div>
+        <button id="btn-new-prog" class="btn-add-pro admin-only" onclick="openM()">+ Programare Nouă</button>
+    </div>
+
+    <div class="main-container">
+        <div class="sidebar">
+            <div class="nav-item active" onclick="showPage('dashboard', this)"><span id="txt-dash">📊 Dashboard</span></div>
+            <div class="nav-item admin-only" onclick="showPage('users', this)"><span id="txt-users">👥 Utilizatori</span></div>
+            <div class="nav-item admin-only" onclick="showPage('connections', this)"><span id="txt-conn">🔗 Conexiuni</span></div>
+            <div class="nav-item admin-only" onclick="showPage('settings', this)"><span id="txt-sett">⚙️ Setări</span></div>
+            
+            <div style="margin-top:auto; background:rgba(255,255,255,0.6); padding:15px; border-radius:22px;">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+                    <div id="u-avatar" style="width:35px; height:35px; background:#000; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">G</div>
+                    <div style="overflow:hidden">
+                        <div id="u-name-display" style="font-size:12px; font-weight:800; white-space:nowrap; text-overflow:ellipsis;">Gabriel Diaz</div>
+                        <div id="u-role" style="font-size:10px; color:#888;">Admin</div>
+                    </div>
+                </div>
+                <button class="btn-logout" style="width:100%" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </div>
+
+        <div class="main-view">
+            <div id="page-dashboard" class="view-section active">
+                <div class="content-card"><div id="gantt_chart"></div></div>
+                <div class="content-card">
+                    <table>
+                        <thead><tr><th id="th-int">Interval</th><th id="th-prog">Program</th><th id="th-cli">Client</th><th id="th-loc">Locație</th><th id="th-tip">Tip</th><th class="admin-only">Acțiuni</th></tr></thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="page-users" class="view-section">
+                <div class="content-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h2 id="txt-team-title">Management Echipă</h2>
+                        <button class="btn-add-pro" onclick="openUserModal()">+ Adaugă Membru</button>
+                    </div>
+                    <div id="users-table-container">
+                        <p style="padding:20px; color:#666;">Se încarcă lista membrilor...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="page-connections" class="view-section"><div class="content-card"><h2>Conexiuni</h2><p>Baza de date Google Sheets este activă.</p></div></div>
+            <div id="page-settings" class="view-section">
+                <div class="content-card">
+                    <h2 id="txt-sett-title" style="margin-top:0">⚙️ Setări Profil & Aplicație</h2>
+                    <p id="txt-sett-desc" style="color:#666; margin-bottom:20px;">Personalizează modul în care apare interfața pentru tine.</p>
+                    
+                    <div style="display:flex; flex-direction:column; gap:20px; max-width:400px;">
+                        <div>
+                            <label id="lbl-username" style="font-weight:700; font-size:13px; display:block; margin-bottom:8px;">Nume Utilizator</label>
+                            <div style="display:flex; gap:10px;">
+                                <input type="text" id="set-user-name" placeholder="Ex: Gabriel Diaz" style="margin-bottom:0;">
+                                <button class="btn-add-pro" onclick="updateProfileName()">Salvează</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label id="lbl-lang" style="font-weight:700; font-size:13px; display:block; margin-bottom:8px;">Limba Sistemului (Language)</label>
+                            <select id="set-lang" onchange="updateLanguage()" style="padding:12px; border-radius:12px;">
+                                <option value="ro">Română 🇷🇴</option>
+                                <option value="fr">Français 🇫🇷</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0">Detalii Șantier</h2>
+            <input type="hidden" id="f-id">
+            <input type="text" id="f-c" placeholder="Client">
+            <input type="text" id="f-o" placeholder="Locație">
+            <div class="flex-row"><input type="date" id="f-d1"><input type="time" id="f-h1"></div>
+            <div class="flex-row"><input type="date" id="f-d2"><input type="time" id="f-h2"></div>
+            <select id="f-t"><option value="interior">Interior</option><option value="exterior">Exterior</option><option value="vizita">Vizită</option></select>
+            <button class="btn-add-pro" style="width:100%" onclick="save()">Salvează</button>
+            <button onclick="closeM()" style="width:100%; border:none; background:none; cursor:pointer; color:#999; margin-top:10px;">Anulează</button>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAPl5J3Pe-ZNNwgQCPONVH6QQI_AGzQETGH3tER6QSvkOjSBy3yLvf3gX0z4QQdy5R/exec";
+        let allData = [];
+        let allUsers = [];
+
+        // --- AUTH & SESSION ---
+        async function handleLogin() {
+            const email = document.getElementById('l-email').value;
+            const pass = document.getElementById('l-pass').value;
+            if(!email || !pass) return Swal.fire('Eroare', 'Completează tot!', 'warning');
+            
+            Swal.fire({title: 'Autentificare...', didOpen: () => Swal.showLoading()});
+            try {
+                const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email: email, pass: pass })});
+                const res = await r.json();
+                
+                if(res.success) {
+                    localStorage.setItem('vibiz_session', JSON.stringify(res));
+                    location.reload();
+                } else {
+                    Swal.fire('Eroare', 'Email/Parolă incorectă', 'error');
+                }
+            } catch(e) { Swal.fire('Eroare', 'Problemă de conexiune', 'error'); }
+        }
+
+        function handleLogout() { localStorage.removeItem('vibiz_session'); location.reload(); }
+
+        function checkSession() {
+            const session = localStorage.getItem('vibiz_session');
+            if(session) {
+                const user = JSON.parse(session);
+                document.getElementById('login-screen').style.display = 'none';
+                
+                document.getElementById('u-name-display').innerText = user.nume;
+                document.getElementById('u-role').innerText = user.rol;
+                const initiala = user.nume.charAt(0).toUpperCase();
+                document.getElementById('u-avatar').innerText = initiala;
+                document.getElementById('main-logo-icon').innerText = initiala;
+                
+                if(user.rol !== 'Admin') {
+                    document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+                }
+
+                // Incarcare limba
+                const savedLang = localStorage.getItem('vibiz_lang') || 'ro';
+                document.getElementById('set-lang').value = savedLang;
+                applyTranslations(savedLang);
+
+                load();
+            }
+        }
+
+        // --- NAVIGATION ---
+        function showPage(pageId, element) {
+            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+            element.classList.add('active');
+            
+            if(pageId === 'dashboard') setTimeout(drawChart, 200);
+            if(pageId === 'users') loadUsers(); 
+            if(pageId === 'settings') syncSettingsFields();
+        }
+
+        // --- DATA LOADING ---
+        google.charts.load('current', {'packages':['gantt']});
+        async function load() {
+            try {
+                const r = await fetch(SCRIPT_URL);
+                const data = await r.json();
+                allData = data.map(x => ({ id: x[0], client: x[1], oras: x[2], data_in: x[3], ora_in: x[4], tip: x[5], data_out: x[6]||x[3], ora_out: x[7]||"17:00" }));
+                renderTable();
+                drawChart();
+            } catch(e) { console.log("Eroare load santiere", e); }
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('table-body');
+            const session = localStorage.getItem('vibiz_session');
+            if(!session) return;
+            const user = JSON.parse(session);
+            
+            tbody.innerHTML = allData.map(x => `
+                <tr>
+                    <td style="font-weight:700; color:var(--primary)">${x.data_in}</td>
+                    <td>${x.ora_in} - ${x.ora_out}</td>
+                    <td style="font-weight:800">${x.client}</td>
+                    <td>📍 ${x.oras}</td>
+                    <td><span class="role-badge" style="background:#eee">${x.tip}</span></td>
+                    ${user.rol === 'Admin' ? `<td><button onclick="openM('${x.id}')" style="cursor:pointer; border:none; background:#000; color:#fff; border-radius:5px; padding:5px 10px;">EDIT</button></td>` : '<td>-</td>'}
+                </tr>
+            `).join('');
+        }
+
+        function drawChart() {
+            if (!allData.length || !document.getElementById('page-dashboard').classList.contains('active')) return;
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'ID'); data.addColumn('string', 'Name'); data.addColumn('string', 'Res'); data.addColumn('date', 'Start'); data.addColumn('date', 'End'); data.addColumn('number', 'Dur'); data.addColumn('number', 'Pct'); data.addColumn('string', 'Dep');
+            const rows = allData.map(x => [x.id, x.client, x.tip, new Date(x.data_in), new Date(new Date(x.data_out).getTime() + 86400000), null, 100, null]);
+            data.addRows(rows);
+            new google.visualization.Gantt(document.getElementById('gantt_chart')).draw(data, { height: 350 });
+        }
+
+        // --- MANAGEMENT UTILIZATORI ---
+        async function loadUsers() {
+            const container = document.getElementById('users-table-container');
+            container.innerHTML = "<p style='padding:20px; color:#666;'>Se încarcă membrii din Google Sheets...</p>";
+            try {
+                const r = await fetch(SCRIPT_URL + "?getUsers=true");
+                const data = await r.json();
+                allUsers = data.slice(1); 
+                renderUsers();
+            } catch(e) { container.innerHTML = "<p style='color:red;'>Eroare la conectare!</p>"; }
+        }
+
+        function renderUsers() {
+            const container = document.getElementById('users-table-container');
+            if (!allUsers || allUsers.length === 0) {
+                container.innerHTML = "<p style='padding:20px;'>Nu s-au găsit utilizatori.</p>";
+                return;
+            }
+            container.innerHTML = `<table><thead><tr><th>Nume</th><th>Email</th><th>Rol</th><th style="text-align:right">Acțiuni</th></tr></thead>
+            <tbody>${allUsers.map(u => `<tr><td><div style="font-weight:800">${u[0]}</div></td><td style="color:#666">${u[1]}</td><td><span class="role-badge ${String(u[3]).toLowerCase()}">${u[3]}</span></td><td style="text-align:right"><button onclick="openUserModal('${u[1]}')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:700">✎</button><button onclick="deleteUser('${u[1]}')" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-left:10px">✖</button></td></tr>`).join('')}</tbody></table>`;
+        }
+
+        async function openUserModal(email = null) {
+            const u = allUsers.find(x => x[1] === email) || ["", "", "", "Worker"];
+            const { value: f } = await Swal.fire({
+                title: email ? 'Editare Utilizator' : 'Membru Nou',
+                html: `<input id="s-n" class="swal2-input" placeholder="Nume" value="${u[0]}"><input id="s-e" class="swal2-input" placeholder="Email" value="${u[1]}"><input id="s-p" class="swal2-input" placeholder="Parolă" value="${u[2]}"><select id="s-r" class="swal2-input"><option value="Admin" ${u[3]=='Admin'?'selected':''}>Admin</option><option value="Worker" ${u[3]=='Worker'?'selected':''}>Worker</option></select>`,
+                preConfirm: () => ({ nume:document.getElementById('s-n').value, email:document.getElementById('s-e').value, pass:document.getElementById('s-p').value, rol:document.getElementById('s-r').value, oldEmail: email })
+            });
+            if(f) {
+                Swal.fire({title:'Salvare...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+                await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ action:'manage_user', subAction: email?'edit':'add', ...f })});
+                await loadUsers();
+                Swal.fire('Succes!', 'Informațiile au fost salvate.', 'success');
+            }
+        }
+
+        async function deleteUser(email) {
+            const result = await Swal.fire({ title: 'Ești sigur?', text: "Utilizatorul " + email + " va fi șters definitiv!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#d33', confirmButtonText: 'Da, șterge!' });
+            if (result.isConfirmed) {
+                Swal.fire({title:'Se șterge...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
+                await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify({ action:'manage_user', subAction:'delete', email: email })});
+                await loadUsers();
+                Swal.fire('Șters!', 'Utilizatorul a fost eliminat.', 'success');
+            }
+        }
+
+        // --- MODAL ȘANTIERE ---
+        function openM(id = null) {
+            const x = allData.find(i => String(i.id) === String(id));
+            document.getElementById('f-id').value = id || "";
+            document.getElementById('f-c').value = id ? x.client : "";
+            document.getElementById('f-o').value = id ? x.oras : "";
+            document.getElementById('f-d1').value = id ? x.data_in : "";
+            document.getElementById('f-h1').value = id ? x.ora_in.substring(0,5) : "08:00";
+            document.getElementById('f-d2').value = id ? x.data_out : "";
+            document.getElementById('f-h2').value = id ? x.ora_out.substring(0,5) : "17:00";
+            document.getElementById('modal').style.display = 'flex';
+        }
+        function closeM() { document.getElementById('modal').style.display = 'none'; }
+        async function save() {
+            const p = { action: document.getElementById('f-id').value ? "edit" : "add", id: document.getElementById('f-id').value || "ID-"+Date.now(), client: document.getElementById('f-c').value, oras: document.getElementById('f-o').value, data_in: document.getElementById('f-d1').value, ora_in: document.getElementById('f-h1').value, data_out: document.getElementById('f-d2').value, ora_out: document.getElementById('f-h2').value, tip: document.getElementById('f-t').value };
+            closeM(); Swal.fire({title:'Salvare...', didOpen: () => Swal.showLoading()});
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(p) });
+            await load(); Swal.close();
+        }
+
+        // --- SETTINGS FUNCTIONS ---
+        function updateProfileName() {
+            const newName = document.getElementById('set-user-name').value;
+            if(!newName) return Swal.fire('Eroare', 'Introdu un nume valid', 'error');
+            let session = JSON.parse(localStorage.getItem('vibiz_session'));
+            session.nume = newName;
+            localStorage.setItem('vibiz_session', JSON.stringify(session));
+            document.getElementById('u-name-display').innerText = newName;
+            const initiala = newName.charAt(0).toUpperCase();
+            document.getElementById('u-avatar').innerText = initiala;
+            document.getElementById('main-logo-icon').innerText = initiala;
+            Swal.fire('Succes', 'Numele a fost actualizat!', 'success');
+        }
+
+        function updateLanguage() {
+            const lang = document.getElementById('set-lang').value;
+            localStorage.setItem('vibiz_lang', lang);
+            applyTranslations(lang);
+            Swal.fire({
+                title: lang === 'fr' ? 'Langue changée!' : 'Limba schimbată!',
+                icon: 'success',
+                timer: 1000,
+                showConfirmButton: false
+            });
+        }
+
+        function applyTranslations(lang) {
+            const i18n = {
+                ro: {
+                    dash: "📊 Dashboard", users: "👥 Utilizatori", conn: "🔗 Conexiuni", sett: "⚙️ Setări",
+                    btn_new: "+ Programare Nouă", team: "Management Echipă", 
+                    s_title: "⚙️ Setări Profil & Aplicație", s_desc: "Personalizează interfața.", 
+                    l_user: "Nume Utilizator", l_lang: "Limba Sistemului",
+                    th1: "Interval", th2: "Program", th3: "Client", th4: "Locație", th5: "Tip"
+                },
+                fr: {
+                    dash: "📊 Tableau de bord", users: "👥 Utilisateurs", conn: "🔗 Connexions", sett: "⚙️ Paramètres",
+                    btn_new: "+ Nouveau Projet", team: "Gestion d'Équipe", 
+                    s_title: "⚙️ Paramètres Profil", s_desc: "Personnalisez votre interface.", 
+                    l_user: "Nom d'utilisateur", l_lang: "Langue du système",
+                    th1: "Intervalle", th2: "Programme", th3: "Client", th4: "Lieu", th5: "Type"
+                }
+            };
+            const t = i18n[lang];
+            document.getElementById('txt-dash').innerHTML = t.dash;
+            document.getElementById('txt-users').innerHTML = t.users;
+            document.getElementById('txt-conn').innerHTML = t.conn;
+            document.getElementById('txt-sett').innerHTML = t.sett;
+            document.getElementById('btn-new-prog').innerText = t.btn_new;
+            document.getElementById('txt-team-title').innerText = t.team;
+            document.getElementById('txt-sett-title').innerText = t.s_title;
+            document.getElementById('txt-sett-desc').innerText = t.s_desc;
+            document.getElementById('lbl-username').innerText = t.l_user;
+            document.getElementById('lbl-lang').innerText = t.l_lang;
+            // Tabel coloane
+            document.getElementById('th-int').innerText = t.th1;
+            document.getElementById('th-prog').innerText = t.th2;
+            document.getElementById('th-cli').innerText = t.th3;
+            document.getElementById('th-loc').innerText = t.th4;
+            document.getElementById('th-tip').innerText = t.th5;
+        }
+
+        function syncSettingsFields() {
+            const session = JSON.parse(localStorage.getItem('vibiz_session'));
+            if(session) document.getElementById('set-user-name').value = session.nume;
+        }
+
+        window.onload = checkSession;
+    </script>
+</body>
+</html>
