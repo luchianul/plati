@@ -44,7 +44,11 @@
 
         .sidebar { width: var(--sidebar-width); background: var(--glass-bg); backdrop-filter: blur(30px); border-radius: 30px; padding: 25px; display: flex; flex-direction: column; gap: 8px; }
         .nav-item { padding: 14px 18px; border-radius: 15px; cursor: pointer; font-weight: 600; color: #666; display: flex; align-items: center; gap: 12px; }
-        .nav-item.active { background: #000; color: #fff; }
+        .nav-item.active { 
+    background: rgba(0, 122, 255, 0.15); /* Albastru foarte transparent */
+    color: var(--primary); /* Textul devine albastru */
+    border: 1px solid rgba(0, 122, 255, 0.2);
+}
 
         .main-view { flex: 1; background: var(--glass-bg); backdrop-filter: blur(30px); border-radius: 30px; padding: 30px; overflow-y: auto; }
         .view-section { display: none; flex-direction: column; gap: 25px; }
@@ -99,9 +103,16 @@
 
     <div class="top-navbar">
         <div style="display:flex; align-items:center; gap:12px;">
-            <div id="main-logo-icon" style="width:38px; height:38px; background:#000; border-radius:12px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900;">G</div>
-            <h1 id="nav-title">Vibiz Pro</h1>
+    <div id="main-logo-icon" style="width:40px; height:40px; background:#000; border-radius:12px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:18px;">G</div>
+    
+    <div style="display:flex; flex-direction:column; justify-content:center;">
+        <h1 id="nav-title" style="margin:0; font-size:22px; line-height:1; font-weight:800; color:#1a1a1a;">Vibiz Pro</h1>
+        <div style="font-size:10px; margin-top:3px; color:#8e8e93; letter-spacing:0.3px;">
+            <span style="font-weight:400; opacity:0.7;">powered by</span> 
+            <span style="font-weight:700; color:#007AFF;">VerTech</span>
         </div>
+    </div>
+</div>
         <div class="search-wrapper"><input type="text" id="pc-search" placeholder="Search..." oninput="renderTable()"></div>
         <button id="btn-new-prog" class="btn-add-pro" style="display:none" onclick="openM()">+ <span id="txt-new-prog">Programare Nouă</span></button>
     </div>
@@ -302,17 +313,31 @@
         }
 
         function updateUserUI(user) {
-            document.getElementById('u-name-display').innerText = user.nume;
-            document.getElementById('u-role-text').innerText = user.rol;
-            const init = user.nume.charAt(0).toUpperCase();
-            document.getElementById('u-avatar').innerText = init;
-            document.getElementById('main-logo-icon').innerText = init;
-            if(user.rol === 'Admin') {
-                document.getElementById('btn-new-prog').style.display = 'block';
-                document.getElementById('menu-users').style.display = 'flex';
-                document.getElementById('menu-conn').style.display = 'flex';
-            }
-        }
+    // 1. Actualizăm numele și rolul în sidebar (jos)
+    document.getElementById('u-name-display').innerText = user.nume;
+    document.getElementById('u-role-text').innerText = user.rol;
+
+    // 2. Calculăm inițiala (ex: 'G' de la Gabriel)
+    const init = user.nume.charAt(0).toUpperCase();
+
+    // 3. Punem inițiala în cele două locuri din interfață:
+    // - În avatarul rotund din sidebar (u-avatar)
+    // - În logo-ul pătrat din bara de sus (main-logo-icon)
+    document.getElementById('u-avatar').innerText = init;
+    document.getElementById('main-logo-icon').innerText = init;
+
+    // 4. Verificăm permisiunile de Admin pentru a afișa butoanele extra
+    if (user.rol === 'Admin') {
+        document.getElementById('btn-new-prog').style.display = 'block';
+        document.getElementById('menu-users').style.display = 'flex';
+        document.getElementById('menu-conn').style.display = 'flex';
+    } else {
+        // Opțional: le ascundem dacă userul nu este Admin
+        document.getElementById('btn-new-prog').style.display = 'none';
+        document.getElementById('menu-users').style.display = 'none';
+        document.getElementById('menu-conn').style.display = 'none';
+    }
+}
 
         async function load() {
             const r = await fetch(SCRIPT_URL);
