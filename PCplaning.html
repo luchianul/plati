@@ -79,8 +79,45 @@
         .modal-input { width: 100%; padding: 14px; border-radius: 15px; border: 1px solid #eee; margin-bottom: 12px; box-sizing: border-box; font-family: inherit; outline: none; }
         
         .status-day-col { background: rgba(255,255,255,0.3); border-radius: 15px; padding: 10px; min-height: 450px; border: 1px dashed rgba(0,0,0,0.1); }
-        .status-card { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; cursor: pointer; border-left: none; }
+        .status-card { background: white; padding: 12px; border-radius: 12px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; cursor: grab; user-select: none; }
         .status-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.1); }
+        .status-card:active { cursor: grabbing; }
+        /* Impiedică elementele interne să blocheze drag-ul */
+        .status-card * { pointer-events: none; }
+		
+		/* Stil pentru carduri cu Border Discret */
+.status-card.tip-interior { 
+    border: 1.5px solid rgba(52, 199, 89, 0.3) !important; /* Verde pal */
+    background: white;
+}
+.status-card.tip-exterior { 
+    border: 1.5px solid rgba(255, 149, 0, 0.3) !important; /* Portocaliu pal */
+    background: white;
+}
+.status-card.tip-vizita { 
+    border: 1.5px solid rgba(88, 86, 214, 0.3) !important; /* Violet pal */
+    background: white;
+}
+
+/* Efectul de Glow apare DOAR la Hover (când treci cu mouse-ul) */
+.status-card:hover {
+    transform: translateY(-3px);
+    transition: 0.3s ease;
+}
+
+.status-card.tip-interior:hover { 
+    border-color: #34C759 !important; 
+    box-shadow: 0 5px 15px rgba(52, 199, 89, 0.2); 
+}
+.status-card.tip-exterior:hover { 
+    border-color: #FF9500 !important; 
+    box-shadow: 0 5px 15px rgba(255, 149, 0, 0.2); 
+}
+.status-card.tip-vizita:hover { 
+    border-color: #5856D6 !important; 
+    box-shadow: 0 5px 15px rgba(88, 86, 214, 0.2); 
+}
+		
     </style>
 </head>
 <body>
@@ -89,16 +126,28 @@
 
     <div id="login-screen">
         <div class="login-card">
-            <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:30px;">
-                <div id="login-logo-circle" style="width:60px; height:60px; background:#000; border-radius:18px; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:28px; margin-bottom:15px;">G</div>
-                <h2 style="margin:0; font-size:24px; font-weight:800;">Vibiz Pro</h2>
-                <div style="font-size:11px; margin-top:5px; color:#8e8e93; letter-spacing:0.5px;">
-                    <span style="font-weight:400; opacity:0.7;">powered by</span> 
-                    <span style="font-weight:800; color:#007AFF;">VerTech</span>
-                </div>
-            </div>
-            <input type="email" id="l-email" placeholder="Email" class="modal-input">
-            <input type="password" id="l-pass" placeholder="Password" class="modal-input">
+    <div style="text-align: center; margin-bottom: 40px; margin-top: 10px;">
+        <h1 style="margin: 0; font-size: 36px; font-weight: 800; color: #1a1a1a; letter-spacing: -1.5px;">
+            Vibiz Pro
+        </h1>
+        <div style="font-size: 14px; margin-top: 8px; color: #8e8e93; letter-spacing: 0.5px;">
+            <span style="font-weight: 400; opacity: 0.7;">powered by</span> 
+            <span style="font-weight: 800; color: #007AFF; text-transform: uppercase;">VerTech</span>
+        </div>
+    </div>
+            
+			<div style="width: 100%;">
+    <input type="email" id="l-email" placeholder="Email" class="modal-input" 
+           style="width: 100%; margin-bottom: 15px;"
+           onkeyup="if(event.key === 'Enter') handleLogin()">
+</div>
+
+<div style="width: 100%;">
+    <input type="password" id="l-pass" placeholder="Password" class="modal-input" 
+           style="width: 100%; margin-bottom: 15px;"
+           onkeyup="if(event.key === 'Enter') handleLogin()">
+</div>
+			
             <button class="btn-add-pro" style="width:100%" onclick="handleLogin()" id="txt-login-btn">Intră în cont</button>
         </div>
     </div>
@@ -239,9 +288,15 @@
         let currentStatusDate = new Date();
         
         const translations = {
-            ro: { dash: "📊 Dashboard", status: "📅 Status Săptămânal", users: "👥 Utilizatori", conn: "🔗 Conexiuni", set: "⚙️ Setări", logout: "Ieșire", new_p: "Programare Nouă", interval: "Interval", hour: "Orar", client: "Client", loc: "Locație", type: "Tip", act: "Acțiuni", save: "Salvează", cancel: "Anulează", team: "Management Echipă", add_u: "Membru Nou", processing: "Se procesează...", name_lbl: "Nume Utilizator", lang_lbl: "Limbă Sistem", conn_title: "Stare Conexiune", conn_msg: "● Baza de date Google Sheets este activă.", cap_title: "Capacitate Anuală", cap_desc: "Calculat la un maxim de 10 intervenții/zi (fără weekend-uri).", edit_btn: "EDITARE", del_btn: "ȘTERGE", status_title: "Planificare Săptămânală", week_prev: "◀ Înapoi", week_next: "Înainte ▶", days: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'], free: "Liber" },
-            fr: { dash: "📊 Tableau de bord", status: "📅 Statut Hebdomadaire", users: "👥 Utilisateurs", conn: "🔗 Connexions", set: "⚙️ Paramètres", logout: "Déconnexion", new_p: "Nouveau RDV", interval: "Intervalle", hour: "Horaire", client: "Client", loc: "Emplacement", type: "Type", act: "Actions", save: "Enregistrer", cancel: "Annuler", team: "Gestion d'équipe", add_u: "Nouveau Membre", processing: "Traitement...", name_lbl: "Nom d'utilisateur", lang_lbl: "Langue", conn_title: "État de Connexion", conn_msg: "● La base de données Google Sheets est active.", cap_title: "Capacité Annuelle", cap_desc: "Calculé sur un max de 10 interventions/jour (hors week-ends).", edit_btn: "MODIFIER", del_btn: "SUPPRIMER", status_title: "Planification Hebdomadaire", week_prev: "◀ Retour", week_next: "Suivant ▶", days: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], free: "Libre" },
-            en: { dash: "📊 Dashboard", status: "📅 Weekly Status", users: "👥 Users", conn: "🔗 Connections", set: "⚙️ Settings", logout: "Logout", new_p: "New Entry", interval: "Interval", hour: "Schedule", client: "Client", loc: "Location", type: "Type", act: "Actions", save: "Save", cancel: "Cancel", team: "Team Management", add_u: "New Member", processing: "Processing...", name_lbl: "Username", lang_lbl: "System Language", conn_title: "Connection Status", conn_msg: "● Google Sheets database is active.", cap_title: "Annual Capacity", cap_desc: "Based on 10 bookings/day (excluding weekends).", edit_btn: "EDIT", del_btn: "DELETE", status_title: "Weekly Planning", week_prev: "◀ Back", week_next: "Next ▶", days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], free: "Free" }
+            ro: { dash: "📊 Dashboard", status: "📅 Status Săptămânal", users: "👥 Utilizatori", conn: "🔗 Conexiuni", set: "⚙️ Setări", logout: "Ieșire", new_p: "Programare Nouă", interval: "Interval", hour: "Orar", client: "Client", loc: "Locație", type: "Tip", act: "Acțiuni", save: "Salvează", cancel: "Anulează", team: "Management Echipă", add_u: "Membru Nou", processing: "Se procesează...", name_lbl: "Nume Utilizator", lang_lbl: "Limbă Sistem", conn_title: "Stare Conexiune", conn_msg: "● Baza de date Google Sheets este activă.", cap_title: "Capacitate Anuală", cap_desc: "Calculat la un maxim de 10 intervenții/zi (fără weekend-uri).", edit_btn: "EDITARE", del_btn: "ȘTERGE", status_title: "Planificare Săptămânală", week_prev: "◀ Înapoi", week_next: "Înainte ▶", days: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'], free: "Liber", type_int: "Interior",
+        type_ext: "Exterior",
+        type_viz: "Vizită" },
+            fr: { dash: "📊 Tableau de bord", status: "📅 Statut Hebdomadaire", users: "👥 Utilisateurs", conn: "🔗 Connexions", set: "⚙️ Paramètres", logout: "Déconnexion", new_p: "Nouveau RDV", interval: "Intervalle", hour: "Horaire", client: "Client", loc: "Emplacement", type: "Type", act: "Actions", save: "Enregistrer", cancel: "Annuler", team: "Gestion d'équipe", add_u: "Nouveau Membre", processing: "Traitement...", name_lbl: "Nom d'utilisateur", lang_lbl: "Langue", conn_title: "État de Connexion", conn_msg: "● La base de données Google Sheets est active.", cap_title: "Capacité Annuelle", cap_desc: "Calculé sur un max de 10 interventions/jour (hors week-ends).", edit_btn: "MODIFIER", del_btn: "SUPPRIMER", status_title: "Planification Hebdomadaire", week_prev: "◀ Retour", week_next: "Suivant ▶", days: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], free: "Libre", type_int: "Intérieur",
+        type_ext: "Extérieur",
+        type_viz: "Visite" },
+            en: { dash: "📊 Dashboard", status: "📅 Weekly Status", users: "👥 Users", conn: "🔗 Connections", set: "⚙️ Settings", logout: "Logout", new_p: "New Entry", interval: "Interval", hour: "Schedule", client: "Client", loc: "Location", type: "Type", act: "Actions", save: "Save", cancel: "Cancel", team: "Team Management", add_u: "New Member", processing: "Processing...", name_lbl: "Username", lang_lbl: "System Language", conn_title: "Connection Status", conn_msg: "● Google Sheets database is active.", cap_title: "Annual Capacity", cap_desc: "Based on 10 bookings/day (excluding weekends).", edit_btn: "EDIT", del_btn: "DELETE", status_title: "Weekly Planning", week_prev: "◀ Back", week_next: "Next ▶", days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], free: "Free", type_int: "Indoor",
+        type_ext: "Outdoor",
+        type_viz: "Visit" }
         };
 
         function applyLang() {
@@ -324,11 +379,26 @@
         }
 
         async function load() {
-            const r = await fetch(SCRIPT_URL);
-            const d = await r.json();
-            allData = d.map(x => ({ id: x[0], client: x[1], oras: x[2], data_in: x[3], ora_in: x[4], tip: x[5], data_out: x[6]||x[3], ora_out: x[7]||"17:00" }));
-            renderTable(); drawChart(); updateCapacityProgress();
-        }
+    console.log("Încep încărcarea datelor...");
+    try {
+        showLoader(true);
+        const r = await fetch(SCRIPT_URL);
+        const d = await r.json();
+        console.log("Date primite din Sheet:", d);
+        allData = d.map(x => ({ 
+            id: x[0], client: x[1], oras: x[2], data_in: x[3], 
+            ora_in: x[4], tip: x[5], data_out: x[6]||x[3], ora_out: x[7]||"" 
+        }));
+        renderTable(); 
+        if (typeof drawChart === "function") drawChart(); 
+        updateCapacityProgress();
+        showLoader(false);
+    } catch (err) {
+        console.error("Eroare la încărcare:", err);
+        showLoader(false);
+        Swal.fire('Eroare de conexiune', 'Nu am putut accesa Google Sheets', 'error');
+    }
+}
 
         function renderTable() {
             const lang = localStorage.getItem('vibiz_lang') || 'ro';
@@ -349,7 +419,7 @@
             document.getElementById('f-d1').value = x.data_in ? new Date(x.data_in).toISOString().split('T')[0] : "";
             document.getElementById('f-h1').value = id ? formatTime(x.ora_in) : "08:00";
             document.getElementById('f-d2').value = x.data_out ? new Date(x.data_out).toISOString().split('T')[0] : "";
-            document.getElementById('f-h2').value = id ? formatTime(x.ora_out) : "17:00";
+            document.getElementById('f-h2').value = id ? formatTime(x.ora_out) : "";
             document.getElementById('f-t').value = x.tip || "interior";
             document.getElementById('modal').style.display = 'flex';
         }
@@ -381,6 +451,7 @@
             const t = translations[lang];
             const grid = document.getElementById('status-grid');
             const picker = document.getElementById('status-date-picker');
+            
             if(!picker.value) picker.value = currentStatusDate.toISOString().split('T')[0];
             const selectedDate = new Date(picker.value);
             const dayOfWeek = selectedDate.getDay();
@@ -389,18 +460,100 @@
             
             grid.innerHTML = '';
             for (let i = 0; i < 7; i++) {
-                const d = new Date(monday); d.setDate(monday.getDate() + i);
+                const d = new Date(monday); 
+                d.setDate(monday.getDate() + i);
                 const dateStr = d.toISOString().split('T')[0];
+                
                 const dailyJobs = allData.filter(j => dateStr >= j.data_in && dateStr <= j.data_out);
-                const col = document.createElement('div'); col.className = "status-day-col";
-                let html = `<div style="text-align:center; margin-bottom:15px; border-bottom: 2px solid var(--primary); padding-bottom:5px;"><div style="font-weight:800; font-size:14px;">${t.days[i]}</div><div style="font-size:11px; color:#666;">${formatDateShort(dateStr)}</div></div>`;
+                const col = document.createElement('div'); 
+                col.className = "status-day-col";
+                
+                col.setAttribute('ondragover', 'allowDrop(event)');
+                col.setAttribute('ondrop', `handleDrop(event, '${dateStr}')`);
+                
+                let html = `<div style="text-align:center; margin-bottom:15px; border-bottom: 2px solid var(--primary); padding-bottom:5px;">
+                                <div style="font-weight:800; font-size:14px;">${t.days[i]}</div>
+                                <div style="font-size:11px; color:#666;">${formatDateShort(dateStr)}</div>
+                            </div>`;
+                
                 dailyJobs.forEach(j => {
-                    html += `<div class="status-card" onclick="openM('${j.id}')"><div style="font-weight:800; font-size:13px; margin-bottom:4px;">${j.client}</div><div style="font-size:11px; color:#555; margin-bottom:4px;">📍 ${j.oras}</div><div style="font-size:10px; color:#888; font-weight:700;">🕒 ${j.ora_in} - ${j.ora_out}</div></div>`;
-                });
+    // Aplicăm clasa de tip direct pe card
+    const typeClass = `tip-${j.tip.toLowerCase()}`;
+    
+    html += `<div class="status-card ${typeClass}" 
+                draggable="true" 
+                ondragstart="handleDragStart(event, '${j.id}')" 
+                onclick="openM('${j.id}')"
+                style="border-radius: 15px;"> <div style="font-weight:800; font-size:13px; margin-bottom:4px; color: #1a1a1a;">
+                    ${j.client}
+                </div>
+                <div style="font-size:11px; color: #555; margin-bottom:4px;">📍 ${j.oras}</div>
+                <div style="font-size:10px; color:#666; font-weight:700; background: rgba(0,0,0,0.03); padding: 3px 6px; border-radius: 6px; display: inline-block;">
+                    🕒 ${j.ora_in} ${j.ora_out ? '- ' + j.ora_out : ''}
+                </div>
+             </div>`;
+});
+                
                 if(!dailyJobs.length) html += `<div style="text-align:center; color:#bbb; font-size:11px; margin-top:20px;">${t.free}</div>`;
-                col.innerHTML = html; grid.appendChild(col);
+                
+                col.innerHTML = html; 
+                grid.appendChild(col);
             }
         }
+
+        function handleDragStart(ev, id) {
+            ev.dataTransfer.setData("text/plain", id);
+            ev.dataTransfer.effectAllowed = "move";
+            setTimeout(() => { ev.target.style.opacity = "0.3"; }, 0);
+        }
+
+        function allowDrop(ev) {
+            ev.preventDefault();
+        }
+
+        async function handleDrop(ev, newDateStr) {
+    ev.preventDefault();
+    document.querySelectorAll('.status-card').forEach(c => c.style.opacity = "1");
+    const id = ev.dataTransfer.getData("text/plain");
+    const job = allData.find(j => String(j.id) === String(id));
+    
+    if (job && job.data_in !== newDateStr) {
+        // Calculăm durata originală în milisecunde
+        const dStartOriginal = new Date(job.data_in);
+        const dEndOriginal = new Date(job.data_out);
+        const durataMs = dEndOriginal.getTime() - dStartOriginal.getTime();
+
+        // Noua dată de început
+        const newStartDate = new Date(newDateStr);
+        // Noua dată de final păstrând durata exactă (0 pentru vizite de o zi)
+        const newEndDate = new Date(newStartDate.getTime() + durataMs);
+
+        const payload = {
+            action: "edit",
+            userRole: 'Admin',
+            id: job.id,
+            client: job.client,
+            oras: job.oras,
+            data_in: newStartDate.toISOString().split('T')[0],
+            ora_in: job.ora_in,
+            data_out: newEndDate.toISOString().split('T')[0],
+            ora_out: job.ora_out,
+            tip: job.tip
+        };
+
+        showLoader(true);
+        try {
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+            await load();
+            renderStatus(); // Refresh vizual instant
+            Swal.fire({ icon: 'success', title: 'Mutat cu succes!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+        } catch (err) {
+            Swal.fire('Eroare', 'Eroare la comunicarea cu serverul', 'error');
+        } finally {
+            showLoader(false);
+        }
+    }
+}
 
         async function loadUsers() {
             const lang = localStorage.getItem('vibiz_lang') || 'ro'; const t = translations[lang];
@@ -459,6 +612,16 @@
         }
 
         window.onload = checkSession;
+		
+		function getTipColor(tip) {
+    switch(tip.toLowerCase()) {
+        case 'interior': return '#34C759';
+        case 'exterior': return '#FF9500';
+        case 'vizita': return '#5856D6';
+        default: return '#8e8e93';
+    }
+}
+		
     </script>
 </body>
 </html>
