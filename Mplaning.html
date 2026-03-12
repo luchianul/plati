@@ -6,76 +6,141 @@
     <title>DiazElectricite Pro Auto-Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --ios-blue: #007AFF;
-            --ios-bg: #E5E5EA;
-            --ios-card: #FFFFFF;
-            --ios-red: #FF3B30;
-            --ios-gray: #8E8E93;
-            --shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
+    :root {
+        --ios-blue: #007AFF;
+        --ios-bg: linear-gradient(135deg, #2E5BFF, #10D7E2, #20E19B, #2E5BFF); 
+        --ios-card: rgba(255, 255, 255, 0.85); 
+        --ios-red: #FF3B30;
+        --ios-gray: #8E8E93;
+        --shadow: 0 12px 35px rgba(0, 50, 100, 0.15);
+    }
 
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--ios-bg); margin: 0; display: flex; justify-content: center; overflow-x: hidden; }
-        .app-shell { width: 100%; max-width: 450px; min-height: 100vh; padding: 15px; box-sizing: border-box; }
+    @keyframes aurora {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
 
-        /* HEADER */
-        .top-card { background: var(--ios-card); border-radius: 24px; padding: 20px; box-shadow: var(--shadow); margin-bottom: 12px; }
-        .user-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
-        .user-info { display: flex; align-items: center; gap: 12px; }
-        .avatar { width: 42px; height: 42px; background: var(--ios-blue); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
-        .user-name { font-size: 17px; font-weight: 800; margin: 0; color: #1C1C1E; }
-        
-        .search-box { position: relative; margin-bottom: 15px; }
-        .search-input { width: 100%; background: #F2F2F7; border: none; padding: 12px 15px 12px 40px; border-radius: 14px; font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none; }
-        .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.5; }
+    body { 
+        font-family: 'Plus Jakarta Sans', sans-serif; 
+        background: var(--ios-bg);
+        background-size: 300% 300%;
+        animation: aurora 15s ease infinite;
+        background-attachment: fixed; 
+        margin: 0; 
+        display: flex; 
+        justify-content: center; 
+        overflow-x: hidden; 
+        min-height: 100vh;
+        position: relative;
+    }
 
-        .nav-tabs { display: flex; background: #F2F2F7; padding: 4px; border-radius: 12px; }
-        .tab-btn { flex: 1; border: none; background: none; padding: 10px; font-size: 12px; font-weight: 700; border-radius: 9px; color: var(--ios-gray); transition: 0.2s; cursor: pointer; }
-        .tab-btn.active { background: white; color: black; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    body::before {
+        content: "";
+        position: fixed;
+        top: -10%;
+        left: -10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(255, 255, 255, 0.2);
+        filter: blur(100px);
+        border-radius: 50%;
+        z-index: -1;
+        pointer-events: none;
+    }
 
-        /* TIMELINE */
-        .timeline-card { background: var(--ios-card); border-radius: 22px; padding: 15px 10px; box-shadow: var(--shadow); margin-bottom: 12px; }
-        .timeline-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px 12px; border-bottom: 1px solid #F2F2F7; margin-bottom: 12px; }
-        .current-month { font-size: 14px; font-weight: 800; text-transform: capitalize; }
-        
-        .jump-btn { position: relative; background: #F2F2F7; border: none; padding: 8px 12px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 5px; font-weight: 700; color: var(--ios-blue); cursor: pointer; overflow: hidden; }
-        #txt-calendar { pointer-events: none; z-index: 1; }
-        #date-jump { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; width: 100%; height: 100%; }
+    .app-shell { width: 100%; max-width: 450px; min-height: 100vh; padding: 15px; box-sizing: border-box; }
 
-        .timeline-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0 10px 0; scrollbar-width: none; scroll-behavior: smooth; }
-        .timeline-scroll::-webkit-scrollbar { display: none; }
-        
-        .t-day { min-width: 50px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; background: #F2F2F7; cursor: pointer; position: relative; transition: 0.3s; }
-        .t-day.is-today { border: 2px solid rgba(0,122,255,0.3); }
-        .t-day.active { background: var(--ios-blue); color: white; transform: scale(1.05); box-shadow: 0 5px 15px rgba(0,122,255,0.2); }
-        .t-day .t-nr { font-size: 17px; font-weight: 800; }
-        .t-day .t-nume { font-size: 9px; font-weight: 600; text-transform: uppercase; opacity: 0.7; }
-        .t-dot { position: absolute; bottom: 6px; width: 5px; height: 5px; background: var(--ios-blue); border-radius: 50%; }
-        .t-day.active .t-dot { background: white; }
+    .top-card, .timeline-card, .card, .modal-body { 
+        background: var(--ios-card); 
+        border-radius: 26px; 
+        box-shadow: var(--shadow); 
+        border: 1px solid rgba(255,255,255,0.6);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+    }
 
-        /* CARDS */
-        .card { background: var(--ios-card); border-radius: 20px; padding: 16px; margin-bottom: 10px; display: flex; align-items: center; box-shadow: var(--shadow); cursor: pointer; }
-        .time-badge { min-width: 100px; padding-right: 12px; margin-right: 12px; border-right: 2px solid #F2F2F7; text-align: center; }
-        .time-val { font-size: 12px; font-weight: 800; color: #1C1C1E; white-space: nowrap; margin-bottom: 4px; }
-        .date-val { font-size: 9px; color: var(--ios-blue); font-weight: 700; line-height: 1.2; }
-        .card-content { flex: 1; }
-        .client-name { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
-        .location { font-size: 12px; color: var(--ios-gray); }
+    .top-card { padding: 20px; margin-bottom: 12px; }
+    .user-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
+    .user-info { display: flex; align-items: center; gap: 12px; }
+    
+    .avatar { 
+        width: 45px; height: 45px; 
+        background: linear-gradient(135deg, var(--ios-blue), #5AC8FA); 
+        color: white; border-radius: 14px; 
+        display: flex; align-items: center; justify-content: center; 
+        font-weight: 800; font-size: 19px;
+        box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+    }
+    
+    .user-name { font-size: 18px; font-weight: 800; margin: 0; color: #1C1C1E; }
+    .search-box { position: relative; margin-bottom: 15px; }
+    .search-input { 
+        width: 100%; background: rgba(0,0,0,0.06); border: none; 
+        padding: 12px 15px 12px 40px; border-radius: 16px; 
+        font-family: inherit; font-size: 14px; box-sizing: border-box; outline: none; 
+    }
+    .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.5; }
 
-        /* MODALS */
-        .fab { position: fixed; bottom: 30px; right: 25px; width: 60px; height: 60px; background: #000; color: white; border-radius: 20px; border: none; font-size: 30px; z-index: 1001; cursor: pointer; }
-        #modal, #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(8px); z-index: 2000; align-items: center; justify-content: center; }
-        .modal-body { background: white; width: 95%; max-width: 380px; border-radius: 28px; padding: 25px; box-sizing: border-box; overflow-y: auto; max-height: 90vh; }
-        .input-group { margin-bottom: 15px; }
-        .input-group label { display: block; font-size: 11px; font-weight: 700; color: var(--ios-gray); margin-bottom: 5px; margin-left: 5px; text-transform: uppercase; }
-        input, select { width: 100%; background: #F2F2F7; border: 1px solid #E5E5EA; padding: 12px; border-radius: 12px; margin-bottom: 5px; font-family: inherit; box-sizing: border-box; font-size: 14px; }
-        .flex-row { display: flex; gap: 8px; }
-        .save-btn { background: #000; color: white; width: 100%; padding: 16px; border-radius: 16px; border: none; font-weight: 700; margin-top: 10px; cursor: pointer; }
-        #loader { display: none; position: fixed; top: 20px; background: #000; color: #fff; padding: 8px 16px; border-radius: 20px; font-size: 11px; z-index: 3000; }
-        
-        /* DELETE BUTTON */
-        .del-btn { display: none; background: #fff; color: var(--ios-red); border: 1.5px solid var(--ios-red); width: 100%; padding: 12px; border-radius: 16px; font-weight: 700; margin-top: 8px; cursor: pointer; align-items: center; justify-content: center; gap: 6px; }
-    </style>
+    .nav-tabs { display: flex; background: rgba(0,0,0,0.06); padding: 4px; border-radius: 14px; }
+    .tab-btn { flex: 1; border: none; background: none; padding: 10px; font-size: 13px; font-weight: 700; border-radius: 11px; color: var(--ios-gray); transition: 0.3s; cursor: pointer; }
+    .tab-btn.active { background: white; color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+    .timeline-card { padding: 15px 10px; margin-bottom: 12px; }
+    .timeline-header { display: flex; justify-content: space-between; align-items: center; padding: 0 10px 12px; border-bottom: 1px solid rgba(0,0,0,0.05); margin-bottom: 12px; }
+    .current-month { font-size: 14px; font-weight: 800; text-transform: capitalize; color: #1C1C1E; }
+    
+    .jump-btn { position: relative; background: rgba(0,0,0,0.05); border: none; padding: 8px 12px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 5px; font-weight: 700; color: var(--ios-blue); cursor: pointer; overflow: hidden; }
+    #date-jump { position: absolute; inset: 0; opacity: 0; cursor: pointer; z-index: 2; width: 100%; height: 100%; }
+
+    .timeline-scroll { display: flex; overflow-x: auto; gap: 10px; padding: 5px 0 10px 0; scrollbar-width: none; scroll-behavior: smooth; }
+    .timeline-scroll::-webkit-scrollbar { display: none; }
+    
+    .t-day { min-width: 52px; height: 68px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 16px; background: rgba(0,0,0,0.04); cursor: pointer; position: relative; transition: 0.3s; }
+    .t-day.is-today { border: 1.5px solid rgba(0,122,255,0.4); }
+    .t-day.active { background: #000; color: white; transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+    .t-day .t-nr { font-size: 17px; font-weight: 800; }
+    .t-day .t-nume { font-size: 9px; font-weight: 600; text-transform: uppercase; opacity: 0.7; }
+    .t-dot { position: absolute; bottom: 8px; width: 5px; height: 5px; background: var(--ios-blue); border-radius: 50%; }
+    .t-day.active .t-dot { background: white; }
+
+    .card { padding: 18px; margin-bottom: 12px; display: flex; align-items: center; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card:active { transform: scale(0.96); }
+    .time-badge { min-width: 95px; padding-right: 15px; margin-right: 15px; border-right: 1.5px solid rgba(0,0,0,0.05); text-align: center; }
+    .time-val { font-size: 13px; font-weight: 800; color: #1C1C1E; margin-bottom: 4px; }
+    .date-val { font-size: 10px; color: var(--ios-blue); font-weight: 700; }
+    .card-content { flex: 1; }
+    .client-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
+    .location { font-size: 13px; color: var(--ios-gray); font-weight: 500; }
+
+    .fab { 
+        position: fixed; bottom: 35px; right: 25px; 
+        width: 65px; height: 65px; background: #000; 
+        color: white; border-radius: 22px; border: none; 
+        font-size: 32px; z-index: 1001; cursor: pointer; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        overflow: hidden;
+    }
+    .fab::after {
+        content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+        transform: rotate(45deg); animation: shine 3.5s infinite;
+    }
+    @keyframes shine { 0% { transform: translateX(-150%) rotate(45deg); } 100% { transform: translateX(150%) rotate(45deg); } }
+
+    #modal, #settings-modal { display: none; position: fixed; inset: 0; background: rgba(0,15,40,0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; align-items: center; justify-content: center; }
+    .modal-body { width: 92%; max-width: 380px; padding: 25px; box-sizing: border-box; overflow-y: auto; max-height: 90vh; }
+    
+    .input-group { margin-bottom: 18px; }
+    .input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--ios-gray); margin-bottom: 6px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    input, select { width: 100%; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); padding: 14px; border-radius: 14px; font-family: inherit; box-sizing: border-box; font-size: 15px; outline: none; transition: 0.2s; }
+    input:focus { background: #fff; border-color: var(--ios-blue); }
+    
+    .save-btn { background: #000; color: white; width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: 700; font-size: 16px; margin-top: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .del-btn { display: none; background: #fff; color: var(--ios-red); border: 1.5px solid var(--ios-red); width: 100%; padding: 14px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; align-items: center; justify-content: center; gap: 8px; }
+    
+    #loader { display: none; position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 13px; z-index: 3000; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+</style>
 </head>
 <body>
 
@@ -88,7 +153,7 @@
                 <div class="avatar" id="app-icon">G</div>
                 <h2 class="user-name" id="welcome-text">Salut, Gabriel!</h2>
             </div>
-            <button style="background:none; border:none; font-size:22px; cursor:pointer" onclick="openSettings()">⚙️</button>
+            <button style="background:none; border:none; font-size:24px; cursor:pointer; opacity: 0.7;" onclick="openSettings()">⚙️</button>
         </div>
         
         <div class="search-box">
@@ -125,20 +190,20 @@
         <div class="input-group">
             <label id="txt-label-client">Detalii Client</label>
             <input type="text" id="f-c">
-            <input type="text" id="f-o">
+            <input type="text" id="f-o" style="margin-top: 8px;">
         </div>
 
         <div class="input-group">
             <label id="txt-label-in">Inceput (Intrare)</label>
-            <div class="flex-row">
+            <div style="display: flex; gap: 8px;">
                 <input type="date" id="f-d1">
                 <input type="time" id="f-h1">
             </div>
         </div>
 
         <div class="input-group">
-            <label id="txt-label-out">Sfârșit (Ieșire)</label>
-            <div class="flex-row">
+            <label id="txt-label-out">Sfârșit (Ieșire - Opțional)</label>
+            <div style="display: flex; gap: 8px;">
                 <input type="date" id="f-d2">
                 <input type="time" id="f-h2">
             </div>
@@ -155,19 +220,17 @@
 
         <button class="save-btn" id="btn-save-job" onclick="save()">Salvează Programarea</button>
         <button class="del-btn" id="btn-delete-job" onclick="delJob()">🗑️ Șterge</button>
-        <button onclick="closeM()" id="btn-cancel-job" style="width:100%; background:none; border:none; color:var(--ios-gray); margin-top:10px; font-weight:600; cursor:pointer">Anulează</button>
+        <button onclick="closeM()" id="btn-cancel-job" style="width:100%; background:none; border:none; color:var(--ios-gray); margin-top:15px; font-weight:700; cursor:pointer">Anulează</button>
     </div>
 </div>
 
 <div id="settings-modal">
     <div class="modal-body">
         <h2 style="text-align:center; margin-top:0; font-size: 20px;">⚙️ Setări Profil</h2>
-        
         <div class="input-group">
             <label id="set-label-name">Numele tău</label>
             <input type="text" id="set-name" placeholder="Ex: Gabriel">
         </div>
-
         <div class="input-group">
             <label id="set-label-lang">Limba Aplicației</label>
             <select id="set-lang">
@@ -176,9 +239,8 @@
                 <option value="en">English 🇬🇧</option>
             </select>
         </div>
-
         <button class="save-btn" id="set-btn-save" onclick="saveSettings()">Salvează Setările</button>
-        <button onclick="closeSettings()" id="set-btn-close" style="width:100%; background:none; border:none; color:var(--ios-gray); margin-top:10px; font-weight:600; cursor:pointer">Închide</button>
+        <button onclick="closeSettings()" id="set-btn-close" style="width:100%; background:none; border:none; color:var(--ios-gray); margin-top:15px; font-weight:700; cursor:pointer">Închide</button>
     </div>
 </div>
 
@@ -190,31 +252,19 @@
     let selectedDate = todayISO;
 
     const translations = {
-        ro: {
-            salut: "Salut", agenda: "Agenda", toate: "Toate Șantierele", cauta: "Caută client sau oraș...", 
-            calendar: "📅 Calendar", niciun: "Niciun șantier de afișat.", titluModal: "Programare Șantier",
-            lClient: "Detalii Client", lIn: "Inceput (Intrare)", lOut: "Sfârșit (Ieșire)", lTip: "Tip Lucrare",
-            bSave: "Salvează Programarea", bCancel: "Anulează", bDel: "🗑️ Șterge", loading: "Se încarcă...",
-            phClient: "Nume Client (Obligatoriu)", phLoc: "Locație (Oraș/Stradă)",
-            setName: "Numele tău", setLang: "Limba Aplicației", setBSave: "Salvează Setările", setBClose: "Închide"
-        },
-        fr: {
-            salut: "Salut", agenda: "Agenda", toate: "Tous les Chantiers", cauta: "Chercher client ou ville...", 
-            calendar: "📅 Calendrier", niciun: "Aucun chantier à afficher.", titluModal: "Planification Chantier",
-            lClient: "Détails Client", lIn: "Début (Entrée)", lOut: "Fin (Sortie)", lTip: "Type de Travail",
-            bSave: "Enregistrer", bCancel: "Annuler", bDel: "🗑️ Supprimer", loading: "Chargement...",
-            phClient: "Nom Client (Obligatoire)", phLoc: "Lieu (Ville/Rue)",
-            setName: "Votre nom", setLang: "Langue de l'App", setBSave: "Enregistrer les paramètres", setBClose: "Fermer"
-        },
-        en: {
-            salut: "Hello", agenda: "Agenda", toate: "All Jobs", cauta: "Search client or city...", 
-            calendar: "📅 Calendar", niciun: "No jobs to display.", titluModal: "Job Scheduling",
-            lClient: "Client Details", lIn: "Start (Check-in)", lOut: "End (Check-out)", lTip: "Work Type",
-            bSave: "Save Job", bCancel: "Cancel", bDel: "🗑️ Delete", loading: "Loading...",
-            phClient: "Client Name (Required)", phLoc: "Location (City/Street)",
-            setName: "Your Name", setLang: "App Language", setBSave: "Save Settings", setBClose: "Close"
-        }
+        ro: { salut: "Salut", agenda: "Agenda", toate: "Toate Șantierele", cauta: "Caută client sau oraș...", calendar: "📅 Calendar", niciun: "Niciun șantier de afișat.", titluModal: "Programare Șantier", lClient: "Detalii Client", lIn: "Inceput (Intrare)", lOut: "Sfârșit (Ieșire)", lTip: "Tip Lucrare", bSave: "Salvează Programarea", bCancel: "Anulează", bDel: "🗑️ Șterge", loading: "Se încarcă...", phClient: "Nume Client (Obligatoriu)", phLoc: "Locație (Oraș/Stradă)", setName: "Numele tău", setLang: "Limba Aplicației", setBSave: "Salvează Setările", setBClose: "Închide" },
+        fr: { salut: "Salut", agenda: "Agenda", toate: "Tous les Chantiers", cauta: "Chercher client ou ville...", calendar: "📅 Calendrier", niciun: "Aucun chantier à afficher.", titluModal: "Planification Chantier", lClient: "Détails Client", lIn: "Début (Entrée)", lOut: "Fin (Sortie)", lTip: "Type de Travail", bSave: "Enregistrer", bCancel: "Annuler", bDel: "🗑️ Supprimer", loading: "Chargement...", phClient: "Nom Client (Obligatoire)", phLoc: "Lieu (Ville/Rue)", setName: "Votre nom", setLang: "Langue de l'App", setBSave: "Enregistrer les paramètres", setBClose: "Fermer" },
+        en: { salut: "Hello", agenda: "Agenda", toate: "All Jobs", cauta: "Search client or city...", calendar: "📅 Calendar", niciun: "No jobs to display.", titluModal: "Job Scheduling", lClient: "Client Details", lIn: "Start (Check-in)", lOut: "End (Check-out)", lTip: "Work Type", bSave: "Save Job", bCancel: "Cancel", bDel: "🗑️ Delete", loading: "Loading...", phClient: "Client Name (Required)", phLoc: "Location (City/Street)", setName: "Your Name", setLang: "App Language", setBSave: "Save Settings", setBClose: "Close" }
     };
+
+    // FUNCȚIE NOUĂ: Repară formatul orei pentru input (HH:mm)
+    function formatTimeForInput(timeStr) {
+        if (!timeStr || timeStr === "--:--") return "";
+        let [h, m] = timeStr.split(':');
+        h = h.padStart(2, '0');
+        m = m ? m.substring(0,2).padStart(2, '0') : '00';
+        return `${h}:${m}`;
+    }
 
     async function load() {
         document.getElementById('loader').style.display = 'block';
@@ -222,13 +272,12 @@
             const r = await fetch(SCRIPT_URL);
             const data = await r.json();
             jobs = data.map(x => ({ 
-                id: x[0], client: x[1] || "Client", oras: x[2] || "Locație", 
-                data: String(x[3] || "").trim(), ora: x[4] || "--:--", 
-                tip: x[5] || "interior", data_out: String(x[6] || x[3] || "").trim(), ora_out: x[7] || "--:--"
+                id: x[0], client: x[1] || "", oras: x[2] || "", 
+                data: String(x[3] || "").trim(), ora: String(x[4] || "").trim(), 
+                tip: x[5] || "interior", 
+                data_out: String(x[6] || "").trim(), ora_out: String(x[7] || "").trim() 
             }));
-            buildTimeline();
-            render();
-            centerSelectedDate();
+            buildTimeline(); render(); centerSelectedDate();
         } catch(e) { console.error(e); }
         document.getElementById('loader').style.display = 'none';
     }
@@ -240,128 +289,50 @@
         const baseDate = new Date(selectedDate);
         const lang = localStorage.getItem('u_lang') || 'ro';
         monthDisp.innerText = baseDate.toLocaleDateString(lang === 'ro' ? 'ro-RO' : (lang === 'fr' ? 'fr-FR' : 'en-US'), { month: 'long', year: 'numeric' });
-
         for (let i = -20; i < 40; i++) {
             const d = new Date(selectedDate);
             d.setDate(baseDate.getDate() + i);
             const iso = d.toISOString().split('T')[0];
-            const hasJob = jobs.some(j => j.data <= iso && j.data_out >= iso);
-            
-            cont.innerHTML += `
-                <div class="t-day ${iso === selectedDate ? 'active' : ''} ${iso === todayISO ? 'is-today' : ''}" id="t-${iso}" onclick="selectDate('${iso}')">
-                    <span class="t-nume">${d.toLocaleDateString(lang === 'ro'?'ro-RO':(lang==='fr'?'fr-FR':'en-US'), { weekday: 'short' })}</span>
-                    <span class="t-nr">${d.getDate()}</span>
-                    ${hasJob ? '<div class="t-dot"></div>' : ''}
-                </div>`;
+            const hasJob = jobs.some(j => j.data <= iso && j.data_out >= iso || j.data === iso);
+            cont.innerHTML += `<div class="t-day ${iso === selectedDate ? 'active' : ''} ${iso === todayISO ? 'is-today' : ''}" id="t-${iso}" onclick="selectDate('${iso}')"><span class="t-nume">${d.toLocaleDateString(lang === 'ro'?'ro-RO':(lang==='fr'?'fr-FR':'en-US'), { weekday: 'short' })}</span><span class="t-nr">${d.getDate()}</span>${hasJob ? '<div class="t-dot"></div>' : ''}</div>`;
         }
         document.getElementById('timeline-box').style.display = (view === 'all') ? 'none' : 'block';
     }
 
-    function centerSelectedDate() {
-        setTimeout(() => {
-            const el = document.getElementById(`t-${selectedDate}`);
-            if(el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }, 300);
-    }
-
-    function selectDate(iso) {
-        selectedDate = iso;
-        buildTimeline();
-        document.getElementById('search-query').value = ""; 
-        render();
-        centerSelectedDate();
-    }
-
-    function jumpToDate(val) {
-        if(!val) return;
-        selectedDate = val;
-        buildTimeline();
-        render();
-        centerSelectedDate();
-    }
-
-    function formatShortDate(iso) {
-        if(!iso) return "";
-        const pts = iso.split('-');
-        return pts.length === 3 ? `${pts[2]}/${pts[1]}` : "";
-    }
+    function centerSelectedDate() { setTimeout(() => { const el = document.getElementById(`t-${selectedDate}`); if(el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }, 300); }
+    function selectDate(iso) { selectedDate = iso; buildTimeline(); document.getElementById('search-query').value = ""; render(); centerSelectedDate(); }
+    function jumpToDate(val) { if(!val) return; selectedDate = val; buildTimeline(); render(); centerSelectedDate(); }
+    function formatShortDate(iso) { if(!iso) return ""; const pts = iso.split('-'); return pts.length === 3 ? `${pts[2]}/${pts[1]}` : ""; }
 
     function render() {
         const cont = document.getElementById('list');
         const query = document.getElementById('search-query').value.toLowerCase();
         const lang = localStorage.getItem('u_lang') || 'ro';
         cont.innerHTML = "";
-        
         let filtered = jobs.filter(x => {
             const matchSearch = x.client.toLowerCase().includes(query) || x.oras.toLowerCase().includes(query);
             if (query !== "") return matchSearch;
-            if (view === 'azi') return x.data <= selectedDate && x.data_out >= selectedDate;
+            if (view === 'azi') return x.data <= selectedDate && (x.data_out ? x.data_out >= selectedDate : x.data === selectedDate);
             return true;
         });
-
-        if (view === 'all' && query === "") {
-            filtered.sort((a,b) => a.data.localeCompare(b.data));
-        }
-
+        if (view === 'all' && query === "") filtered.sort((a,b) => a.data.localeCompare(b.data));
         if(filtered.length === 0) {
-            cont.innerHTML = `<div style="text-align:center; padding:50px 20px; color:gray; font-size:14px; background:white; border-radius:20px; box-shadow:var(--shadow)">${translations[lang].niciun}</div>`;
+            cont.innerHTML = `<div style="text-align:center; padding:50px 20px; color:gray; font-size:14px; background:rgba(255,255,255,0.7); border-radius:20px; backdrop-filter:blur(10px);">${translations[lang].niciun}</div>`;
             return;
         }
-
         filtered.forEach(x => {
             const icon = x.tip === 'exterior' ? '🌳' : (x.tip === 'vizita' ? '📋' : '🏠');
-            const hStart = (x.ora || "").substring(0,5);
-            const hEnd = (x.ora_out || "").substring(0,5);
-            const dStart = formatShortDate(x.data);
-            const dEnd = formatShortDate(x.data_out);
-            const dateDisplay = (x.data === x.data_out || !x.data_out) ? dStart : `${dStart} - ${dEnd}`;
-
-            cont.innerHTML += `
-                <div class="card" onclick="openM('${x.id}')">
-                    <div class="time-badge">
-                        <div class="time-val">${hStart} - ${hEnd}</div>
-                        <div class="date-val">${dateDisplay}</div>
-                    </div>
-                    <div class="card-content">
-                        <div class="client-name">${x.client}</div>
-                        <div class="location">📍 ${x.oras} ${icon}</div>
-                    </div>
-                </div>`;
+            const hStart = x.ora || "--:--";
+            const hEnd = x.ora_out || "--:--";
+            const dateDisplay = (x.data === x.data_out || !x.data_out) ? formatShortDate(x.data) : `${formatShortDate(x.data)} - ${formatShortDate(x.data_out)}`;
+            cont.innerHTML += `<div class="card" onclick="openM('${x.id}')"><div class="time-badge"><div class="time-val">${hStart} - ${hEnd}</div><div class="date-val">${dateDisplay}</div></div><div class="card-content"><div class="client-name">${x.client}</div><div class="location">📍 ${x.oras} ${icon}</div></div></div>`;
         });
     }
 
-    function tab(m) {
-        view = m;
-        document.getElementById('t-azi').classList.toggle('active', m === 'azi');
-        document.getElementById('t-all').classList.toggle('active', m === 'all');
-        if(m === 'azi') {
-            selectedDate = todayISO;
-            buildTimeline();
-            centerSelectedDate();
-        }
-        render();
-    }
-
-    function openSettings() {
-        document.getElementById('set-name').value = localStorage.getItem('u_name') || "Gabriel";
-        document.getElementById('set-lang').value = localStorage.getItem('u_lang') || "ro";
-        document.getElementById('settings-modal').style.display = 'flex';
-    }
-
+    function tab(m) { view = m; document.getElementById('t-azi').classList.toggle('active', m === 'azi'); document.getElementById('t-all').classList.toggle('active', m === 'all'); if(m === 'azi') { selectedDate = todayISO; buildTimeline(); centerSelectedDate(); } render(); }
+    function openSettings() { document.getElementById('set-name').value = localStorage.getItem('u_name') || "Gabriel"; document.getElementById('set-lang').value = localStorage.getItem('u_lang') || "ro"; document.getElementById('settings-modal').style.display = 'flex'; }
     function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
-
-    function saveSettings() {
-        const n = document.getElementById('set-name').value;
-        const l = document.getElementById('set-lang').value;
-        if(n.trim()) {
-            localStorage.setItem('u_name', n);
-            localStorage.setItem('u_lang', l);
-            applyUi(n, l);
-            closeSettings();
-            buildTimeline();
-            render();
-        }
-    }
+    function saveSettings() { const n = document.getElementById('set-name').value; const l = document.getElementById('set-lang').value; if(n.trim()) { localStorage.setItem('u_name', n); localStorage.setItem('u_lang', l); applyUi(n, l); closeSettings(); buildTimeline(); render(); } }
 
     function applyUi(name, lang) {
         const t = translations[lang];
@@ -372,7 +343,6 @@
         document.getElementById('search-query').placeholder = t.cauta;
         document.getElementById('txt-calendar').innerText = t.calendar;
         document.getElementById('loader').innerText = t.loading;
-        
         document.getElementById('txt-modal-title').innerText = t.titluModal;
         document.getElementById('txt-label-client').innerText = t.lClient;
         document.getElementById('f-c').placeholder = t.phClient;
@@ -383,7 +353,6 @@
         document.getElementById('btn-save-job').innerText = t.bSave;
         document.getElementById('btn-cancel-job').innerText = t.bCancel;
         document.getElementById('btn-delete-job').innerText = t.bDel;
-        
         document.getElementById('set-label-name').innerText = t.setName;
         document.getElementById('set-label-lang').innerText = t.setLang;
         document.getElementById('set-btn-save').innerText = t.setBSave;
@@ -393,60 +362,43 @@
     async function save() {
         const client = document.getElementById('f-c').value;
         if(!client) return;
-
-        const payload = {
-            action: document.getElementById('f-id').value ? "edit" : "add",
-            id: document.getElementById('f-id').value || "ID-" + Date.now(),
-            client: client,
-            oras: document.getElementById('f-o').value,
-            data_in: document.getElementById('f-d1').value,
-            ora_in: document.getElementById('f-h1').value,
-            data_out: document.getElementById('f-d2').value,
-            ora_out: document.getElementById('f-h2').value,
-            tip: document.getElementById('f-t').value
+        const payload = { 
+            action: document.getElementById('f-id').value ? "edit" : "add", 
+            id: document.getElementById('f-id').value || "ID-" + Date.now(), 
+            client: client, oras: document.getElementById('f-o').value, 
+            data_in: document.getElementById('f-d1').value, ora_in: document.getElementById('f-h1').value, 
+            data_out: document.getElementById('f-d2').value, ora_out: document.getElementById('f-h2').value, 
+            tip: document.getElementById('f-t').value 
         };
-        closeM();
-        document.getElementById('loader').style.display = 'block';
-        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-        load();
+        closeM(); document.getElementById('loader').style.display = 'block';
+        try { 
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
+            load(); 
+        } catch(e) { alert("Eroare!"); document.getElementById('loader').style.display = 'none'; }
     }
 
-    async function delJob() {
-        const id = document.getElementById('f-id').value;
-        if(!id) return;
-        if(!confirm("Ești sigur că vrei să ștergi acest șantier?")) return;
-
-        closeM();
-        document.getElementById('loader').style.display = 'block';
-        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) });
-        load();
-    }
-
+    async function delJob() { const id = document.getElementById('f-id').value; if(!id || !confirm("Ștergi?")) return; closeM(); document.getElementById('loader').style.display = 'block'; await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) }); load(); }
+    
     function openM(id = null) {
         const x = jobs.find(i => String(i.id) === String(id));
         document.getElementById('f-id').value = id || "";
         document.getElementById('f-c').value = id ? x.client : "";
         document.getElementById('f-o').value = id ? x.oras : "";
         document.getElementById('f-d1').value = id ? x.data : selectedDate;
-        document.getElementById('f-h1').value = id ? String(x.ora || "").substring(0,5) : "";
-        document.getElementById('f-d2').value = id ? x.data_out : (id ? "" : selectedDate);
-        document.getElementById('f-h2').value = id ? String(x.ora_out || "").substring(0,5) : "";
+        
+        // AICI E REPARATIA: Formatăm ora special pentru input
+        document.getElementById('f-h1').value = id ? formatTimeForInput(x.ora) : "08:00";
+        document.getElementById('f-d2').value = id ? x.data_out : "";
+        document.getElementById('f-h2').value = id ? formatTimeForInput(x.ora_out) : "";
+        
         document.getElementById('f-t').value = id ? x.tip : "interior";
-        
-        // Afișăm butonul de ștergere DOAR dacă edităm un șantier existent
         document.getElementById('btn-delete-job').style.display = id ? 'flex' : 'none';
-        
         document.getElementById('modal').style.display = 'flex';
     }
 
     function closeM() { document.getElementById('modal').style.display = 'none'; }
 
-    window.onload = () => {
-        const n = localStorage.getItem('u_name') || "Gabriel";
-        const l = localStorage.getItem('u_lang') || "ro";
-        applyUi(n, l);
-        load();
-    }
+    window.onload = () => { const n = localStorage.getItem('u_name') || "Gabriel"; const l = localStorage.getItem('u_lang') || "ro"; applyUi(n, l); load(); }
 </script>
 </body>
 </html>
