@@ -1,7 +1,7 @@
 {
   "name": "DiazElectricite Pro",
   "short_name": "DiazPro",
-  "start_url": "index.html",
+  "start_url": "Mplaning.html",
   "display": "standalone",
   "background_color": "#2E5BFF",
   "theme_color": "#2E5BFF",
@@ -9,11 +9,6 @@
     {
       "src": "https://via.placeholder.com/192",
       "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://via.placeholder.com/512",
-      "sizes": "512x512",
       "type": "image/png"
     }
   ]
