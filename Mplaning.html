@@ -82,8 +82,8 @@
     }
     .search-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); font-size: 14px; opacity: 0.5; }
 
-    .nav-tabs { display: flex; background: rgba(0,0,0,0.06); padding: 4px; border-radius: 14px; }
-    .tab-btn { flex: 1; border: none; background: none; padding: 10px; font-size: 13px; font-weight: 700; border-radius: 11px; color: var(--ios-gray); transition: 0.3s; cursor: pointer; }
+    .nav-tabs { display: flex; background: rgba(0,0,0,0.06); padding: 4px; border-radius: 14px; gap: 2px; }
+    .tab-btn { flex: 1; border: none; background: none; padding: 10px 5px; font-size: 11px; font-weight: 700; border-radius: 11px; color: var(--ios-gray); transition: 0.3s; cursor: pointer; white-space: nowrap; }
     .tab-btn.active { background: white; color: black; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
 
     .timeline-card { padding: 15px 10px; margin-bottom: 12px; }
@@ -104,14 +104,52 @@
     .t-dot { position: absolute; bottom: 8px; width: 5px; height: 5px; background: var(--ios-blue); border-radius: 50%; }
     .t-day.active .t-dot { background: white; }
 
-    .card { padding: 18px; margin-bottom: 12px; display: flex; align-items: center; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+    /* CARD DESIGN & ANIMATIONS */
+    .card { padding: 18px; margin-bottom: 12px; display: flex; align-items: flex-start; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.6); }
     .card:active { transform: scale(0.96); }
+    
+    .card.priority-card {
+        border: 2px solid #ff3b30 !important;
+        background: rgba(255, 255, 255, 0.98);
+        animation: card-pulse-red 2s infinite alternate;
+        z-index: 1;
+    }
+
+    @keyframes card-pulse-red {
+        from { box-shadow: 0 4px 15px rgba(255, 59, 48, 0.1); transform: scale(1); }
+        to { box-shadow: 0 8px 25px rgba(255, 59, 48, 0.4); transform: scale(1.015); }
+    }
+
     .time-badge { min-width: 95px; padding-right: 15px; margin-right: 15px; border-right: 1.5px solid rgba(0,0,0,0.05); text-align: center; }
     .time-val { font-size: 13px; font-weight: 800; color: #1C1C1E; margin-bottom: 4px; }
     .date-val { font-size: 10px; color: var(--ios-blue); font-weight: 700; }
     .card-content { flex: 1; }
-    .client-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; }
-    .location { font-size: 13px; color: var(--ios-gray); font-weight: 500; }
+    .client-name { font-size: 16px; font-weight: 700; margin-bottom: 3px; color: #000; }
+    .location { font-size: 13px; color: var(--ios-gray); font-weight: 500; margin-bottom: 8px; }
+    
+    /* NEON MESSAGES */
+    .job-message { 
+        font-size: 12.5px; 
+        color: #004fb1;
+        background: rgba(0, 122, 255, 0.05);
+        padding: 10px 14px; 
+        border-radius: 12px; 
+        border: 2px solid #007AFF; 
+        margin-top: 10px;
+        line-height: 1.4;
+        font-weight: 600;
+        box-shadow: 0 0 8px rgba(0, 122, 255, 0.2);
+    }
+
+    .job-message.important { 
+        color: #d00000;
+        background: rgba(255, 0, 0, 0.05);
+        border-color: #ff3b30;
+        box-shadow: 0 0 10px rgba(255, 59, 48, 0.4);
+    }
+
+    .job-message strong { font-weight: 800; text-transform: uppercase; font-size: 11px; display: block; margin-bottom: 2px; }
+    .job-message.important strong { color: #ff3b30; }
 
     .fab { 
         position: fixed; bottom: 35px; right: 25px; 
@@ -133,18 +171,15 @@
     
     .input-group { margin-bottom: 18px; }
     .input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--ios-gray); margin-bottom: 6px; margin-left: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-    input, select { width: 100%; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); padding: 14px; border-radius: 14px; font-family: inherit; box-sizing: border-box; font-size: 15px; outline: none; transition: 0.2s; }
-    input:focus { background: #fff; border-color: var(--ios-blue); }
+    input, select, textarea { width: 100%; background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); padding: 14px; border-radius: 14px; font-family: inherit; box-sizing: border-box; font-size: 15px; outline: none; transition: 0.2s; }
+    textarea { resize: none; height: 80px; }
+    input:focus, textarea:focus { background: #fff; border-color: var(--ios-blue); }
     
     .save-btn { background: #000; color: white; width: 100%; padding: 16px; border-radius: 18px; border: none; font-weight: 700; font-size: 16px; margin-top: 10px; cursor: pointer; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
     .del-btn { display: none; background: #fff; color: var(--ios-red); border: 1.5px solid var(--ios-red); width: 100%; padding: 14px; border-radius: 18px; font-weight: 700; margin-top: 10px; cursor: pointer; align-items: center; justify-content: center; gap: 8px; }
     
     #loader { display: none; position: fixed; top: 25px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); color: #fff; padding: 12px 24px; border-radius: 24px; font-size: 13px; z-index: 3000; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
 </style>
-<link rel="manifest" href="manifest.json?v=2">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">    
 </head>
 <body>
 
@@ -167,7 +202,8 @@
 
         <div class="nav-tabs">
             <button class="tab-btn active" id="t-azi" onclick="tab('azi')">Agenda</button>
-            <button class="tab-btn" id="t-all" onclick="tab('all')">Toate Șantierele</button>
+            <button class="tab-btn" id="t-all" onclick="tab('all')">Toate</button>
+            <button class="tab-btn" id="t-urgente" onclick="tab('urgente')" style="color: #ff3b30;">🚨 Urgente</button>
         </div>
     </div>
 
@@ -206,7 +242,7 @@
         </div>
 
         <div class="input-group">
-            <label id="txt-label-out">Sfârșit (Ieșire - Opțional)</label>
+            <label id="txt-label-out">Sfârșit (Ieșire)</label>
             <div style="display: flex; gap: 8px;">
                 <input type="date" id="f-d2">
                 <input type="time" id="f-h2">
@@ -222,6 +258,16 @@
             </select>
         </div>
 
+        <div class="input-group">
+            <label id="txt-label-msg">Mesaj / Observații</label>
+            <textarea id="f-m"></textarea>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                <input type="checkbox" id="f-important" style="width: 20px; height: 20px; cursor: pointer;">
+                <label for="f-important" id="txt-label-imp" style="margin: 0; color: #ff3b30; font-size: 13px; cursor: pointer; text-transform: none;">Important (Neon Roșu)</label>
+            </div>
+        </div>
+
         <button class="save-btn" id="btn-save-job" onclick="save()">Salvează Programarea</button>
         <button class="del-btn" id="btn-delete-job" onclick="delJob()">🗑️ Șterge</button>
         <button onclick="closeM()" id="btn-cancel-job" style="width:100%; background:none; border:none; color:var(--ios-gray); margin-top:15px; font-weight:700; cursor:pointer">Anulează</button>
@@ -233,7 +279,7 @@
         <h2 style="text-align:center; margin-top:0; font-size: 20px;">⚙️ Setări Profil</h2>
         <div class="input-group">
             <label id="set-label-name">Numele tău</label>
-            <input type="text" id="set-name" placeholder="Ex: Gabriel">
+            <input type="text" id="set-name">
         </div>
         <div class="input-group">
             <label id="set-label-lang">Limba Aplicației</label>
@@ -249,19 +295,18 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzAPl5J3Pe-ZNNwgQCPONVH6QQI_AGzQETGH3tER6QSvkOjSBy3yLvf3gX0z4QQdy5R/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVagyoPhLZhbcw7g9uGUd9ttVZCYPdE_JzjJsIbsumSvNxv7EwTG2l8qJZfofPgAVq/exec";
     let jobs = [];
     let view = 'azi';
     let todayISO = new Date().toISOString().split('T')[0];
     let selectedDate = todayISO;
 
     const translations = {
-        ro: { salut: "Salut", agenda: "Agenda", toate: "Toate Șantierele", cauta: "Caută client sau oraș...", calendar: "📅 Calendar", niciun: "Niciun șantier de afișat.", titluModal: "Programare Șantier", lClient: "Detalii Client", lIn: "Inceput (Intrare)", lOut: "Sfârșit (Ieșire)", lTip: "Tip Lucrare", bSave: "Salvează Programarea", bCancel: "Anulează", bDel: "🗑️ Șterge", loading: "Se încarcă...", phClient: "Nume Client (Obligatoriu)", phLoc: "Locație (Oraș/Stradă)", setName: "Numele tău", setLang: "Limba Aplicației", setBSave: "Salvează Setările", setBClose: "Închide" },
-        fr: { salut: "Salut", agenda: "Agenda", toate: "Tous les Chantiers", cauta: "Chercher client ou ville...", calendar: "📅 Calendrier", niciun: "Aucun chantier à afficher.", titluModal: "Planification Chantier", lClient: "Détails Client", lIn: "Début (Entrée)", lOut: "Fin (Sortie)", lTip: "Type de Travail", bSave: "Enregistrer", bCancel: "Annuler", bDel: "🗑️ Supprimer", loading: "Chargement...", phClient: "Nom Client (Obligatoire)", phLoc: "Lieu (Ville/Rue)", setName: "Votre nom", setLang: "Langue de l'App", setBSave: "Enregistrer les paramètres", setBClose: "Fermer" },
-        en: { salut: "Hello", agenda: "Agenda", toate: "All Jobs", cauta: "Search client or city...", calendar: "📅 Calendar", niciun: "No jobs to display.", titluModal: "Job Scheduling", lClient: "Client Details", lIn: "Start (Check-in)", lOut: "End (Check-out)", lTip: "Work Type", bSave: "Save Job", bCancel: "Cancel", bDel: "🗑️ Delete", loading: "Loading...", phClient: "Client Name (Required)", phLoc: "Location (City/Street)", setName: "Your Name", setLang: "App Language", setBSave: "Save Settings", setBClose: "Close" }
+        ro: { salut: "Salut", agenda: "Agenda", toate: "Toate", urgente: "🚨 Urgente", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTĂ", calendar: "📅 Calendar", niciun: "Niciun șantier.", titluModal: "Programare Șantier", lClient: "Detalii Client", lIn: "Inceput", lOut: "Sfârșit", lTip: "Tip Lucrare", lMsg: "Mesaj / Observații", lImp: "Marcat ca IMPORTANT", bSave: "Salvează", bCancel: "Anulează", bDel: "🗑️ Șterge", loading: "Se încarcă...", phClient: "Nume Client", phLoc: "Oraș", phMsg: "Detalii...", setName: "Numele tău", setLang: "Limba Aplicației", setBSave: "Salvează", setBClose: "Închide" },
+        fr: { salut: "Salut", agenda: "Agenda", toate: "Tous", urgente: "🚨 Urgents", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE", calendar: "📅 Calendrier", niciun: "Aucun chantier.", titluModal: "Planification", lClient: "Client", lIn: "Début", lOut: "Fin", lTip: "Type", lMsg: "Notes", lImp: "Marquer IMPORTANT", bSave: "Enregistrer", bCancel: "Annuler", bDel: "🗑️ Supprimer", loading: "Chargement...", phClient: "Nom Client", phLoc: "Ville", phMsg: "Notes...", setName: "Votre nom", setLang: "Langue", setBSave: "Sauver", setBClose: "Fermer" },
+        en: { salut: "Hello", agenda: "Agenda", toate: "All", urgente: "🚨 Urgent", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE", calendar: "📅 Calendar", niciun: "No jobs.", titluModal: "Scheduling", lClient: "Client Details", lIn: "Start", lOut: "End", lTip: "Type", lMsg: "Notes", lImp: "Mark IMPORTANT", bSave: "Save", bCancel: "Cancel", bDel: "🗑️ Delete", loading: "Loading...", phClient: "Client Name", phLoc: "City", phMsg: "Details...", setName: "Your Name", setLang: "Language", setBSave: "Save", setBClose: "Close" }
     };
 
-    // FUNCȚIE NOUĂ: Repară formatul orei pentru input (HH:mm)
     function formatTimeForInput(timeStr) {
         if (!timeStr || timeStr === "--:--") return "";
         let [h, m] = timeStr.split(':');
@@ -279,7 +324,8 @@
                 id: x[0], client: x[1] || "", oras: x[2] || "", 
                 data: String(x[3] || "").trim(), ora: String(x[4] || "").trim(), 
                 tip: x[5] || "interior", 
-                data_out: String(x[6] || "").trim(), ora_out: String(x[7] || "").trim() 
+                data_out: String(x[6] || "").trim(), ora_out: String(x[7] || "").trim(),
+                mesaj: x[8] || "" 
             }));
             buildTimeline(); render(); centerSelectedDate();
         } catch(e) { console.error(e); }
@@ -300,7 +346,7 @@
             const hasJob = jobs.some(j => j.data <= iso && j.data_out >= iso || j.data === iso);
             cont.innerHTML += `<div class="t-day ${iso === selectedDate ? 'active' : ''} ${iso === todayISO ? 'is-today' : ''}" id="t-${iso}" onclick="selectDate('${iso}')"><span class="t-nume">${d.toLocaleDateString(lang === 'ro'?'ro-RO':(lang==='fr'?'fr-FR':'en-US'), { weekday: 'short' })}</span><span class="t-nr">${d.getDate()}</span>${hasJob ? '<div class="t-dot"></div>' : ''}</div>`;
         }
-        document.getElementById('timeline-box').style.display = (view === 'all') ? 'none' : 'block';
+        document.getElementById('timeline-box').style.display = (view === 'all' || view === 'urgente') ? 'none' : 'block';
     }
 
     function centerSelectedDate() { setTimeout(() => { const el = document.getElementById(`t-${selectedDate}`); if(el) el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }); }, 300); }
@@ -308,32 +354,77 @@
     function jumpToDate(val) { if(!val) return; selectedDate = val; buildTimeline(); render(); centerSelectedDate(); }
     function formatShortDate(iso) { if(!iso) return ""; const pts = iso.split('-'); return pts.length === 3 ? `${pts[2]}/${pts[1]}` : ""; }
 
-    function render() {
-        const cont = document.getElementById('list');
-        const query = document.getElementById('search-query').value.toLowerCase();
-        const lang = localStorage.getItem('u_lang') || 'ro';
-        cont.innerHTML = "";
-        let filtered = jobs.filter(x => {
-            const matchSearch = x.client.toLowerCase().includes(query) || x.oras.toLowerCase().includes(query);
-            if (query !== "") return matchSearch;
-            if (view === 'azi') return x.data <= selectedDate && (x.data_out ? x.data_out >= selectedDate : x.data === selectedDate);
-            return true;
-        });
-        if (view === 'all' && query === "") filtered.sort((a,b) => a.data.localeCompare(b.data));
-        if(filtered.length === 0) {
-            cont.innerHTML = `<div style="text-align:center; padding:50px 20px; color:gray; font-size:14px; background:rgba(255,255,255,0.7); border-radius:20px; backdrop-filter:blur(10px);">${translations[lang].niciun}</div>`;
-            return;
-        }
-        filtered.forEach(x => {
-            const icon = x.tip === 'exterior' ? '🌳' : (x.tip === 'vizita' ? '📋' : '🏠');
-            const hStart = x.ora || "--:--";
-            const hEnd = x.ora_out || "--:--";
-            const dateDisplay = (x.data === x.data_out || !x.data_out) ? formatShortDate(x.data) : `${formatShortDate(x.data)} - ${formatShortDate(x.data_out)}`;
-            cont.innerHTML += `<div class="card" onclick="openM('${x.id}')"><div class="time-badge"><div class="time-val">${hStart} - ${hEnd}</div><div class="date-val">${dateDisplay}</div></div><div class="card-content"><div class="client-name">${x.client}</div><div class="location">📍 ${x.oras} ${icon}</div></div></div>`;
-        });
+function render() {
+    const cont = document.getElementById('list');
+    const query = document.getElementById('search-query').value.toLowerCase();
+    const lang = localStorage.getItem('u_lang') || 'ro';
+    cont.innerHTML = "";
+
+    let filtered = jobs.filter(x => {
+        const matchSearch = (x.client + x.oras).toLowerCase().includes(query);
+        if (query !== "") return matchSearch;
+        if (view === 'urgente') return (x.mesaj || "").startsWith("!");
+        if (view === 'azi') return x.data <= selectedDate && (x.data_out ? x.data_out >= selectedDate : x.data === selectedDate);
+        return true;
+    });
+
+    if ((view === 'all' || view === 'urgente') && query === "") filtered.sort((a,b) => a.data.localeCompare(b.data));
+
+    if(filtered.length === 0) {
+        cont.innerHTML = `<div style="text-align:center; padding:50px 20px; color:gray; font-size:14px; background:rgba(255,255,255,0.7); border-radius:20px; backdrop-filter:blur(10px);">${translations[lang].niciun}</div>`;
+        return;
     }
 
-    function tab(m) { view = m; document.getElementById('t-azi').classList.toggle('active', m === 'azi'); document.getElementById('t-all').classList.toggle('active', m === 'all'); if(m === 'azi') { selectedDate = todayISO; buildTimeline(); centerSelectedDate(); } render(); }
+    filtered.forEach(x => {
+        const icon = x.tip === 'exterior' ? '🌳' : (x.tip === 'vizita' ? '📋' : '🏠');
+        const hStart = x.ora || "--:--";
+        const hEnd = x.ora_out || "--:--";
+        const dateDisplay = (x.data === x.data_out || !x.data_out) ? formatShortDate(x.data) : `${formatShortDate(x.data)} - ${formatShortDate(x.data_out)}`;
+        
+        let msgText = x.mesaj || "";
+        let isImportant = msgText.startsWith("!");
+        let finalMsg = isImportant ? msgText.substring(1) : msgText;
+        const labelText = isImportant ? translations[lang].tagImp : translations[lang].tagNota;
+
+        // --- LOGICA NOUA: Link către Google Maps ---
+        // Curățăm adresa de caractere ciudate pentru URL
+        const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.oras)}`;
+
+        const messageHtml = finalMsg ? `
+            <div class="job-message ${isImportant ? 'important' : ''}">
+                <strong>${labelText}:</strong> ${finalMsg}
+            </div>` : "";
+
+        cont.innerHTML += `
+            <div class="card ${isImportant ? 'priority-card' : ''}" onclick="openM('${x.id}')">
+                <div class="time-badge">
+                    <div class="time-val">${hStart} - ${hEnd}</div>
+                    <div class="date-val">${dateDisplay}</div>
+                </div>
+                <div class="card-content">
+                    <div class="client-name">${x.client}</div>
+                    <div class="location">
+                        📍 ${x.oras} ${icon}
+                        <a href="${mapsUrl}" target="_blank" onclick="event.stopPropagation();" style="text-decoration:none; margin-left:8px; display:inline-block; background:#eef2ff; padding:2px 8px; border-radius:8px; font-size:11px; font-weight:bold; color:#007AFF; border:1px solid #d0dbff;">
+                             GPS ↗
+                        </a>
+                    </div>
+                    ${messageHtml}
+                </div>
+            </div>`;
+    });
+}
+
+    function tab(m) { 
+        view = m; 
+        document.getElementById('t-azi').classList.toggle('active', m === 'azi'); 
+        document.getElementById('t-all').classList.toggle('active', m === 'all'); 
+        document.getElementById('t-urgente').classList.toggle('active', m === 'urgente'); 
+        if(m === 'azi') { selectedDate = todayISO; buildTimeline(); centerSelectedDate(); }
+        document.getElementById('timeline-box').style.display = (m === 'all' || m === 'urgente') ? 'none' : 'block';
+        render(); 
+    }
+
     function openSettings() { document.getElementById('set-name').value = localStorage.getItem('u_name') || "Gabriel"; document.getElementById('set-lang').value = localStorage.getItem('u_lang') || "ro"; document.getElementById('settings-modal').style.display = 'flex'; }
     function closeSettings() { document.getElementById('settings-modal').style.display = 'none'; }
     function saveSettings() { const n = document.getElementById('set-name').value; const l = document.getElementById('set-lang').value; if(n.trim()) { localStorage.setItem('u_name', n); localStorage.setItem('u_lang', l); applyUi(n, l); closeSettings(); buildTimeline(); render(); } }
@@ -344,6 +435,7 @@
         document.getElementById('app-icon').innerText = name.charAt(0).toUpperCase();
         document.getElementById('t-azi').innerText = t.agenda;
         document.getElementById('t-all').innerText = t.toate;
+        document.getElementById('t-urgente').innerText = t.urgente;
         document.getElementById('search-query').placeholder = t.cauta;
         document.getElementById('txt-calendar').innerText = t.calendar;
         document.getElementById('loader').innerText = t.loading;
@@ -354,6 +446,9 @@
         document.getElementById('txt-label-in').innerText = t.lIn;
         document.getElementById('txt-label-out').innerText = t.lOut;
         document.getElementById('txt-label-tip').innerText = t.lTip;
+        document.getElementById('txt-label-msg').innerText = t.lMsg;
+        document.getElementById('txt-label-imp').innerText = t.lImp;
+        document.getElementById('f-m').placeholder = t.phMsg;
         document.getElementById('btn-save-job').innerText = t.bSave;
         document.getElementById('btn-cancel-job').innerText = t.bCancel;
         document.getElementById('btn-delete-job').innerText = t.bDel;
@@ -366,19 +461,20 @@
     async function save() {
         const client = document.getElementById('f-c').value;
         if(!client) return;
+        let rawMsg = document.getElementById('f-m').value;
+        let isImp = document.getElementById('f-important').checked;
+        let finalMsg = (isImp && rawMsg) ? "!" + rawMsg : rawMsg;
+
         const payload = { 
             action: document.getElementById('f-id').value ? "edit" : "add", 
             id: document.getElementById('f-id').value || "ID-" + Date.now(), 
             client: client, oras: document.getElementById('f-o').value, 
             data_in: document.getElementById('f-d1').value, ora_in: document.getElementById('f-h1').value, 
             data_out: document.getElementById('f-d2').value, ora_out: document.getElementById('f-h2').value, 
-            tip: document.getElementById('f-t').value 
+            tip: document.getElementById('f-t').value, mesaj: finalMsg 
         };
         closeM(); document.getElementById('loader').style.display = 'block';
-        try { 
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); 
-            load(); 
-        } catch(e) { alert("Eroare!"); document.getElementById('loader').style.display = 'none'; }
+        try { await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) }); load(); } catch(e) { alert("Eroare!"); document.getElementById('loader').style.display = 'none'; }
     }
 
     async function delJob() { const id = document.getElementById('f-id').value; if(!id || !confirm("Ștergi?")) return; closeM(); document.getElementById('loader').style.display = 'block'; await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete", id: id }) }); load(); }
@@ -389,22 +485,26 @@
         document.getElementById('f-c').value = id ? x.client : "";
         document.getElementById('f-o').value = id ? x.oras : "";
         document.getElementById('f-d1').value = id ? x.data : selectedDate;
-        
-        // AICI E REPARATIA: Formatăm ora special pentru input
         document.getElementById('f-h1').value = id ? formatTimeForInput(x.ora) : "08:00";
         document.getElementById('f-d2').value = id ? x.data_out : "";
         document.getElementById('f-h2').value = id ? formatTimeForInput(x.ora_out) : "";
-        
         document.getElementById('f-t').value = id ? x.tip : "interior";
+        
+        let msgData = id ? (x.mesaj || "") : "";
+        if (msgData.startsWith("!")) {
+            document.getElementById('f-m').value = msgData.substring(1);
+            document.getElementById('f-important').checked = true;
+        } else {
+            document.getElementById('f-m').value = msgData;
+            document.getElementById('f-important').checked = false;
+        }
         document.getElementById('btn-delete-job').style.display = id ? 'flex' : 'none';
         document.getElementById('modal').style.display = 'flex';
     }
 
     function closeM() { document.getElementById('modal').style.display = 'none'; }
-
     window.onload = () => { const n = localStorage.getItem('u_name') || "Gabriel"; const l = localStorage.getItem('u_lang') || "ro"; applyUi(n, l); load(); }
 </script>
 </body>
 </html>
-
-
+</html>
