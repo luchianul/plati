@@ -45,9 +45,57 @@
 
         .main-container { width: 95vw; flex: 1; display: flex; gap: 20px; overflow: hidden; }
 
-        .sidebar { width: var(--sidebar-width); background: var(--glass-bg); backdrop-filter: blur(30px); border-radius: 30px; padding: 25px; display: flex; flex-direction: column; gap: 8px; }
-        .nav-item { padding: 14px 18px; border-radius: 15px; cursor: pointer; font-weight: 600; color: #666; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
-        .nav-item.active { background: var(--primary); color: #fff; box-shadow: 0 4px 15px rgba(0,122,255,0.2); }
+/* Sidebar redesenat */
+.sidebar { 
+    width: var(--sidebar-width); 
+    background: rgba(255, 255, 255, 0.4); /* Mai transparent */
+    backdrop-filter: blur(20px); 
+    border-radius: 30px; 
+    padding: 30px 15px; 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 10px 0 30px rgba(0,0,0,0.02);
+}
+
+/* Item-uri de navigare mai moderne */
+.nav-item { 
+    padding: 16px 20px; 
+    border-radius: 18px; 
+    cursor: pointer; 
+    font-weight: 700; 
+    color: #4A5568; 
+    display: flex; 
+    align-items: center; 
+    gap: 15px; 
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid transparent;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.6);
+    transform: translateX(5px);
+    color: var(--primary);
+}
+
+/* Stilul pentru butonul ACTIV */
+.nav-item.active { 
+    background: #007AFF; 
+    color: #fff !important; 
+    box-shadow: 0 10px 20px rgba(0, 122, 255, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Avatar și Info utilizator jos */
+.user-card-bottom {
+    margin-top: auto; 
+    background: white; 
+    padding: 20px; 
+    border-radius: 24px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    border: 1px solid rgba(0,0,0,0.03);
+}
 
         .main-view { flex: 1; background: var(--glass-bg); backdrop-filter: blur(30px); border-radius: 30px; padding: 30px; overflow-y: auto; }
         .view-section { display: none; flex-direction: column; gap: 25px; }
@@ -98,6 +146,45 @@
     border: 1.5px solid rgba(88, 86, 214, 0.3) !important; /* Violet pal */
     background: white;
 }
+
+/* --- STILURI NOI ADAUGATE AZI --- */
+.status-card.important {
+    border: 2px solid #FF3B30 !important;
+    animation: neon-pulse-pc 1.5s infinite alternate;
+    background: #fff5f5 !important;
+}
+
+@keyframes neon-pulse-pc {
+    from { box-shadow: 0 0 5px rgba(255, 59, 48, 0.2); }
+    to { box-shadow: 0 0 15px rgba(255, 59, 48, 0.5); }
+}
+
+.gps-btn {
+    text-decoration: none; margin-left: 8px; display: inline-flex; align-items: center;
+    background: #f0f4ff; padding: 2px 8px; border-radius: 6px; font-size: 10px;
+    font-weight: 800; color: #007AFF; border: 1px solid #c0d0ff; transition: 0.2s;
+}
+.gps-btn:hover { background: #007AFF; color: white; }
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
+    70% { box-shadow: 0 0 0 10px rgba(255, 59, 48, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+}
+.important-pulse {
+    animation: pulse-red 2s infinite;
+    border: 1px solid rgba(255, 59, 48, 0.3) !important;
+}
+
+.job-tag {
+    font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px;
+    margin-bottom: 4px; display: inline-block; text-transform: uppercase;
+}
+.tag-important { background: #FF3B30; color: white; }
+.tag-nota { background: #EEE; color: #666; }
+
+/* Stil pentru noul tab de Urgente */
+#t-urgente.active { background: #FF3B30 !important; color: #fff !important; }
 
 /* Efectul de Glow apare DOAR la Hover (când treci cu mouse-ul) */
 .status-card:hover {
@@ -169,23 +256,37 @@
 
     <div class="main-container">
         <div class="sidebar">
-            <div class="nav-item active" onclick="showPage('dashboard', this)"><span id="txt-nav-dash">📊 Dashboard</span></div>
-            <div class="nav-item" onclick="showPage('status', this)"><span id="txt-nav-status">📅 Status Săptămânal</span></div>
-            <div id="menu-users" class="nav-item" style="display:none" onclick="showPage('users', this)"><span id="txt-nav-users">👥 Utilizatori</span></div>
-            <div id="menu-conn" class="nav-item" style="display:none" onclick="showPage('connections', this)"><span id="txt-nav-conn">🔗 Conexiuni</span></div>
-            <div class="nav-item" onclick="showPage('settings', this)"><span id="txt-nav-set">⚙️ Setări</span></div>
-            
-            <div style="margin-top:auto; background:rgba(255,255,255,0.6); padding:15px; border-radius:22px;">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:10px;">
-                    <div id="u-avatar" style="width:35px; height:35px; background:#000; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">G</div>
-                    <div>
-                        <div id="u-name-display" style="font-size:12px; font-weight:800;">Utilizator</div>
-                        <div id="u-role-text" style="font-size:10px; color:#888;">Rol</div>
-                    </div>
-                </div>
-                <button onclick="handleLogout()" id="txt-logout" style="width:100%; background:none; border:1px solid rgba(255,59,48,0.2); color:var(--danger); padding:8px; border-radius:10px; cursor:pointer; font-weight:700;">Logout</button>
+    <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="nav-item active" onclick="showPage('dashboard', this)">
+            <span style="font-size: 20px;"></span> <span id="txt-nav-dash">Dashboard</span>
+        </div>
+        <div class="nav-item" onclick="showPage('status', this)">
+            <span style="font-size: 20px;"></span> <span id="txt-nav-status">Status Săptămânal</span>
+        </div>
+        <div id="menu-users" class="nav-item" style="display:none" onclick="showPage('users', this)">
+            <span style="font-size: 20px;"></span> <span id="txt-nav-users">Utilizatori</span>
+        </div>
+        <div id="menu-conn" class="nav-item" style="display:none" onclick="showPage('connections', this)">
+            <span style="font-size: 20px;"></span> <span id="txt-nav-conn">Conexiuni</span>
+        </div>
+        <div class="nav-item" onclick="showPage('settings', this)">
+            <span style="font-size: 20px;"></span> <span id="txt-nav-set">Setări</span>
+        </div>
+    </div>
+    
+    <div class="user-card-bottom">
+        <div style="display:flex; align-items:center; gap:12px; margin-bottom:15px;">
+            <div id="u-avatar" style="width:45px; height:45px; background:#000; color:#fff; border-radius:15px; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:16px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">G</div>
+            <div>
+                <div id="u-name-display" style="font-size:14px; font-weight:800; color: #1a1a1a;">Gabriel</div>
+                <div id="u-role-text" style="font-size:11px; color:#8e8e93; font-weight: 600;">Admin</div>
             </div>
         </div>
+        <button onclick="handleLogout()" id="txt-logout" style="width:100%; background: rgba(255, 59, 48, 0.05); border: 1px solid rgba(255, 59, 48, 0.1); color: var(--danger); padding: 10px; border-radius: 12px; cursor: pointer; font-weight: 700; transition: 0.2s;">
+            Ieșire
+        </button>
+    </div>
+</div>
 
         <div class="main-view">
             <div id="page-dashboard" class="view-section active">
@@ -261,16 +362,41 @@
     </div>
 
     <div id="modal">
-        <div class="modal-content">
-            <h3 id="txt-modal-job">Detalii Șantier</h3>
-            <input type="hidden" id="f-id"><input type="text" id="f-c" placeholder="Client" class="modal-input"><input type="text" id="f-o" placeholder="Locație" class="modal-input">
-            <div style="display:flex; gap:10px;"><input type="date" id="f-d1" class="modal-input"><input type="time" id="f-h1" class="modal-input"></div>
-            <div style="display:flex; gap:10px;"><input type="date" id="f-d2" class="modal-input"><input type="time" id="f-h2" class="modal-input"></div>
-            <select id="f-t" class="modal-input"><option value="interior">Interior</option><option value="exterior">Exterior</option><option value="vizita">Vizită</option></select>
-            <button class="btn-add-pro" style="width:100%;" onclick="save()" id="txt-save-job">Salvează</button>
-            <button onclick="closeM()" style="width:100%; border:none; background:none; cursor:pointer; color:#999; margin-top:10px;" id="txt-cancel-job">Anulează</button>
+    <div class="modal-content">
+        <h3 id="txt-modal-job">Detalii Șantier</h3>
+        <input type="hidden" id="f-id">
+        <input type="text" id="f-c" placeholder="Client" class="modal-input">
+        <input type="text" id="f-o" placeholder="Locație" class="modal-input">
+        
+        <div style="display:flex; gap:10px;">
+            <input type="date" id="f-d1" class="modal-input">
+            <input type="time" id="f-h1" class="modal-input">
         </div>
+        
+        <div style="display:flex; gap:10px;">
+            <input type="date" id="f-d2" class="modal-input">
+            <input type="time" id="f-h2" class="modal-input">
+        </div>
+        
+        <select id="f-t" class="modal-input">
+            <option value="interior">Interior</option>
+            <option value="exterior">Exterior</option>
+            <option value="vizita">Vizită</option>
+        </select>
+
+        <div style="margin-bottom:15px;">
+            <textarea id="f-m" placeholder="Mesaj sau detalii suplimentare..." class="modal-input" style="height: 60px; padding-top:10px; resize: none;"></textarea>
+        </div>
+
+        <div style="margin-bottom:20px; display:flex; align-items:center; gap:10px; background:rgba(255,59,48,0.05); padding:10px; border-radius:12px; border:1px solid rgba(255,59,48,0.1);">
+            <input type="checkbox" id="f-imp" style="width:20px; height:20px; cursor:pointer;">
+            <label for="f-imp" style="font-size:12px; font-weight:800; color:#FF3B30; cursor:pointer; flex:1;">🚨 MARCHEAZĂ CA URGENT / IMPORTANT</label>
+        </div>
+
+        <button class="btn-add-pro" style="width:100%;" onclick="save()" id="txt-save-job">Salvează</button>
+        <button onclick="closeM()" style="width:100%; border:none; background:none; cursor:pointer; color:#999; margin-top:10px;" id="txt-cancel-job">Anulează</button>
     </div>
+</div>
 
     <div id="user-modal">
         <div class="modal-content">
@@ -283,345 +409,446 @@
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwV0XUTQIu0j2y0OK3uYQLhsKvZpkn03pdlFM4h4BuoG8-UE4ONcN3s6VlsXRraQgvF/exec";
-        let allData = []; let allUsers = [];
-        let currentStatusDate = new Date();
-        
-        const translations = {
-            ro: { dash: "📊 Dashboard", status: "📅 Status Săptămânal", users: "👥 Utilizatori", conn: "🔗 Conexiuni", set: "⚙️ Setări", logout: "Ieșire", new_p: "Programare Nouă", interval: "Interval", hour: "Orar", client: "Client", loc: "Locație", type: "Tip", act: "Acțiuni", save: "Salvează", cancel: "Anulează", team: "Management Echipă", add_u: "Membru Nou", processing: "Se procesează...", name_lbl: "Nume Utilizator", lang_lbl: "Limbă Sistem", conn_title: "Stare Conexiune", conn_msg: "● Baza de date Google Sheets este activă.", cap_title: "Capacitate Anuală", cap_desc: "Calculat la un maxim de 10 intervenții/zi (fără weekend-uri).", edit_btn: "EDITARE", del_btn: "ȘTERGE", status_title: "Planificare Săptămânală", week_prev: "◀ Înapoi", week_next: "Înainte ▶", days: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'], free: "Liber", type_int: "Interior",
-        type_ext: "Exterior",
-        type_viz: "Vizită" },
-            fr: { dash: "📊 Tableau de bord", status: "📅 Statut Hebdomadaire", users: "👥 Utilisateurs", conn: "🔗 Connexions", set: "⚙️ Paramètres", logout: "Déconnexion", new_p: "Nouveau RDV", interval: "Intervalle", hour: "Horaire", client: "Client", loc: "Emplacement", type: "Type", act: "Actions", save: "Enregistrer", cancel: "Annuler", team: "Gestion d'équipe", add_u: "Nouveau Membre", processing: "Traitement...", name_lbl: "Nom d'utilisateur", lang_lbl: "Langue", conn_title: "État de Connexion", conn_msg: "● La base de données Google Sheets est active.", cap_title: "Capacité Annuelle", cap_desc: "Calculé sur un max de 10 interventions/jour (hors week-ends).", edit_btn: "MODIFIER", del_btn: "SUPPRIMER", status_title: "Planification Hebdomadaire", week_prev: "◀ Retour", week_next: "Suivant ▶", days: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], free: "Libre", type_int: "Intérieur",
-        type_ext: "Extérieur",
-        type_viz: "Visite" },
-            en: { dash: "📊 Dashboard", status: "📅 Weekly Status", users: "👥 Users", conn: "🔗 Connections", set: "⚙️ Settings", logout: "Logout", new_p: "New Entry", interval: "Interval", hour: "Schedule", client: "Client", loc: "Location", type: "Type", act: "Actions", save: "Save", cancel: "Cancel", team: "Team Management", add_u: "New Member", processing: "Processing...", name_lbl: "Username", lang_lbl: "System Language", conn_title: "Connection Status", conn_msg: "● Google Sheets database is active.", cap_title: "Annual Capacity", cap_desc: "Based on 10 bookings/day (excluding weekends).", edit_btn: "EDIT", del_btn: "DELETE", status_title: "Weekly Planning", week_prev: "◀ Back", week_next: "Next ▶", days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], free: "Free", type_int: "Indoor",
-        type_ext: "Outdoor",
-        type_viz: "Visit" }
-        };
-
-        function applyLang() {
-            const lang = localStorage.getItem('vibiz_lang') || 'ro';
-            const t = translations[lang];
-            document.getElementById('txt-nav-dash').innerText = t.dash;
-            document.getElementById('txt-nav-status').innerText = t.status;
-            document.getElementById('txt-nav-users').innerText = t.users;
-            document.getElementById('txt-nav-conn').innerText = t.conn;
-            document.getElementById('txt-nav-set').innerText = t.set;
-            document.getElementById('txt-logout').innerText = t.logout;
-            document.getElementById('txt-new-prog').innerText = t.new_p;
-            document.getElementById('th-interval').innerText = t.interval;
-            document.getElementById('th-hour').innerText = t.hour;
-            document.getElementById('th-client').innerText = t.client;
-            document.getElementById('th-loc').innerText = t.loc;
-            document.getElementById('th-type').innerText = t.type;
-            document.getElementById('th-act').innerText = t.act;
-            document.getElementById('txt-team-title').innerText = t.team;
-            document.getElementById('txt-add-user').innerText = t.add_u;
-            document.getElementById('txt-processing').innerText = t.processing;
-            document.getElementById('lbl-set-name').innerText = t.name_lbl;
-            document.getElementById('lbl-set-lang').innerText = t.lang_lbl;
-            document.getElementById('btn-save-set').innerText = t.save;
-            document.getElementById('txt-save-job').innerText = t.save;
-            document.getElementById('txt-cancel-job').innerText = t.cancel;
-            document.getElementById('txt-save-user').innerText = t.save;
-            document.getElementById('txt-cancel-user').innerText = t.cancel;
-            document.getElementById('txt-conn-title').innerText = t.conn_title;
-            document.getElementById('txt-conn-msg').innerText = t.conn_msg;
-            document.getElementById('txt-capacity-title').innerText = t.cap_title;
-            document.getElementById('txt-capacity-desc').innerText = t.cap_desc;
-            document.getElementById('set-lang').value = lang;
-            document.getElementById('txt-status-title').innerText = t.status_title;
-            document.getElementById('btn-week-prev').innerText = t.week_prev;
-            document.getElementById('btn-week-next').innerText = t.week_next;
-            renderTable();
-            if(document.getElementById('page-status').classList.contains('active')) renderStatus();
+    // URL-ul nou furnizat
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVagyoPhLZhbcw7g9uGUd9ttVZCYPdE_JzjJsIbsumSvNxv7EwTG2l8qJZfofPgAVq/exec";
+    let allData = []; let allUsers = [];
+    let currentStatusDate = new Date();
+    
+    // Obiectul de traduceri extins cu etichetele noi
+    const translations = {
+        ro: { 
+            dash: "Dashboard", status: "Status Săptămânal", urgente: "Urgente", users: "Utilizatori", conn: "Conexiuni", set: "Setări", logout: "Ieșire", new_p: "Programare Nouă", interval: "Interval", hour: "Orar", client: "Client", loc: "Locație", type: "Tip", act: "Acțiuni", save: "Salvează", cancel: "Anulează", team: "Management Echipă", add_u: "Membru Nou", processing: "Se procesează...", name_lbl: "Nume Utilizator", lang_lbl: "Limbă Sistem", conn_title: "Stare Conexiune", conn_msg: "● Baza de date Google Sheets este activă.", cap_title: "Capacitate Anuală", cap_desc: "Calculat la un maxim de 10 intervenții/zi (fără weekend-uri).", edit_btn: "EDITARE", del_btn: "ȘTERGE", status_title: "Planificare Săptămânală", week_prev: "◀ Înapoi", week_next: "Înainte ▶", days: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'], free: "Liber", type_int: "Interior", type_ext: "Exterior", type_viz: "Vizită", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTĂ" 
+        },
+        fr: { 
+            dash: "Tableau de bord", status: "Statut Hebdomadaire", urgente: "Urgents", users: "Utilisateurs", conn: "Connexions", set: "Paramètres", logout: "Déconnexion", new_p: "Nouveau RDV", interval: "Intervalle", hour: "Horaire", client: "Client", loc: "Emplacement", type: "Type", act: "Actions", save: "Enregistrer", cancel: "Annuler", team: "Gestion d'équipe", add_u: "Nouveau Membre", processing: "Traitement...", name_lbl: "Nom d'utilisateur", lang_lbl: "Langue", conn_title: "État de Connexion", conn_msg: "● La base de données active.", cap_title: "Capacité Annuelle", cap_desc: "Max 10 RDV/jour.", edit_btn: "MODIFIER", del_btn: "SUPPRIMER", status_title: "Planification", week_prev: "◀ Retour", week_next: "Suivant ▶", days: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], free: "Libre", type_int: "Intérieur", type_ext: "Extérieur", type_viz: "Visite", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE" 
+        },
+        en: { 
+            dash: "Dashboard", status: "Weekly Status", urgente: "Urgent", users: "Users", conn: "Connections", set: "Settings", logout: "Logout", new_p: "New Entry", interval: "Interval", hour: "Schedule", client: "Client", loc: "Location", type: "Type", act: "Actions", save: "Save", cancel: "Cancel", team: "Team Management", add_u: "New Member", processing: "Processing...", name_lbl: "Username", lang_lbl: "Language", conn_title: "Connection", conn_msg: "● Active database.", cap_title: "Annual Capacity", cap_desc: "Max 10 bookings/day.", edit_btn: "EDIT", del_btn: "DELETE", status_title: "Weekly Planning", week_prev: "◀ Back", week_next: "Next ▶", days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], free: "Free", type_int: "Indoor", type_ext: "Outdoor", type_viz: "Visit", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE" 
         }
+    };
 
-        function changeLang(val) { localStorage.setItem('vibiz_lang', val); applyLang(); }
-        function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
-        google.charts.load('current', {'packages':['gantt']});
-
-        function formatTime(t) { if(!t) return ""; let p = t.split(':'); return `${p[0].padStart(2,'0')}:${(p[1]||"00").substring(0,2).padStart(2,'0')}`; }
-        function formatDateShort(d) { if(!d) return ""; const parts = d.split('-'); return parts.length < 3 ? d : `${parts[2]}/${parts[1]}`; }
-
-        async function handleLogin() {
-            const email = document.getElementById('l-email').value; const pass = document.getElementById('l-pass').value;
-            showLoader(true);
-            const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email, pass })});
-            const res = await r.json();
-            if(res.success) { localStorage.setItem('vibiz_session', JSON.stringify(res)); location.reload(); }
-            else { showLoader(false); Swal.fire('Eroare', 'Login failed', 'error'); }
-        }
-
-        function handleLogout() { localStorage.removeItem('vibiz_session'); location.reload(); }
-
-        function checkSession() {
-            const session = localStorage.getItem('vibiz_session');
-            if(session) {
-                const user = JSON.parse(session);
-                document.getElementById('login-screen').style.display = 'none';
-                updateUserUI(user); applyLang(); load();
-            }
-        }
-
-        function updateUserUI(user) {
-            document.getElementById('u-name-display').innerText = user.nume;
-            document.getElementById('u-role-text').innerText = user.rol;
-            const init = user.nume.charAt(0).toUpperCase();
-            document.getElementById('u-avatar').innerText = init;
-            document.getElementById('main-logo-icon').innerText = init;
-            const logIcon = document.getElementById('login-logo-circle'); if(logIcon) logIcon.innerText = init;
-            if(user.rol === 'Admin') {
-                document.getElementById('btn-new-prog').style.display = 'block';
-                document.getElementById('menu-users').style.display = 'flex';
-                document.getElementById('menu-conn').style.display = 'flex';
-            }
-        }
-
-        async function load() {
-    console.log("Încep încărcarea datelor...");
-    try {
-        showLoader(true);
-        const r = await fetch(SCRIPT_URL);
-        const d = await r.json();
-        console.log("Date primite din Sheet:", d);
-        allData = d.map(x => ({ 
-            id: x[0], client: x[1], oras: x[2], data_in: x[3], 
-            ora_in: x[4], tip: x[5], data_out: x[6]||x[3], ora_out: x[7]||"" 
-        }));
-        renderTable(); 
-        if (typeof drawChart === "function") drawChart(); 
-        updateCapacityProgress();
-        showLoader(false);
-    } catch (err) {
-        console.error("Eroare la încărcare:", err);
-        showLoader(false);
-        Swal.fire('Eroare de conexiune', 'Nu am putut accesa Google Sheets', 'error');
+    function applyLang() {
+        const lang = localStorage.getItem('vibiz_lang') || 'ro';
+        const t = translations[lang];
+        document.getElementById('txt-nav-dash').innerText = t.dash;
+        document.getElementById('txt-nav-status').innerText = t.status;
+        if(document.getElementById('txt-nav-urgente')) document.getElementById('txt-nav-urgente').innerText = t.urgente;
+        document.getElementById('txt-nav-users').innerText = t.users;
+        document.getElementById('txt-nav-conn').innerText = t.conn;
+        document.getElementById('txt-nav-set').innerText = t.set;
+        document.getElementById('txt-logout').innerText = t.logout;
+        document.getElementById('txt-new-prog').innerText = t.new_p;
+        document.getElementById('th-interval').innerText = t.interval;
+        document.getElementById('th-hour').innerText = t.hour;
+        document.getElementById('th-client').innerText = t.client;
+        document.getElementById('th-loc').innerText = t.loc;
+        document.getElementById('th-type').innerText = t.type;
+        document.getElementById('th-act').innerText = t.act;
+        document.getElementById('txt-team-title').innerText = t.team;
+        document.getElementById('txt-add-user').innerText = t.add_u;
+        document.getElementById('txt-processing').innerText = t.processing;
+        document.getElementById('lbl-set-name').innerText = t.name_lbl;
+        document.getElementById('lbl-set-lang').innerText = t.lang_lbl;
+        document.getElementById('btn-save-set').innerText = t.save;
+        document.getElementById('txt-save-job').innerText = t.save;
+        document.getElementById('txt-cancel-job').innerText = t.cancel;
+        document.getElementById('txt-save-user').innerText = t.save;
+        document.getElementById('txt-cancel-user').innerText = t.cancel;
+        document.getElementById('txt-conn-title').innerText = t.conn_title;
+        document.getElementById('txt-conn-msg').innerText = t.conn_msg;
+        document.getElementById('txt-capacity-title').innerText = t.cap_title;
+        document.getElementById('txt-capacity-desc').innerText = t.cap_desc;
+        document.getElementById('set-lang').value = lang;
+        document.getElementById('txt-status-title').innerText = t.status_title;
+        document.getElementById('btn-week-prev').innerText = t.week_prev;
+        document.getElementById('btn-week-next').innerText = t.week_next;
+        renderTable();
+        if(document.getElementById('page-status').classList.contains('active')) renderStatus();
+        if(document.getElementById('page-urgente') && document.getElementById('page-urgente').classList.contains('active')) renderUrgente();
     }
-}
 
-        function renderTable() {
-            const lang = localStorage.getItem('vibiz_lang') || 'ro';
-            const t = translations[lang];
-            const tb = document.getElementById('table-body'); const user = JSON.parse(localStorage.getItem('vibiz_session'));
-            const q = document.getElementById('pc-search').value.toLowerCase();
-            const filtered = allData.filter(x => x.client.toLowerCase().includes(q) || x.oras.toLowerCase().includes(q));
-            tb.innerHTML = filtered.map(x => {
-                const intervalStr = x.data_in === x.data_out ? formatDateShort(x.data_in) : `${formatDateShort(x.data_in)} - ${formatDateShort(x.data_out)}`;
-                return `<tr><td style="font-weight:700; color:var(--primary);">${intervalStr}</td><td>${x.ora_in} - ${x.ora_out}</td><td style="font-weight:800">${x.client}</td><td>📍 ${x.oras}</td><td><span class="role-badge tip-${x.tip.toLowerCase()}">${x.tip}</span></td><td><div class="action-cell">${user.rol==='Admin'?`<button class="btn-action-edit" onclick="openM('${x.id}')">${t.edit_btn}</button><button class="btn-action-delete" onclick="delE('${x.id}')">${t.del_btn}</button>`:'-'}</div></td></tr>`;
-            }).join('');
-        }
+    function changeLang(val) { localStorage.setItem('vibiz_lang', val); applyLang(); }
+    function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
+    google.charts.load('current', {'packages':['gantt']});
 
-        function openM(id = null) {
-            const x = allData.find(i => String(i.id) === String(id)) || {};
-            document.getElementById('f-id').value = id || ""; document.getElementById('f-c').value = x.client || "";
-            document.getElementById('f-o').value = x.oras || "";
-            document.getElementById('f-d1').value = x.data_in ? new Date(x.data_in).toISOString().split('T')[0] : "";
-            document.getElementById('f-h1').value = id ? formatTime(x.ora_in) : "08:00";
-            document.getElementById('f-d2').value = x.data_out ? new Date(x.data_out).toISOString().split('T')[0] : "";
-            document.getElementById('f-h2').value = id ? formatTime(x.ora_out) : "";
-            document.getElementById('f-t').value = x.tip || "interior";
-            document.getElementById('modal').style.display = 'flex';
-        }
+    function formatTime(t) { if(!t) return ""; let p = t.split(':'); return `${p[0].padStart(2,'0')}:${(p[1]||"00").substring(0,2).padStart(2,'0')}`; }
+    function formatDateShort(d) { if(!d) return ""; const parts = d.split('-'); return parts.length < 3 ? d : `${parts[2]}/${parts[1]}`; }
 
-        function closeM() { document.getElementById('modal').style.display = 'none'; }
-        async function save() {
-            const user = JSON.parse(localStorage.getItem('vibiz_session'));
-            const p = { action: document.getElementById('f-id').value?"edit":"add", userRole: user.rol, id: document.getElementById('f-id').value||"ID-"+Date.now(), client: document.getElementById('f-c').value, oras: document.getElementById('f-o').value, data_in: document.getElementById('f-d1').value, ora_in: document.getElementById('f-h1').value, data_out: document.getElementById('f-d2').value, ora_out: document.getElementById('f-h2').value, tip: document.getElementById('f-t').value };
-            closeM(); showLoader(true); await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(p) });
-            await load(); showLoader(false);
-            Swal.fire({ icon: 'success', title: 'Salvat!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
-        }
-
-        async function delE(id) {
-            if(await Swal.fire({ title: 'Confirmați ștergerea?', showCancelButton: true }).then(r => r.isConfirmed)) {
-                showLoader(true); await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete", id, userRole: 'Admin' }) });
-                await load(); showLoader(false);
-            }
-        }
-
-        function changeWeek(direction) {
-            currentStatusDate.setDate(currentStatusDate.getDate() + (direction * 7));
-            document.getElementById('status-date-picker').value = currentStatusDate.toISOString().split('T')[0];
-            renderStatus();
-        }
-
-        function renderStatus() {
-            const lang = localStorage.getItem('vibiz_lang') || 'ro';
-            const t = translations[lang];
-            const grid = document.getElementById('status-grid');
-            const picker = document.getElementById('status-date-picker');
-            
-            if(!picker.value) picker.value = currentStatusDate.toISOString().split('T')[0];
-            const selectedDate = new Date(picker.value);
-            const dayOfWeek = selectedDate.getDay();
-            const diff = selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
-            const monday = new Date(selectedDate.setDate(diff));
-            
-            grid.innerHTML = '';
-            for (let i = 0; i < 7; i++) {
-                const d = new Date(monday); 
-                d.setDate(monday.getDate() + i);
-                const dateStr = d.toISOString().split('T')[0];
-                
-                const dailyJobs = allData.filter(j => dateStr >= j.data_in && dateStr <= j.data_out);
-                const col = document.createElement('div'); 
-                col.className = "status-day-col";
-                
-                col.setAttribute('ondragover', 'allowDrop(event)');
-                col.setAttribute('ondrop', `handleDrop(event, '${dateStr}')`);
-                
-                let html = `<div style="text-align:center; margin-bottom:15px; border-bottom: 2px solid var(--primary); padding-bottom:5px;">
-                                <div style="font-weight:800; font-size:14px;">${t.days[i]}</div>
-                                <div style="font-size:11px; color:#666;">${formatDateShort(dateStr)}</div>
-                            </div>`;
-                
-                dailyJobs.forEach(j => {
-    // Aplicăm clasa de tip direct pe card
-    const typeClass = `tip-${j.tip.toLowerCase()}`;
-    
-    html += `<div class="status-card ${typeClass}" 
-                draggable="true" 
-                ondragstart="handleDragStart(event, '${j.id}')" 
-                onclick="openM('${j.id}')"
-                style="border-radius: 15px;"> <div style="font-weight:800; font-size:13px; margin-bottom:4px; color: #1a1a1a;">
-                    ${j.client}
-                </div>
-                <div style="font-size:11px; color: #555; margin-bottom:4px;">📍 ${j.oras}</div>
-                <div style="font-size:10px; color:#666; font-weight:700; background: rgba(0,0,0,0.03); padding: 3px 6px; border-radius: 6px; display: inline-block;">
-                    🕒 ${j.ora_in} ${j.ora_out ? '- ' + j.ora_out : ''}
-                </div>
-             </div>`;
-});
-                
-                if(!dailyJobs.length) html += `<div style="text-align:center; color:#bbb; font-size:11px; margin-top:20px;">${t.free}</div>`;
-                
-                col.innerHTML = html; 
-                grid.appendChild(col);
-            }
-        }
-
-        function handleDragStart(ev, id) {
-            ev.dataTransfer.setData("text/plain", id);
-            ev.dataTransfer.effectAllowed = "move";
-            setTimeout(() => { ev.target.style.opacity = "0.3"; }, 0);
-        }
-
-        function allowDrop(ev) {
-            ev.preventDefault();
-        }
-
-        async function handleDrop(ev, newDateStr) {
-    ev.preventDefault();
-    document.querySelectorAll('.status-card').forEach(c => c.style.opacity = "1");
-    const id = ev.dataTransfer.getData("text/plain");
-    const job = allData.find(j => String(j.id) === String(id));
-    
-    if (job && job.data_in !== newDateStr) {
-        // Calculăm durata originală în milisecunde
-        const dStartOriginal = new Date(job.data_in);
-        const dEndOriginal = new Date(job.data_out);
-        const durataMs = dEndOriginal.getTime() - dStartOriginal.getTime();
-
-        // Noua dată de început
-        const newStartDate = new Date(newDateStr);
-        // Noua dată de final păstrând durata exactă (0 pentru vizite de o zi)
-        const newEndDate = new Date(newStartDate.getTime() + durataMs);
-
-        const payload = {
-            action: "edit",
-            userRole: 'Admin',
-            id: job.id,
-            client: job.client,
-            oras: job.oras,
-            data_in: newStartDate.toISOString().split('T')[0],
-            ora_in: job.ora_in,
-            data_out: newEndDate.toISOString().split('T')[0],
-            ora_out: job.ora_out,
-            tip: job.tip
-        };
-
+    async function handleLogin() {
+        const email = document.getElementById('l-email').value; const pass = document.getElementById('l-pass').value;
         showLoader(true);
+        const r = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: 'login', email, pass })});
+        const res = await r.json();
+        if(res.success) { localStorage.setItem('vibiz_session', JSON.stringify(res)); location.reload(); }
+        else { showLoader(false); Swal.fire('Eroare', 'Login failed', 'error'); }
+    }
+
+    function handleLogout() { localStorage.removeItem('vibiz_session'); location.reload(); }
+
+    function checkSession() {
+        const session = localStorage.getItem('vibiz_session');
+        if(session) {
+            const user = JSON.parse(session);
+            document.getElementById('login-screen').style.display = 'none';
+            updateUserUI(user); applyLang(); load();
+        }
+    }
+
+    function updateUserUI(user) {
+        document.getElementById('u-name-display').innerText = user.nume;
+        document.getElementById('u-role-text').innerText = user.rol;
+        const init = user.nume.charAt(0).toUpperCase();
+        document.getElementById('u-avatar').innerText = init;
+        document.getElementById('main-logo-icon').innerText = init;
+        const logIcon = document.getElementById('login-logo-circle'); if(logIcon) logIcon.innerText = init;
+        if(user.rol === 'Admin') {
+            document.getElementById('btn-new-prog').style.display = 'block';
+            document.getElementById('menu-users').style.display = 'flex';
+            document.getElementById('menu-conn').style.display = 'flex';
+        }
+    }
+
+    async function load() {
         try {
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
-            await load();
-            renderStatus(); // Refresh vizual instant
-            Swal.fire({ icon: 'success', title: 'Mutat cu succes!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            showLoader(true);
+            const r = await fetch(SCRIPT_URL);
+            const d = await r.json();
+            // Maparea datelor incluzând și coloana pentru Mesaj (index 8)
+            allData = d.map(x => ({ 
+                id: x[0], client: x[1], oras: x[2], data_in: x[3], 
+                ora_in: x[4], tip: x[5], data_out: x[6]||x[3], ora_out: x[7]||"", mesaj: x[8]||""
+            }));
+            renderTable(); 
+            if (typeof drawChart === "function") drawChart(); 
+            updateCapacityProgress();
+            showLoader(false);
         } catch (err) {
-            Swal.fire('Eroare', 'Eroare la comunicarea cu serverul', 'error');
-        } finally {
             showLoader(false);
+            Swal.fire('Eroare de conexiune', 'Nu am putut accesa Google Sheets', 'error');
         }
+    }
+
+function renderTable() {
+    const lang = localStorage.getItem('vibiz_lang') || 'ro';
+    const t = translations[lang];
+    const tb = document.getElementById('table-body'); 
+    const user = JSON.parse(localStorage.getItem('vibiz_session'));
+    const q = document.getElementById('pc-search').value.toLowerCase();
+    
+    const filtered = allData.filter(x => x.client.toLowerCase().includes(q) || x.oras.toLowerCase().includes(q));
+    
+    tb.innerHTML = filtered.map(x => {
+        const intervalStr = x.data_in === x.data_out ? formatDateShort(x.data_in) : `${formatDateShort(x.data_in)} - ${formatDateShort(x.data_out)}`;
+        
+        // Logica pentru mesaj
+        const msgText = x.mesaj || "";
+        const isImportant = msgText.startsWith("!");
+        const displayMsg = isImportant ? msgText.substring(1) : msgText;
+
+        return `
+        <tr style="${isImportant ? 'background: rgba(255, 59, 48, 0.03);' : ''}">
+            <td style="font-weight:700; color:var(--primary);">${intervalStr}</td>
+            <td>${x.ora_in} - ${x.ora_out}</td>
+            <td>
+                <div style="font-weight:800">${x.client}</div>
+                ${displayMsg ? `
+                <div style="font-size:10px; margin-top:4px; color:${isImportant ? '#FF3B30' : '#555'}; font-weight:600;">
+                    ${isImportant ? '⚠️ ' : ''}${displayMsg}
+                </div>` : ''}
+            </td>
+            <td>📍 ${x.oras}</td>
+            <td><span class="role-badge tip-${x.tip.toLowerCase()}">${x.tip}</span></td>
+            <td>
+                <div class="action-cell">
+                    ${user.rol==='Admin' ? `
+                        <button class="btn-action-edit" onclick="openM('${x.id}')">${t.edit_btn}</button>
+                        <button class="btn-action-delete" onclick="delE('${x.id}')">${t.del_btn}</button>
+                    ` : '-'}
+                </div>
+            </td>
+        </tr>`;
+    }).join('');
+}
+
+    function renderUrgente() {
+        const tb = document.getElementById('urgente-table-body');
+        if(!tb) return;
+        const lang = localStorage.getItem('vibiz_lang') || 'ro';
+        const t = translations[lang];
+        const user = JSON.parse(localStorage.getItem('vibiz_session'));
+        const urgentData = allData.filter(x => (x.mesaj || "").startsWith("!"));
+
+        tb.innerHTML = urgentData.map(x => {
+            const intervalStr = x.data_in === x.data_out ? formatDateShort(x.data_in) : `${formatDateShort(x.data_in)} - ${formatDateShort(x.data_out)}`;
+            const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(x.oras)}`;
+            return `
+                <tr style="background: #fff5f5;">
+                    <td style="font-weight:700; color:var(--danger);">${intervalStr}</td>
+                    <td>${x.ora_in} - ${x.ora_out}</td>
+                    <td style="font-weight:800">${x.client}</td>
+                    <td>📍 ${x.oras} <a href="${mapsUrl}" target="_blank" onclick="event.stopPropagation();" class="gps-btn">GPS ↗</a></td>
+                    <td><span class="job-tag tag-important">${t.tagImp}</span> ${x.mesaj.substring(1)}</td>
+                    <td><button class="btn-action-edit" onclick="openM('${x.id}')">${t.edit_btn}</button></td>
+                </tr>`;
+        }).join('');
+    }
+
+    function renderStatus() {
+        const lang = localStorage.getItem('vibiz_lang') || 'ro';
+        const t = translations[lang];
+        const grid = document.getElementById('status-grid');
+        const picker = document.getElementById('status-date-picker');
+        
+        if(!picker.value) picker.value = currentStatusDate.toISOString().split('T')[0];
+        const selectedDate = new Date(picker.value);
+        const dayOfWeek = selectedDate.getDay();
+        const diff = selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1);
+        const monday = new Date(selectedDate.setDate(diff));
+        
+        grid.innerHTML = '';
+        for (let i = 0; i < 7; i++) {
+            const d = new Date(monday); 
+            d.setDate(monday.getDate() + i);
+            const dateStr = d.toISOString().split('T')[0];
+            
+            const dailyJobs = allData.filter(j => dateStr >= j.data_in && dateStr <= j.data_out);
+            const col = document.createElement('div'); 
+            col.className = "status-day-col";
+            col.setAttribute('ondragover', 'allowDrop(event)');
+            col.setAttribute('ondrop', `handleDrop(event, '${dateStr}')`);
+            
+            let html = `<div style="text-align:center; margin-bottom:15px; border-bottom: 2px solid var(--primary); padding-bottom:5px;">
+                            <div style="font-weight:800; font-size:14px;">${t.days[i]}</div>
+                            <div style="font-size:11px; color:#666;">${formatDateShort(dateStr)}</div>
+                        </div>`;
+            
+            dailyJobs.forEach(j => {
+    const msgText = j.mesaj || "";
+    const isImportant = msgText.startsWith("!");
+    const displayMsg = isImportant ? msgText.substring(1) : msgText;
+    const typeClass = `tip-${j.tip.toLowerCase()}`;
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(j.oras)}`;
+
+    html += `
+    <div class="status-card ${typeClass} ${isImportant ? 'important-pulse' : ''}" 
+         draggable="true" 
+         ondragstart="handleDragStart(event, '${j.id}')" 
+         onclick="openM('${j.id}')"
+         style="border-radius: 15px; position: relative; border-left: 5px solid ${getTipColor(j.tip)};">
+        
+        <div style="font-weight:800; font-size:13px; margin-bottom:4px; color: #1a1a1a;">${j.client}</div>
+        <div style="font-size:11px; color: #555; margin-bottom:4px;">📍 ${j.oras}</div>
+        
+        <div style="font-size:10px; color:#666; font-weight:700; background: rgba(0,0,0,0.03); padding: 3px 6px; border-radius: 6px; display: inline-block;">
+            🕒 ${j.ora_in} ${j.ora_out ? '- ' + j.ora_out : ''}
+        </div>
+
+        ${displayMsg ? `
+        <div style="margin-top:8px; font-size:10px; padding:6px; border-radius:8px; 
+                    background: ${isImportant ? 'rgba(255,59,48,0.1)' : 'rgba(0,122,255,0.1)'}; 
+                    color: ${isImportant ? '#FF3B30' : '#007AFF'}; 
+                    border: 1px solid ${isImportant ? 'rgba(255,59,48,0.2)' : 'rgba(0,122,255,0.2)'};
+                    font-weight: 600;">
+            ${isImportant ? '⚠️' : 'ℹ️'} ${displayMsg}
+        </div>` : ''}
+    </div>`;
+});
+            
+            if(!dailyJobs.length) html += `<div style="text-align:center; color:#bbb; font-size:11px; margin-top:20px;">${t.free}</div>`;
+            col.innerHTML = html; 
+            grid.appendChild(col);
+        }
+    }
+
+    // --- FUNCȚII MODAL ȘANTIER (VERSIUNEA NOUĂ CU URGENȚE) ---
+
+function openM(id = null) {
+    const x = allData.find(i => String(i.id) === String(id)) || {};
+    
+    // Completăm câmpurile de bază
+    document.getElementById('f-id').value = id || ""; 
+    document.getElementById('f-c').value = x.client || "";
+    document.getElementById('f-o').value = x.oras || "";
+    document.getElementById('f-d1').value = x.data_in ? new Date(x.data_in).toISOString().split('T')[0] : "";
+    document.getElementById('f-h1').value = id ? formatTime(x.ora_in) : "08:00";
+    document.getElementById('f-d2').value = x.data_out ? new Date(x.data_out).toISOString().split('T')[0] : "";
+    document.getElementById('f-h2').value = id ? formatTime(x.ora_out) : "";
+    document.getElementById('f-t').value = x.tip || "interior";
+
+    // LOGICA NOUĂ PENTRU MESAJ ȘI BIFA "IMPORTANT"
+    let rawMsg = x.mesaj || "";
+    const isImp = rawMsg.startsWith("!");
+    
+    // Dacă există elementele în HTML, le setăm valorile
+    if(document.getElementById('f-imp')) {
+        document.getElementById('f-imp').checked = isImp;
+    }
+    if(document.getElementById('f-m')) {
+        // Arătăm textul curat (fără semnul !) în căsuța de scris
+        document.getElementById('f-m').value = isImp ? rawMsg.substring(1) : rawMsg;
+    }
+
+    document.getElementById('modal').style.display = 'flex';
+}
+
+function closeM() { 
+    document.getElementById('modal').style.display = 'none'; 
+}
+
+async function save() {
+    const user = JSON.parse(localStorage.getItem('vibiz_session'));
+    
+    // Preluăm textul din căsuță
+    let msgInput = document.getElementById('f-m') ? document.getElementById('f-m').value : "";
+    let isUrgent = document.getElementById('f-imp') ? document.getElementById('f-imp').checked : false;
+    
+    // Construim mesajul final pentru Google Sheets
+    // Dacă bifa e pusă, adăugăm "!" în fața textului
+    let finalMsg = isUrgent ? "!" + msgInput : msgInput;
+
+    const p = { 
+        action: document.getElementById('f-id').value ? "edit" : "add", 
+        userRole: user.rol, 
+        id: document.getElementById('f-id').value || "ID-" + Date.now(), 
+        client: document.getElementById('f-c').value, 
+        oras: document.getElementById('f-o').value, 
+        data_in: document.getElementById('f-d1').value, 
+        ora_in: document.getElementById('f-h1').value, 
+        data_out: document.getElementById('f-d2').value, 
+        ora_out: document.getElementById('f-h2').value, 
+        tip: document.getElementById('f-t').value,
+        mesaj: finalMsg // Trimitem mesajul prelucrat
+    };
+
+    closeM(); 
+    showLoader(true); 
+    try {
+        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(p) });
+        await load(); // Reîncărcăm datele ca să vedem schimbarea
+        Swal.fire({ icon: 'success', title: 'Salvat!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+    } catch (e) {
+        Swal.fire('Eroare', 'Nu s-a putut salva.', 'error');
+    } finally {
+        showLoader(false);
     }
 }
 
-        async function loadUsers() {
-            const lang = localStorage.getItem('vibiz_lang') || 'ro'; const t = translations[lang];
-            showLoader(true); const r = await fetch(SCRIPT_URL + "?getUsers=true");
-            allUsers = (await r.json()).slice(1);
-            const user = JSON.parse(localStorage.getItem('vibiz_session'));
-            document.getElementById('users-table-container').innerHTML = `<table><thead><tr><th>Membru</th><th>Email</th><th>Rol</th><th>Acțiuni</th></tr></thead><tbody>${allUsers.map(u => `<tr><td><b>${u[0]}</b></td><td>${u[1]}</td><td><span class="role-badge role-${u[3].toLowerCase()}">${u[3]}</span></td><td class="action-cell">${user.rol==='Admin'?`<button class="btn-action-edit" onclick="openU('${u[1]}')">${t.edit_btn}</button><button class="btn-action-delete" onclick="delU('${u[1]}')">${t.del_btn}</button>`:'-'}</td></tr>`).join('')}</tbody></table>`;
-            showLoader(false);
-        }
-
-        function openU(email = null) {
-            const u = allUsers.find(x => x[1] === email) || ["", "", "", "Worker"];
-            document.getElementById('u-old-email').value = email || "";
-            document.getElementById('u-n').value = u[0]; document.getElementById('u-e').value = u[1];
-            document.getElementById('u-p').value = u[2]; document.getElementById('u-r').value = u[3];
-            document.getElementById('user-modal').style.display = 'flex';
-        }
-        function closeU() { document.getElementById('user-modal').style.display = 'none'; }
-        async function saveU() {
-            const p = { action: 'manage_user', subAction: document.getElementById('u-old-email').value?'edit':'add', userRole: 'Admin', oldEmail: document.getElementById('u-old-email').value, nume: document.getElementById('u-n').value, email: document.getElementById('u-e').value, pass: document.getElementById('u-p').value, rol: document.getElementById('u-r').value };
-            closeU(); showLoader(true); await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(p) });
-            await loadUsers(); showLoader(false);
-        }
-
-        function drawChart() {
-            if (!allData.length || !document.getElementById('page-dashboard').classList.contains('active')) return;
-            const data = new google.visualization.DataTable();
-            data.addColumn('string', 'ID'); data.addColumn('string', 'Name'); data.addColumn('string', 'Res'); data.addColumn('date', 'Start'); data.addColumn('date', 'End'); data.addColumn('number', 'Dur'); data.addColumn('number', 'Pct'); data.addColumn('string', 'Dep');
-            const rows = allData.map(x => [x.id, x.client, x.tip, new Date(x.data_in), new Date(new Date(x.data_out).getTime() + 86400000), null, 100, null]);
-            data.addRows(rows); new google.visualization.Gantt(document.getElementById('gantt_chart')).draw(data, { height: 350 });
-        }
-
-        function showPage(p, el) {
-            document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-            document.getElementById('page-' + p).classList.add('active'); el.classList.add('active');
-            if(p === 'dashboard') setTimeout(drawChart, 300);
-            if(p === 'status') renderStatus();
-            if(p === 'users') loadUsers();
-            if(p === 'settings') document.getElementById('set-user-name').value = JSON.parse(localStorage.getItem('vibiz_session')).nume;
-            if(p === 'connections') updateCapacityProgress();
-        }
-
-        function updateProfileName() {
-            const n = document.getElementById('set-user-name').value;
-            let s = JSON.parse(localStorage.getItem('vibiz_session'));
-            s.nume = n; localStorage.setItem('vibiz_session', JSON.stringify(s));
-            updateUserUI(s); Swal.fire('Succes', 'Setările au fost salvate!', 'success');
-        }
-
-        function updateCapacityProgress() {
-            const current = allData.length; const percent = Math.min((current / 2600) * 100, 100);
-            const bar = document.getElementById('capacity-bar'); bar.style.width = percent + '%';
-            bar.style.background = percent < 50 ? 'var(--success)' : (percent < 85 ? 'var(--warning)' : 'var(--danger)');
-            document.getElementById('capacity-val').innerText = `${current} / 2600`;
-        }
-
-        window.onload = checkSession;
-		
-		function getTipColor(tip) {
-    switch(tip.toLowerCase()) {
-        case 'interior': return '#34C759';
-        case 'exterior': return '#FF9500';
-        case 'vizita': return '#5856D6';
-        default: return '#8e8e93';
+async function delE(id) {
+    if(await Swal.fire({ title: 'Confirmați ștergerea?', showCancelButton: true, confirmButtonColor: '#FF3B30' }).then(r => r.isConfirmed)) {
+        showLoader(true); 
+        await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify({ action: "delete", id, userRole: 'Admin' }) });
+        await load(); 
+        showLoader(false);
     }
 }
-		
-    </script>
+    // Navigație Tabel Status
+    function changeWeek(direction) {
+        currentStatusDate.setDate(currentStatusDate.getDate() + (direction * 7));
+        document.getElementById('status-date-picker').value = currentStatusDate.toISOString().split('T')[0];
+        renderStatus();
+    }
+
+    // Drag and Drop
+    function handleDragStart(ev, id) {
+        ev.dataTransfer.setData("text/plain", id);
+        ev.dataTransfer.effectAllowed = "move";
+        setTimeout(() => { ev.target.style.opacity = "0.3"; }, 0);
+    }
+    function allowDrop(ev) { ev.preventDefault(); }
+    async function handleDrop(ev, newDateStr) {
+        ev.preventDefault();
+        document.querySelectorAll('.status-card').forEach(c => c.style.opacity = "1");
+        const id = ev.dataTransfer.getData("text/plain");
+        const job = allData.find(j => String(j.id) === String(id));
+        if (job && job.data_in !== newDateStr) {
+            const dStartOriginal = new Date(job.data_in);
+            const dEndOriginal = new Date(job.data_out);
+            const durataMs = dEndOriginal.getTime() - dStartOriginal.getTime();
+            const newStartDate = new Date(newDateStr);
+            const newEndDate = new Date(newStartDate.getTime() + durataMs);
+
+            const payload = { action: "edit", userRole: 'Admin', id: job.id, client: job.client, oras: job.oras, data_in: newStartDate.toISOString().split('T')[0], ora_in: job.ora_in, data_out: newEndDate.toISOString().split('T')[0], ora_out: job.ora_out, tip: job.tip, mesaj: job.mesaj };
+            showLoader(true);
+            try {
+                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+                await load();
+                renderStatus();
+                Swal.fire({ icon: 'success', title: 'Mutat!', toast: true, position: 'top-end', showConfirmButton: false, timer: 2000 });
+            } catch (err) { Swal.fire('Eroare', 'Server error', 'error'); } finally { showLoader(false); }
+        }
+    }
+
+    // Management Utilizatori
+    async function loadUsers() {
+        const lang = localStorage.getItem('vibiz_lang') || 'ro'; const t = translations[lang];
+        showLoader(true); const r = await fetch(SCRIPT_URL + "?getUsers=true");
+        allUsers = (await r.json()).slice(1);
+        const user = JSON.parse(localStorage.getItem('vibiz_session'));
+        document.getElementById('users-table-container').innerHTML = `<table><thead><tr><th>Membru</th><th>Email</th><th>Rol</th><th>Acțiuni</th></tr></thead><tbody>${allUsers.map(u => `<tr><td><b>${u[0]}</b></td><td>${u[1]}</td><td><span class="role-badge role-${u[3].toLowerCase()}">${u[3]}</span></td><td class="action-cell">${user.rol==='Admin'?`<button class="btn-action-edit" onclick="openU('${u[1]}')">${t.edit_btn}</button><button class="btn-action-delete" onclick="delU('${u[1]}')">${t.del_btn}</button>`:'-'}</td></tr>`).join('')}</tbody></table>`;
+        showLoader(false);
+    }
+    function openU(email = null) {
+        const u = allUsers.find(x => x[1] === email) || ["", "", "", "Worker"];
+        document.getElementById('u-old-email').value = email || "";
+        document.getElementById('u-n').value = u[0]; document.getElementById('u-e').value = u[1];
+        document.getElementById('u-p').value = u[2]; document.getElementById('u-r').value = u[3];
+        document.getElementById('user-modal').style.display = 'flex';
+    }
+    function closeU() { document.getElementById('user-modal').style.display = 'none'; }
+    async function saveU() {
+        const p = { action: 'manage_user', subAction: document.getElementById('u-old-email').value?'edit':'add', userRole: 'Admin', oldEmail: document.getElementById('u-old-email').value, nume: document.getElementById('u-n').value, email: document.getElementById('u-e').value, pass: document.getElementById('u-p').value, rol: document.getElementById('u-r').value };
+        closeU(); showLoader(true); await fetch(SCRIPT_URL, { method:'POST', body: JSON.stringify(p) });
+        await loadUsers(); showLoader(false);
+    }
+
+    // Grafic Gantt
+    function drawChart() {
+        if (!allData.length || !document.getElementById('page-dashboard').classList.contains('active')) return;
+        const data = new google.visualization.DataTable();
+        data.addColumn('string', 'ID'); data.addColumn('string', 'Name'); data.addColumn('string', 'Res'); data.addColumn('date', 'Start'); data.addColumn('date', 'End'); data.addColumn('number', 'Dur'); data.addColumn('number', 'Pct'); data.addColumn('string', 'Dep');
+        const rows = allData.map(x => [x.id, x.client, x.tip, new Date(x.data_in), new Date(new Date(x.data_out).getTime() + 86400000), null, 100, null]);
+        data.addRows(rows); new google.visualization.Gantt(document.getElementById('gantt_chart')).draw(data, { height: 350 });
+    }
+
+    // Navigație Pagini
+    function showPage(p, el) {
+        document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        const target = document.getElementById('page-' + p);
+        if(target) target.classList.add('active'); 
+        el.classList.add('active');
+        if(p === 'dashboard') setTimeout(drawChart, 300);
+        if(p === 'status') renderStatus();
+        if(p === 'urgente') renderUrgente();
+        if(p === 'users') loadUsers();
+        if(p === 'settings') document.getElementById('set-user-name').value = JSON.parse(localStorage.getItem('vibiz_session')).nume;
+        if(p === 'connections') updateCapacityProgress();
+    }
+
+    function updateProfileName() {
+        const n = document.getElementById('set-user-name').value;
+        let s = JSON.parse(localStorage.getItem('vibiz_session'));
+        s.nume = n; localStorage.setItem('vibiz_session', JSON.stringify(s));
+        updateUserUI(s); Swal.fire('Succes', 'Setările au fost salvate!', 'success');
+    }
+
+    function updateCapacityProgress() {
+        const current = allData.length; const percent = Math.min((current / 2600) * 100, 100);
+        const bar = document.getElementById('capacity-bar'); bar.style.width = percent + '%';
+        bar.style.background = percent < 50 ? 'var(--success)' : (percent < 85 ? 'var(--warning)' : 'var(--danger)');
+        document.getElementById('capacity-val').innerText = `${current} / 2600`;
+    }
+
+    window.onload = checkSession;
+
+    function getTipColor(tip) {
+        switch(tip.toLowerCase()) {
+            case 'interior': return '#34C759';
+            case 'exterior': return '#FF9500';
+            case 'vizita': return '#5856D6';
+            default: return '#8e8e93';
+        }
+    }
+</script>
 </body>
 </html>
