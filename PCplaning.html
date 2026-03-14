@@ -390,7 +390,7 @@
 
         <div style="margin-bottom:20px; display:flex; align-items:center; gap:10px; background:rgba(255,59,48,0.05); padding:10px; border-radius:12px; border:1px solid rgba(255,59,48,0.1);">
             <input type="checkbox" id="f-imp" style="width:20px; height:20px; cursor:pointer;">
-            <label for="f-imp" style="font-size:12px; font-weight:800; color:#FF3B30; cursor:pointer; flex:1;">🚨 MARCHEAZĂ CA URGENT / IMPORTANT</label>
+            <label id="lbl-urgent" for="f-imp" style="font-size:12px; font-weight:800; color:#FF3B30; cursor:pointer; flex:1;">🚨 MARCHEAZĂ CA URGENT / IMPORTANT</label>
         </div>
 
         <button class="btn-add-pro" style="width:100%;" onclick="save()" id="txt-save-job">Salvează</button>
@@ -417,55 +417,107 @@
     // Obiectul de traduceri extins cu etichetele noi
     const translations = {
         ro: { 
-            dash: "Dashboard", status: "Status Săptămânal", urgente: "Urgente", users: "Utilizatori", conn: "Conexiuni", set: "Setări", logout: "Ieșire", new_p: "Programare Nouă", interval: "Interval", hour: "Orar", client: "Client", loc: "Locație", type: "Tip", act: "Acțiuni", save: "Salvează", cancel: "Anulează", team: "Management Echipă", add_u: "Membru Nou", processing: "Se procesează...", name_lbl: "Nume Utilizator", lang_lbl: "Limbă Sistem", conn_title: "Stare Conexiune", conn_msg: "● Baza de date Google Sheets este activă.", cap_title: "Capacitate Anuală", cap_desc: "Calculat la un maxim de 10 intervenții/zi (fără weekend-uri).", edit_btn: "EDITARE", del_btn: "ȘTERGE", status_title: "Planificare Săptămânală", week_prev: "◀ Înapoi", week_next: "Înainte ▶", days: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'], free: "Liber", type_int: "Interior", type_ext: "Exterior", type_viz: "Vizită", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTĂ" 
+            dash: "Dashboard", status: "Status Săptămânal", urgente: "Urgente", users: "Utilizatori", conn: "Conexiuni", set: "Setări", logout: "Ieșire", new_p: "Programare Nouă", interval: "Interval", hour: "Orar", client: "Client", loc: "Locație", type: "Tip", act: "Actions", save: "Salvează", cancel: "Anulează", team: "Management Echipă", add_u: "Membru Nou", processing: "Se procesează...", name_lbl: "Nume Utilizator", lang_lbl: "Limbă Sistem", conn_title: "Stare Conexiune", conn_msg: "● Baza de date Google Sheets este activă.", cap_title: "Capacitate Anuală", cap_desc: "Calculat la un maxim de 10 intervenții/zi (fără weekend-uri).", edit_btn: "EDITARE", del_btn: "ȘTERGE", status_title: "Planificare Săptămânală", week_prev: "◀ Înapoi", week_next: "Înainte ▶", days: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică'], free: "Liber", type_int: "Interior", type_ext: "Exterior", type_viz: "Vizită", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTĂ",
+            // --- ADAUGATE ACUM ---
+            modal_job_title: "Detalii Șantier",
+            placeholder_msg: "Mesaj sau detalii suplimentare...",
+            label_urgent: "MARCHEAZĂ CA URGENT / IMPORTANT",
+            set_profile_title: "Setări Profil",
+            user_modal_title: "Gestionare Utilizator",
+            u_placeholder_name: "Nume complet",
+            u_placeholder_email: "Adresă de email",
+            u_placeholder_pass: "Parolă",
+            u_label_role: "Rol utilizator"
         },
         fr: { 
-            dash: "Tableau de bord", status: "Statut Hebdomadaire", urgente: "Urgents", users: "Utilisateurs", conn: "Connexions", set: "Paramètres", logout: "Déconnexion", new_p: "Nouveau RDV", interval: "Intervalle", hour: "Horaire", client: "Client", loc: "Emplacement", type: "Type", act: "Actions", save: "Enregistrer", cancel: "Annuler", team: "Gestion d'équipe", add_u: "Nouveau Membre", processing: "Traitement...", name_lbl: "Nom d'utilisateur", lang_lbl: "Langue", conn_title: "État de Connexion", conn_msg: "● La base de données active.", cap_title: "Capacité Annuelle", cap_desc: "Max 10 RDV/jour.", edit_btn: "MODIFIER", del_btn: "SUPPRIMER", status_title: "Planification", week_prev: "◀ Retour", week_next: "Suivant ▶", days: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], free: "Libre", type_int: "Intérieur", type_ext: "Extérieur", type_viz: "Visite", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE" 
+            dash: "Tableau de bord", status: "Statut Hebdomadaire", urgente: "Urgents", users: "Utilisateurs", conn: "Connexions", set: "Paramètres", logout: "Déconnexion", new_p: "Nouveau RDV", interval: "Intervalle", hour: "Horaire", client: "Client", loc: "Emplacement", type: "Type", act: "Actions", save: "Enregistrer", cancel: "Annuler", team: "Gestion d'équipe", add_u: "Nouveau Membre", processing: "Traitement...", name_lbl: "Nom d'utilisateur", lang_lbl: "Langue", conn_title: "État de Connexion", conn_msg: "● La base de données active.", cap_title: "Capacité Annuelle", cap_desc: "Max 10 RDV/jour.", edit_btn: "MODIFIER", del_btn: "SUPPRIMER", status_title: "Planification", week_prev: "◀ Retour", week_next: "Suivant ▶", days: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'], free: "Libre", type_int: "Intérieur", type_ext: "Extérieur", type_viz: "Visite", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE",
+            // --- ADAUGATE ACUM ---
+            modal_job_title: "Détails du Chantier",
+            placeholder_msg: "Message ou détails supplémentaires...",
+            label_urgent: "MARQUER COMME URGENT / IMPORTANT",
+            set_profile_title: "Paramètres du Profil",
+            user_modal_title: "Gestion de l'Utilisateur",
+            u_placeholder_name: "Nom complet",
+            u_placeholder_email: "Adresse e-mail",
+            u_placeholder_pass: "Mot de passe",
+            u_label_role: "Rôle de l'utilisateur"
         },
         en: { 
-            dash: "Dashboard", status: "Weekly Status", urgente: "Urgent", users: "Users", conn: "Connections", set: "Settings", logout: "Logout", new_p: "New Entry", interval: "Interval", hour: "Schedule", client: "Client", loc: "Location", type: "Type", act: "Actions", save: "Save", cancel: "Cancel", team: "Team Management", add_u: "New Member", processing: "Processing...", name_lbl: "Username", lang_lbl: "Language", conn_title: "Connection", conn_msg: "● Active database.", cap_title: "Annual Capacity", cap_desc: "Max 10 bookings/day.", edit_btn: "EDIT", del_btn: "DELETE", status_title: "Weekly Planning", week_prev: "◀ Back", week_next: "Next ▶", days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], free: "Free", type_int: "Indoor", type_ext: "Outdoor", type_viz: "Visit", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE" 
+            dash: "Dashboard", status: "Weekly Status", urgente: "Urgent", users: "Users", conn: "Connections", set: "Settings", logout: "Logout", new_p: "New Entry", interval: "Interval", hour: "Schedule", client: "Client", loc: "Location", type: "Type", act: "Actions", save: "Save", cancel: "Cancel", team: "Team Management", add_u: "New Member", processing: "Processing...", name_lbl: "Username", lang_lbl: "Language", conn_title: "Connection", conn_msg: "● Active database.", cap_title: "Annual Capacity", cap_desc: "Max 10 bookings/day.", edit_btn: "EDIT", del_btn: "DELETE", status_title: "Weekly Planning", week_prev: "◀ Back", week_next: "Next ▶", days: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'], free: "Free", type_int: "Indoor", type_ext: "Outdoor", type_viz: "Visit", tagImp: "⚠️ IMPORTANT", tagNota: "ℹ️ NOTE",
+            // --- ADAUGATE ACUM ---
+            modal_job_title: "Project Details",
+            placeholder_msg: "Message or additional details...",
+            label_urgent: "MARK AS URGENT / IMPORTANT",
+            set_profile_title: "Profile Settings",
+            user_modal_title: "User Management",
+            u_placeholder_name: "Full Name",
+            u_placeholder_email: "Email address",
+            u_placeholder_pass: "Password",
+            u_label_role: "User Role"
         }
     };
 
-    function applyLang() {
-        const lang = localStorage.getItem('vibiz_lang') || 'ro';
-        const t = translations[lang];
-        document.getElementById('txt-nav-dash').innerText = t.dash;
-        document.getElementById('txt-nav-status').innerText = t.status;
-        if(document.getElementById('txt-nav-urgente')) document.getElementById('txt-nav-urgente').innerText = t.urgente;
-        document.getElementById('txt-nav-users').innerText = t.users;
-        document.getElementById('txt-nav-conn').innerText = t.conn;
-        document.getElementById('txt-nav-set').innerText = t.set;
-        document.getElementById('txt-logout').innerText = t.logout;
-        document.getElementById('txt-new-prog').innerText = t.new_p;
-        document.getElementById('th-interval').innerText = t.interval;
-        document.getElementById('th-hour').innerText = t.hour;
-        document.getElementById('th-client').innerText = t.client;
-        document.getElementById('th-loc').innerText = t.loc;
-        document.getElementById('th-type').innerText = t.type;
-        document.getElementById('th-act').innerText = t.act;
-        document.getElementById('txt-team-title').innerText = t.team;
-        document.getElementById('txt-add-user').innerText = t.add_u;
-        document.getElementById('txt-processing').innerText = t.processing;
-        document.getElementById('lbl-set-name').innerText = t.name_lbl;
-        document.getElementById('lbl-set-lang').innerText = t.lang_lbl;
-        document.getElementById('btn-save-set').innerText = t.save;
-        document.getElementById('txt-save-job').innerText = t.save;
-        document.getElementById('txt-cancel-job').innerText = t.cancel;
-        document.getElementById('txt-save-user').innerText = t.save;
-        document.getElementById('txt-cancel-user').innerText = t.cancel;
-        document.getElementById('txt-conn-title').innerText = t.conn_title;
-        document.getElementById('txt-conn-msg').innerText = t.conn_msg;
-        document.getElementById('txt-capacity-title').innerText = t.cap_title;
-        document.getElementById('txt-capacity-desc').innerText = t.cap_desc;
-        document.getElementById('set-lang').value = lang;
-        document.getElementById('txt-status-title').innerText = t.status_title;
-        document.getElementById('btn-week-prev').innerText = t.week_prev;
-        document.getElementById('btn-week-next').innerText = t.week_next;
-        renderTable();
-        if(document.getElementById('page-status').classList.contains('active')) renderStatus();
-        if(document.getElementById('page-urgente') && document.getElementById('page-urgente').classList.contains('active')) renderUrgente();
-    }
+function applyLang() {
+    const lang = localStorage.getItem('vibiz_lang') || 'ro';
+    const t = translations[lang];
+    
+    // Navigație
+    document.getElementById('txt-nav-dash').innerText = t.dash;
+    document.getElementById('txt-nav-status').innerText = t.status;
+    if(document.getElementById('txt-nav-urgente')) document.getElementById('txt-nav-urgente').innerText = t.urgente;
+    document.getElementById('txt-nav-users').innerText = t.users;
+    document.getElementById('txt-nav-conn').innerText = t.conn;
+    document.getElementById('txt-nav-set').innerText = t.set;
+    document.getElementById('txt-logout').innerText = t.logout;
+    document.getElementById('txt-new-prog').innerText = t.new_p;
+    
+    // Tabel Dashboard
+    document.getElementById('th-interval').innerText = t.interval;
+    document.getElementById('th-hour').innerText = t.hour;
+    document.getElementById('th-client').innerText = t.client;
+    document.getElementById('th-loc').innerText = t.loc;
+    document.getElementById('th-type').innerText = t.type;
+    document.getElementById('th-act').innerText = t.act;
+    
+    // Secțiune Setări
+    document.getElementById('txt-set-title').innerText = t.set_profile_title;
+    document.getElementById('lbl-set-name').innerText = t.name_lbl;
+    document.getElementById('lbl-set-lang').innerText = t.lang_lbl;
+    document.getElementById('btn-save-set').innerText = t.save;
+    
+    // Modal Șantier (Job)
+    document.getElementById('txt-modal-job').innerText = t.modal_job_title;
+    document.getElementById('f-m').placeholder = t.placeholder_msg;
+    document.getElementById('lbl-urgent').innerText = t.label_urgent;
+    document.getElementById('txt-save-job').innerText = t.save;
+    document.getElementById('txt-cancel-job').innerText = t.cancel;
+    
+    // Modal Utilizatori
+    document.getElementById('u-modal-title').innerText = t.user_modal_title;
+    document.getElementById('u-n').placeholder = t.u_placeholder_name;
+    document.getElementById('u-e').placeholder = t.u_placeholder_email;
+    document.getElementById('u-p').placeholder = t.u_placeholder_pass;
+    document.getElementById('txt-save-user').innerText = t.save;
+    document.getElementById('txt-cancel-user').innerText = t.cancel;
+    
+    // Altele (Echipă, Conexiuni, Loader)
+    document.getElementById('txt-team-title').innerText = t.team;
+    document.getElementById('txt-add-user').innerText = t.add_u;
+    document.getElementById('txt-processing').innerText = t.processing;
+    document.getElementById('txt-conn-title').innerText = t.conn_title;
+    document.getElementById('txt-conn-msg').innerText = t.conn_msg;
+    document.getElementById('txt-capacity-title').innerText = t.cap_title;
+    document.getElementById('txt-capacity-desc').innerText = t.cap_desc;
+    document.getElementById('txt-status-title').innerText = t.status_title;
+    document.getElementById('btn-week-prev').innerText = t.week_prev;
+    document.getElementById('btn-week-next').innerText = t.week_next;
+    
+    document.getElementById('set-lang').value = lang;
+    
+    renderTable();
+    if(document.getElementById('page-status').classList.contains('active')) renderStatus();
+    if(document.getElementById('page-urgente') && document.getElementById('page-urgente').classList.contains('active')) renderUrgente();
+}
 
     function changeLang(val) { localStorage.setItem('vibiz_lang', val); applyLang(); }
     function showLoader(show) { document.getElementById('loader').style.display = show ? 'flex' : 'none'; }
