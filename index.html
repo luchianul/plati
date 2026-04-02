@@ -3,227 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Management Plăți | Gabriel</title>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>Gabriel | Smart Finance 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;600;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { 
-    /* Am definit noul gradient: pleacă de jos (bottom) cu mov și urcă spre alb */
-    --bg-gradient: linear-gradient(to top, #a29bfe 0%, #f8faff 100%);
-    --primary-vibrant: #5865f2; 
-    --text-main: #2d3436;
-    --mint: #00d2d3;
-    --accent-purple: #6c5ce7;
-}
+        :root {
+            --season-primary: #5865f2;
+            --season-glow: rgba(88, 101, 242, 0.2);
+            --glass: rgba(255, 255, 255, 0.88);
+            --text-dark: #0f172a;
+            --urgent: #ef4444;
+        }
 
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; 
+            background-image: url('manga.jpg'); background-size: cover;
+            background-position: center; background-attachment: fixed;
+            min-height: 100vh; display: flex; flex-direction: column; 
+            align-items: center; padding: 20px; box-sizing: border-box;
+        }
+
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.5) 100%);
+            backdrop-filter: blur(3px); z-index: -1;
+        }
+
+        .main-wrapper { width: 100%; max-width: 450px; z-index: 1; }
+
+        /* HEADER CU EFECT DE PULSARE DACA EXISTA PLATI NEFECTUATE */
         .frost-panel {
-            background: rgba(255, 255, 255, 0.45);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 80px var(--season-glow);
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
-       body { 
-    margin: 0; 
-    font-family: 'Inter', sans-serif; 
-    /* Referință directă către poza ta din GitHub */
-    background-image: url('manga.jpg'); 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    min-height: 100vh;
-    display: flex; 
-    flex-direction: column; 
-    align-items: center; 
-    color: var(--text-main); 
-    padding: 15px; 
-    box-sizing: border-box;
-}
-
-/* Acest strat face ca interfața să "plutească" peste poza manga */
-body::before {
-    content: "";
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    /* Un strat negru transparent face panourile albe să "strălucească" */
-    background: rgba(0, 0, 0, 0.2); 
-    backdrop-filter: blur(2px);
-    -webkit-backdrop-filter: blur(2px);
-    z-index: -1;
-}
-
-        .main-wrapper { width: 100%; max-width: 450px; }
-
-        /* Header adaptiv mobil */
-        .mike-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 20px; width: 100%;
+        .urgent-glow {
+            animation: pulse-red 2s infinite;
+            border: 2px solid var(--urgent) !important;
         }
-        .welcome-text { font-size: 13px; font-weight: 700; color: rgba(0,0,0,0.5); }
 
-        .brand-card-header { 
-    padding: 20px; 
-    border-radius: 30px; 
-    text-align: center; 
-    margin-bottom: 20px;
-    position: relative; /* Esențial pentru fundal */
-    overflow: hidden;   /* Să nu iasă simbolurile din card */
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
+        @keyframes pulse-red {
+            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
 
-#patternSezon {
-    position: absolute; 
-    top: 0; 
-    left: 0; 
-    width: 100%; 
-    height: 100%; 
-    opacity: 0.07; /* Foarte discret, să nu deranjeze pe mobil */
-    font-size: 18px; 
-    overflow: hidden; 
-    pointer-events: none; 
-    line-height: 1.8;
-    word-break: break-all;
-    user-select: none;
-    z-index: 0; /* Stă în spatele textului */
-}
-
-/* Ne asigurăm că restul elementelor stau deasupra fundalului */
-.brand-card-header > *:not(#patternSezon) {
-    position: relative;
-    z-index: 1;
-}
-        
-        .app-icon-dynamic {
-            width: 55px; height: 55px; background: white; border-radius: 18px;
+        .app-icon {
+            width: 65px; height: 65px; background: white; border-radius: 20px;
             display: flex; justify-content: center; align-items: center;
-            font-size: 28px; font-weight: 900; color: var(--primary-vibrant);
-            margin: 0 auto 10px auto; box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            text-transform: uppercase;
+            font-size: 30px; font-weight: 900; color: var(--season-primary);
+            margin: 0 auto 15px auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
 
-        /* Formular Add corectat pentru ecrane mici */
-        .add-slim { display: flex; gap: 8px; margin-bottom: 25px; width: 100%; }
-        .add-slim input { 
-            background: white; border: none; padding: 12px; 
-            border-radius: 15px; font-size: 14px; outline: none; min-width: 0;
-        }
-        #newFactura { flex: 2; }
-        #newSuma { flex: 1; }
-        .add-slim button { 
-            background: var(--primary-vibrant); color: white; border: none; 
-            width: 50px; height: 50px; border-radius: 15px; font-size: 22px; 
-            flex-shrink: 0; cursor: pointer;
+        #headerMonth {
+            font-size: 11px; font-weight: 900; text-transform: uppercase;
+            color: var(--season-primary); background: rgba(255,255,255,0.8);
+            padding: 5px 15px; border-radius: 50px; display: inline-block;
+            margin-top: 10px; border: 1px solid var(--season-primary);
         }
 
-        /* Carduri facturi compacte */
-        .item-card { 
-    padding: 12px; 
-    border-radius: 20px; 
-    margin-bottom: 12px; 
-    display: grid; 
-    grid-template-columns: auto 1fr 65px 75px; 
-    align-items: center; 
-    gap: 8px;
-    /* Efect de sticlă mai solidă */
-    background: rgba(255, 255, 255, 0.85) !important; 
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1); /* Umbră fină */
-}
-
-        .controls { display: flex; gap: 4px; }
-        .btn-ctrl { 
-            background: white; border: 1px solid rgba(0,0,0,0.05); 
-            width: 30px; height: 30px; border-radius: 8px; 
-            display: flex; align-items: center; justify-content: center; font-size: 13px;
+        /* BILL CARDS */
+        .bill-card { 
+            background: rgba(255, 255, 255, 0.75);
+            border-radius: 20px; padding: 15px; margin-bottom: 12px;
+            display: grid; grid-template-columns: 40px 1fr 65px 90px; 
+            align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.5);
+            transition: 0.3s;
         }
-        .item-name-text { font-weight: 700; font-size: 13px; line-height: 1.2; word-break: break-word; }
+        .bill-card:hover { transform: scale(1.02); background: white; }
 
-        .summary-pan { border-radius: 25px; padding: 18px; margin-top: 20px; }
-        .score-num { font-weight: 900; font-size: 26px; color: #2d3436; letter-spacing: -1px; }
-
-        .btn-sync { 
-            width: 100%; padding: 16px; margin-top: 15px; 
-            background: rgba(88, 101, 242, 0.6); backdrop-filter: blur(10px); 
-            border: 1px solid rgba(255, 255, 255, 0.2); color: white; 
-            border-radius: 18px; font-weight: 800; text-transform: uppercase; 
+        .btn-pay { 
+            padding: 10px; border-radius: 12px; border: none; font-size: 11px; 
+            font-weight: 800; cursor: pointer; transition: 0.3s;
         }
+        .unpaid { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+        .paid { background: var(--season-primary); color: white; }
+
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        .input-group input { 
+            background: white; border: none; padding: 15px; 
+            border-radius: 15px; font-size: 14px; outline: none; flex: 1;
+        }
+        .btn-add { 
+            background: var(--season-primary); color: white; border: none; 
+            width: 50px; height: 50px; border-radius: 15px; font-size: 24px; cursor: pointer;
+        }
+
+        h3 { font-size: 12px; text-transform: uppercase; color: white; background: var(--season-primary); padding: 5px 15px; border-radius: 10px; margin: 20px 0 10px 0; }
         
-    .btn-reset {
-    margin-top: 40px;
-    background: rgba(255, 255, 255, 0.2);
-    border: 1px solid #ff7675 !important;
-    color: #ff7675;
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    
-    /* MODIFICĂRILE DE LUNGIME AICI: */
-    width: auto;            /* Nu mai ocupă tot rândul */
-    min-width: 150px;       /* O lungime minimă ca să arate bine */
-    padding: 8px 20px;      /* Mai puțin înalt (8px), dar cu spațiu lateral (20px) */
-    display: block;         /* Permite centrarea */
-    margin-left: auto;      /* Centrare stânga */
-    margin-right: auto;     /* Centrare dreapta */
-    
-    border-radius: 10px;
-    cursor: pointer;
-    opacity: 0.7;
-}
-}
-
-.btn-reset:hover {
-    background: rgba(255, 118, 117, 0.1);
-    opacity: 1;
-}
-
-        h3 { 
-    font-size: 11px; 
-    text-transform: uppercase; 
-    color: white; /* Alb pe fundalul întunecat de mai sus */
-    background: var(--primary-vibrant); 
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    margin: 20px 0 10px 5px; 
-    letter-spacing: 1.5px;
-    font-weight: 800;
-}
-        .btn-pay { width: 100%; padding: 10px 0; border-radius: 10px; border: none; font-size: 10px; font-weight: 800; }
-        .unpaid { background: white; color: #b2bec3; border: 1px solid #eee; }
-        .paid { background: var(--primary-vibrant); color: white; }
-        
-        .nav-icon { cursor: pointer; padding: 5px; }
-		#totalFill { 
-    background: #2d3436 !important; /* Culoarea barei de progres */
-}
+        .total-box { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
     </style>
 </head>
 <body>
 
 <div class="main-wrapper">
-    <div class="mike-header">
-        <span class="welcome-text" id="welcomeUser">Welcome back, Gabriel!</span>
-        <div style="font-size: 18px; display: flex; gap: 10px;">
-            <span class="nav-icon" onclick="Swal.fire('Profil','Salut, Gabriel!','info')">👤</span>
-            <span class="nav-icon" onclick="schimbaNume()">⚙️</span>
-        </div>
+    <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:white; font-weight:800; font-size:14px;">
+        <span id="welcomeUser">Welcome, Gabriel</span>
+        <span onclick="schimbaNume()" style="cursor:pointer">⚙️</span>
     </div>
 
-    <div class="brand-card-header frost-panel">
-    <div id="patternSezon"></div> <div class="app-icon-dynamic" id="dynamicLetter">G</div>
-    <h1 style="margin:0; font-size: 22px; font-weight: 800;">Management Plăți</h1>
-    <div style="font-family:'Caveat'; color:var(--accent-purple); font-size:18px;">power by VerTech</div>
-    <div id="headerMonth" style="font-size:10px; font-weight:800; text-transform:uppercase; margin-top:10px; color:var(--mint); border: 1px solid var(--mint); display: inline-block; padding: 3px 10px; border-radius: 8px; background: rgba(255,255,255,0.5);">--</div>
-</div>
+    <div id="statusPanel" class="frost-panel">
+        <div class="app-icon" id="dynamicLetter">G</div>
+        <h1 style="margin:0; font-size: 24px; font-weight: 900;">Management Plăți</h1>
+        <div style="font-family:'Caveat'; color:var(--season-primary); font-size:20px;">power by VerTech</div>
+        <div id="headerMonth">--</div>
+    </div>
 
-    <div class="add-slim">
-        <input type="text" id="newFactura" placeholder="Nume...">
-        <input type="number" id="newSuma" placeholder="€">
-        <button id="addBtn" onclick="adaugaFactura()">+</button>
+    <div class="input-group">
+        <input type="text" id="newFactura" placeholder="Nume factură...">
+        <input type="number" id="newSuma" placeholder="€" style="max-width: 80px;">
+        <button class="btn-add" onclick="adaugaFactura()">+</button>
     </div>
 
     <div id="mainContent">
@@ -233,200 +129,103 @@ body::before {
         <div id="containerPlatite"></div>
     </div>
 
-    <div class="summary-pan frost-panel">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:10px; font-weight:800; opacity:0.5;">TOTAL ACHITAT</span>
-            <div style="text-align:right;">
-                <div id="totalSumaPlatita" class="score-num">0.00 €</div>
-                <div style="height:4px; background:rgba(0,0,0,0.05); border-radius:2px; margin-top:5px; width: 80px; overflow:hidden; margin-left: auto;">
-                    <div id="totalFill" style="height:100%; background:#d4e157; width:0%; transition: 0.5s;"></div>
-                </div>
-            </div>
-        </div>
+    <div class="frost-panel total-box">
+        <span style="font-size:11px; font-weight:900; opacity:0.6;">TOTAL ACHITAT</span>
+        <div id="totalSumaPlatita" style="font-weight:900; font-size:28px;">0.00 €</div>
     </div>
 
-    <button class="btn-sync" onclick="trimiteDate()">Sincronizează în Cloud</button>
-    <button class="btn-reset" onclick="resetareLocala()">Resetare Memorie</button>
+    <button onclick="trimiteDate()" style="width:100%; padding:20px; background:var(--season-primary); color:white; border:none; border-radius:20px; font-weight:900; cursor:pointer; box-shadow: 0 10px 20px var(--season-glow);">Sincronizează Cloud</button>
 </div>
 
 <script>
-const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
+    const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
     let facturi = [];
-    let editIndex = -1;
 
-    // Lista ta fixă - pune sumele aici dacă le știi
-    const platiFixeDefault = [
-        { nume: "Internet", suma: 78 },
-        { nume: "Factura GSM", suma: 108 },
-        { nume: "Garaj Trimestru", suma: 500 },
-        { nume: "Rata Impozit", suma: 500 },
-        { nume: "Chirie", suma: 925 },
-        { nume: "Electricitate și Gaz", suma: 198 },
-        { nume: "Factura Apa", suma: 108 }
-    ];
+    // 1. LOGICA DE SEZOANE
+    function applySeasonUI() {
+        const luna = new Date().getMonth();
+        const colors = [
+            { p: "#3b82f6", g: "rgba(59, 130, 246, 0.2)" }, // Iarna
+            { p: "#10b981", g: "rgba(16, 185, 129, 0.2)" }, // Primavara
+            { p: "#f59e0b", g: "rgba(245, 158, 11, 0.2)" }, // Vara
+            { p: "#f97316", g: "rgba(249, 115, 22, 0.2)" }  // Toamna
+        ];
+        let s = colors[3]; // default toamna
+        if (luna <= 1 || luna === 11) s = colors[0];
+        else if (luna >= 2 && luna <= 4) s = colors[1];
+        else if (luna >= 5 && luna <= 7) s = colors[2];
 
-    function verificaSiAdaugaPlatiRecurente() {
-        const lunaCurenta = new Date().getMonth();
-        const ultimaLunaSalvata = localStorage.getItem("ultimaLunaVerificata");
-
-        // Adăugăm dacă e lună nouă SAU dacă lista e complet goală
-        if (ultimaLunaSalvata === null || parseInt(ultimaLunaSalvata) !== lunaCurenta || facturi.length === 0) {
-            
-            platiFixeDefault.forEach(plataFixa => {
-                const existaDeja = facturi.some(f => f.nume.toLowerCase() === plataFixa.nume.toLowerCase());
-                if (!existaDeja) {
-                    facturi.push({
-                        nume: plataFixa.nume,
-                        suma: plataFixa.suma,
-                        status: false
-                    });
-                }
-            });
-
-            localStorage.setItem("ultimaLunaVerificata", lunaCurenta);
-        }
+        document.documentElement.style.setProperty('--season-primary', s.p);
+        document.documentElement.style.setProperty('--season-glow', s.g);
+        document.getElementById('headerMonth').innerText = new Date().toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
     }
 
-    function schimbaNume() {
-        Swal.fire({
-            title: 'Personalizare',
-            input: 'text',
-            inputPlaceholder: 'Introdu numele tău',
-            inputValue: localStorage.getItem("userName") || "Gabriel",
-            confirmButtonColor: '#5865f2',
-            confirmButtonText: 'Salvează',
-            background: 'rgba(255,255,255,0.9)',
-            backdrop: 'blur(10px)'
-        }).then((result) => {
-            if (result.value) {
-                const nume = result.value.trim();
-                localStorage.setItem("userName", nume);
-                actualizeazaInterfataNume(nume);
-            }
-        });
-    }
+    // 2. SMART SYNC (Refresh la 3 AM + Sync la 10 min)
+    function initSmartSync() {
+        setInterval(() => {
+            const acum = new Date();
+            if (acum.getHours() === 3 && acum.getMinutes() === 0) location.reload();
+        }, 60000);
 
-    function actualizeazaInterfataNume(nume) {
-        if(!nume) return;
-        document.getElementById('welcomeUser').innerText = `Welcome back, ${nume}!`;
-        document.getElementById('dynamicLetter').innerText = nume.charAt(0).toUpperCase();
-    }
-
-    async function incarcaDate() {
-        Swal.fire({ title: 'Sincronizare...', didOpen: () => Swal.showLoading(), background: 'rgba(255,255,255,0.8)', backdrop: 'blur(10px)' });
-        actualizeazaInterfataNume(localStorage.getItem("userName") || "Gabriel");
-        try {
+        setInterval(async () => {
             const r = await fetch(scriptURL + "?t=" + new Date().getTime());
             const data = await r.json();
-            
-            // Dacă primim date valide, le încărcăm
-            if (Array.isArray(data) && data.length > 0) {
-                facturi = data;
-            } else {
-                // Dacă Cloud-ul e gol, luăm din LocalStorage sau pornim de la zero
-                facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
-            }
-
-            // Aplicăm regula de lună nouă/listă default
-            verificaSiAdaugaPlatiRecurente();
-            render();
-            Swal.close();
-        } catch (e) {
-            facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
-            verificaSiAdaugaPlatiRecurente();
-            render();
-            Swal.fire({ icon: 'info', title: 'Mod Local', timer: 1000, showConfirmButton: false });
-        }
+            if (Array.isArray(data)) { facturi = data; render(); }
+        }, 600000);
     }
 
+    // 3. RENDER & NOTIFICARE VIZUALA
     function render() {
         const ne = document.getElementById("containerNeplatite"), pl = document.getElementById("containerPlatite");
         ne.innerHTML = ""; pl.innerHTML = "";
         let total = 0;
+
         facturi.forEach((f, i) => {
-            const h = `
-                <div class="item-card frost-panel">
-                    <div class="controls">
-                        <div class="btn-ctrl" onclick="sterge(${i})" style="color:#ff7675">✕</div>
-                        <div class="btn-ctrl" onclick="pregatesteEditare(${i})" style="color:#fab1a0">✏️</div>
-                    </div>
-                    <div class="item-name-text">${f.nume}</div>
-                    <div style="background:rgba(255,255,255,0.6); border-radius:8px; padding:4px; text-align:center; font-weight:800; font-size:12px;">${f.suma}€</div>
-                    <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'✓ OK':'ACHITĂ'}</button>
-                </div>`;
-            if(!f.status) ne.innerHTML += h;
-            else { pl.innerHTML += h; total += parseFloat(f.suma) || 0; }
+            const card = `<div class="bill-card">
+                <span onclick="sterge(${i})" style="cursor:pointer; opacity:0.3;">✕</span>
+                <div style="font-weight:700;">${f.nume}</div>
+                <div style="font-weight:900; color:var(--season-primary);">${f.suma}€</div>
+                <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'OK':'ACHITĂ'}</button>
+            </div>`;
+            if(!f.status) ne.innerHTML += card;
+            else { pl.innerHTML += card; total += parseFloat(f.suma) || 0; }
         });
+
+        // Alerta vizuala: daca ai plati neefectuate, panelul pulseaza rosu
+        const hasUnpaid = facturi.some(f => !f.status);
+        document.getElementById('statusPanel').className = hasUnpaid ? "frost-panel urgent-glow" : "frost-panel";
+        
         document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
-        document.getElementById("totalFill").style.width = Math.min((total/2000)*100, 100) + "%";
         localStorage.setItem("facturi_gabriel_final", JSON.stringify(facturi));
     }
 
+    // --- FUNCTII AJUTATOARE ---
+    function toggle(i) { facturi[i].status = !facturi[i].status; render(); }
+    function sterge(i) { facturi.splice(i, 1); render(); }
     function adaugaFactura() {
         const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
-        if(!n.value.trim()) return;
-        if(editIndex > -1) { facturi[editIndex].nume = n.value; facturi[editIndex].suma = parseFloat(s.value) || 0; editIndex = -1; document.getElementById("addBtn").innerText = "+"; }
-        else { facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status: false}); }
-        n.value = ""; s.value = ""; render();
+        if(n.value) { facturi.push({nume: n.value, suma: s.value||0, status: false}); n.value=""; s.value=""; render(); }
     }
-
-    function pregatesteEditare(i) {
-        editIndex = i;
-        document.getElementById("newFactura").value = facturi[i].nume;
-        document.getElementById("newSuma").value = facturi[i].suma;
-        document.getElementById("addBtn").innerText = "✓";
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    function schimbaNume() { 
+        const n = prompt("Numele tau:", localStorage.getItem("userName") || "Gabriel");
+        if(n) { localStorage.setItem("userName", n); location.reload(); }
     }
-
-    function toggle(i) { facturi[i].status = !facturi[i].status; render(); }
-    
-    function sterge(i) { 
-        Swal.fire({ title: 'Ștergi?', text: facturi[i].nume, icon: 'warning', showCancelButton: true }).then((r) => { 
-            if(r.isConfirmed) { facturi.splice(i, 1); render(); } 
-        }); 
-    }
-
-    function resetareLocala() { 
-        Swal.fire({ title: 'Resetare?', icon: 'error', showCancelButton: true }).then((r) => { 
-            if(r.isConfirmed) { localStorage.clear(); location.reload(); } 
-        }); 
-    }
-
-    function trimiteDate() {
-        Swal.fire({ title: 'Salvare...', didOpen: () => Swal.showLoading() });
-        fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
-        .then(() => Swal.fire({ icon: 'success', title: 'Salvat!', timer: 1000, showConfirmButton: false }));
-    }
-
-    window.onload = () => {
-        const data = new Date();
-        const luna = data.getMonth(); // 0 = Ian, 1 = Feb... 2 = Martie etc.
-        const numeLuna = data.toLocaleString('ro-RO', { month: 'long', year: 'numeric' });
-        
-        const elLuna = document.getElementById('headerMonth');
-        elLuna.innerText = numeLuna;
-
-        // Alegem culoarea în funcție de lună
-        let culoareSezon;
-        if (luna >= 2 && luna <= 4) { // Primăvara (Martie, Aprilie, Mai)
-            culoareSezon = "#00b894"; // Verde crud
-        } else if (luna >= 5 && luna <= 7) { // Vara (Iunie, Iulie, August)
-            culoareSezon = "#fdcb6e"; // Galben solar
-        } else if (luna >= 8 && luna <= 10) { // Toamna (Septembrie, Octombrie, Noiembrie)
-            culoareSezon = "#e17055"; // Portocaliu tomnatic
-        } else { // Iarna (Decembrie, Ianuarie, Februarie)
-            culoareSezon = "#0984e3"; // Albastru înghețat
+    async function incarcaDate() {
+        applySeasonUI();
+        const user = localStorage.getItem("userName") || "Gabriel";
+        document.getElementById('welcomeUser').innerText = "Welcome, " + user;
+        document.getElementById('dynamicLetter').innerText = user[0];
+        try {
+            const r = await fetch(scriptURL + "?t=" + new Date().getTime());
+            facturi = await r.json();
+            render();
+        } catch(e) { 
+            facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
+            render();
         }
+    }
 
-        // Aplicăm culoarea pe tag-ul lunii
-        elLuna.style.color = culoareSezon;
-        elLuna.style.borderColor = culoareSezon;
-        
-        // Opțional: Schimbăm și culoarea butonului "+" și a iconiței dinamice
-        document.documentElement.style.setProperty('--primary-vibrant', culoareSezon);
-
-        incarcaDate();
-    };
+    window.onload = () => { incarcaDate(); initSmartSync(); };
 </script>
 </body>
 </html>
