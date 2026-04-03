@@ -626,10 +626,12 @@ function saveMobileJob() {
   const u = document.getElementById('l_user').value;
   const p = document.getElementById('l_pass').value;
   const msg = document.getElementById('loginMsg');
+  
+  if (!msg) return; // Siguranță
   msg.innerText = "Se verifică...";
 
   try {
-    // 1. Căutăm utilizatorul în tabelul din Supabase
+    // 1. Căutăm utilizatorul în Supabase
     const { data: res, error } = await supabaseClient
       .from('Utilizatori')
       .select('*')
@@ -642,45 +644,49 @@ function saveMobileJob() {
       return;
     }
 
-    // 2. Dacă am ajuns aici, login-ul e de succes
+    // 2. Succes - Ascundem login-ul
     document.getElementById('loginOverlay').style.display = 'none';
     currentUser = res;
-    
-    // Salvezi userul în memoria browserului ca să nu se logheze mereu
     localStorage.setItem('santierUser', JSON.stringify(res));  
 
-    // 3. Trimitem log-ul de activitate în Supabase
+    // 3. Log activitate
     await supabaseClient.from('Logs').insert([
       { nume: res.nume, rol: res.rol, actiune: 'Login' }
     ]);
 
-    // 4. Actualizăm interfața (Meniu, Badge, etc.)
+    // 4. Actualizăm interfața
     document.getElementById('navLog').style.display = (res.rol === 'ADMIN') ? 'flex' : 'none';
     document.getElementById('userBadge').style.display = 'block';
     document.getElementById('u_display_rol').innerText = res.rol;
     
-    // Generăm inițialele (ex: Gabriel Luchian -> GL)
     const initials = res.nume.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
     document.getElementById('u_initials').innerText = initials;
 
-    if(res.rol !== 'ADMIN') {
-      document.getElementById('navUtilizatori').style.display = 'none';
-    } else {
-      document.getElementById('navUtilizatori').style.display = 'flex';
+    // Afișăm sau ascundem meniul de utilizatori
+    const navUtil = document.getElementById('navUtilizatori');
+    if (navUtil) {
+       navUtil.style.display = (res.rol === 'ADMIN') ? 'flex' : 'none';
     }
 
-    // 5. Pornim încărcarea datelor
-    setSaptamanaCurenta();
+    // 5. Pornim aplicația
+    if (typeof setSaptamanaCurenta === 'function') setSaptamanaCurenta();
     load(); 
     
-    if(typeof lucide !== 'undefined') lucide.createIcons();
-    alert("Bun venit, " + res.nume + "!");
+    if (window.lucide) lucide.createIcons();
+    
+    Swal.fire({
+      icon: 'success',
+      title: 'Bun venit!',
+      text: res.nume,
+      timer: 2000,
+      showConfirmButton: false
+    });
 
   } catch (err) {
-    console.error("Eroare neașteptată la login:", err);
-    msg.innerText = "Eroare de conexiune!";
+    console.error("Eroare login:", err);
+    msg.innerText = "Eroare de conexiune la bază!";
   }
-}
+} // <--- Verifică să ai această acoladă de închidere aici!
       
     setSaptamanaCurenta();  
 
