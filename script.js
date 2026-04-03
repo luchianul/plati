@@ -1,76 +1,62 @@
-// CONFIGURARE CONEXIUNE SUPABASE
+// 1. CONFIGURARE (Pune datele tale aici)
 const SB_URL = "https://uuhbdleietpibjjdkmea.supabase.co"; 
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aGJkbGVpZXRwaWJqamRrbWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTUxMjIsImV4cCI6MjA5MDc5MTEyMn0._8dVAyPb0nfB5b7JgWcI1i6PKaSh7h2uX9FGoJ_Es70"; 
 
-// Inițializează clientul Supabase
-const supabase = window.supabase.createClient(SB_URL, SB_KEY);
+// 2. INITIALIZARE (Folosim un nume care să nu se repete)
+const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
-// 1. FUNCȚIA PENTRU AFIȘARE (CITIRE DATE)
+// 3. FUNCTIA DE AFISARE
 async function afiseazaSantiere() {
-    console.log("Se încarcă datele...");
-    
-    const { data, error } = await supabase
-        .from('Santiere') // Verifică dacă tabelul tău se numește exact așa!
+    // Atenție: Folosim 'Santiere' cu S mare așa cum ai zis că e în DB
+    const { data, error } = await supabaseClient
+        .from('Santiere') 
         .select('*')
         .order('id', { ascending: false });
 
     const listaDiv = document.getElementById('lista-santiere');
     
     if (error) {
-        console.error("Eroare Supabase:", error);
-        listaDiv.innerHTML = "<p style='color:red;'>Eroare la încărcare. Verifică setările RLS în Supabase!</p>";
+        console.error("Eroare:", error);
+        listaDiv.innerHTML = "<p style='color:red;'>Eroare: " + error.message + "</p>";
         return;
     }
 
-    if (data.length === 0) {
-        listaDiv.innerHTML = "<p style='text-align:center;'>Baza de date este goală.</p>";
+    if (!data || data.length === 0) {
+        listaDiv.innerHTML = "<p>Momentan nu sunt șantiere în listă.</p>";
         return;
     }
 
-    // Curățăm lista și adăugăm rândurile noi
     listaDiv.innerHTML = data.map(s => `
         <div class="card">
-            <strong>${s.nume}</strong>
-            <p>📍 Locație: ${s.locatie}</p>
-            <p>💰 Buget: ${Number(s.buget).toLocaleString()} EUR</p>
+            <strong>${s.nume || s.Nume}</strong><br>
+            📍 ${s.locatie || s.Locatie} | 💰 ${s.buget || s.Buget} EUR
         </div>
     `).join('');
 }
 
-// 2. FUNCȚIA PENTRU SALVARE (SCRIERE DATE)
+// 4. FUNCTIA DE SALVARE
 async function salveazaDate() {
-    const numeVal = document.getElementById('nume').value;
-    const locatieVal = document.getElementById('locatie').value;
-    const bugetVal = document.getElementById('buget').value;
+    const n = document.getElementById('nume').value;
+    const l = document.getElementById('locatie').value;
+    const b = document.getElementById('buget').value;
 
-    // Validare simplă
-    if(!numeVal || !locatieVal || !bugetVal) {
-        alert("Te rugăm să completezi toate câmpurile!");
-        return;
-    }
+    if(!n || !l || !b) { alert("Completează tot!"); return; }
 
-    // Trimitem datele către tabelul 'santiere'
-    const { error } = await supabase
-        .from('santiere')
-        .insert([{ 
-            nume: numeVal, 
-            locatie: locatieVal, 
-            buget: parseInt(bugetVal) 
-        }]);
+    // Trimitem datele (Verifică dacă în DB coloanele sunt cu Nume sau nume)
+    const { error } = await supabaseClient
+        .from('Santiere')
+        .insert([{ nume: n, locatie: l, buget: parseInt(b) }]);
 
     if (error) {
         alert("Eroare la salvare: " + error.message);
-        console.error(error);
     } else {
-        alert("Șantierul a fost adăugat cu succes! 🏗️");
-        // Resetăm formularul
+        alert("Salvat cu succes! 🏗️");
         document.getElementById('nume').value = "";
         document.getElementById('locatie').value = "";
         document.getElementById('buget').value = "";
-        // Reîmprospătăm lista automat
         afiseazaSantiere();
     }
 }
 
-// Apelăm funcția de afișare imediat ce se încarcă fișierul
+// Pornim afișarea
 afiseazaSantiere();
