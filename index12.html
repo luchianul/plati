@@ -560,22 +560,29 @@ window.executaLogin = async function() {
     try {
         if (msg) msg.innerText = "Se verifică...";
         
-        // REPARARE: Scoatem ghilimelele manuale. 
-        // Librăria Supabase știe să gestioneze caracterele speciale din numele coloanelor.
+        // SOLUȚIA FINALĂ: Punem ghilimele duble în interiorul string-ului 
+        // pentru a forța PostgreSQL să citească TOT numele coloanei, inclusiv slash-ul.
         const { data: res, error } = await supabaseClient
             .from('Utilizatori')
             .select('*')
-            .eq('Email/User', u) // FĂRĂ ghilimele în interiorul string-ului
-            .eq('Parola', p)     // FĂRĂ ghilimele în interiorul string-ului
+            .eq('"Email/User"', u) 
+            .eq('"Parola"', p)
             .single();
 
-        if (error || !res) {
+        if (error) {
             console.error("Eroare Supabase:", error);
+            // Dacă eroarea este 406 sau 400, e de la numele coloanelor.
+            // Dacă e 406 (PGRST116), înseamnă că nu a găsit rândul (user/parolă greșită).
             if (msg) msg.innerText = "Utilizator sau parolă incorectă!";
             return;
         }
 
-        // --- DACĂ LOGINUL ESTE SUCCES ---
+        if (!res) {
+            if (msg) msg.innerText = "Utilizator inexistent!";
+            return;
+        }
+
+        // --- SUCCES ---
         currentUser = {
             nume: res.Nume,
             user: res["Email/User"],
@@ -592,13 +599,18 @@ window.executaLogin = async function() {
 
         initializareInterfata(currentUser);
         setSaptamanaCurenta();
-        load(); 
+        if (typeof load === 'function') load(); 
 
-        Swal.fire({ icon: 'success', title: 'Bun venit, ' + currentUser.nume + '!', timer: 1500, showConfirmButton: false });
+        Swal.fire({ 
+            icon: 'success', 
+            title: 'Bun venit, ' + currentUser.nume + '!', 
+            timer: 1500, 
+            showConfirmButton: false 
+        });
 
     } catch (err) {
-        console.error("Eroare Login:", err);
-        if (msg) msg.innerText = "Eroare de conexiune la baza de date!";
+        console.error("Eroare neprevăzută:", err);
+        if (msg) msg.innerText = "Eroare de conexiune!";
     }
 };
 
