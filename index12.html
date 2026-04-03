@@ -581,53 +581,82 @@ window.onload = () => {
 };
 
 // --- SISTEM LOGIN ---
-async function executaLogin() {
-  const u = document.getElementById('l_user').value;
-  const p = document.getElementById('l_pass').value;
+aasync function executaLogin() {
+  const u = document.getElementById('l_user').value.trim();
+  const p = document.getElementById('l_pass').value.trim();
   const msg = document.getElementById('loginMsg');
   
+  if (!u || !p) {
+    if (msg) msg.innerText = "Introdu utilizatorul și parola!";
+    return;
+  }
+
   if (msg) msg.innerText = "Se verifică...";
 
   try {
+    // Atenție la ghilimelele duble interioare pentru "Email/User" și "Parola"
     const { data: res, error } = await supabaseClient
       .from('Utilizatori')
       .select('*')
-      .eq('user', u)
-      .eq('pass', p)
+      .eq('"Email/User"', u) 
+      .eq('"Parola"', p)
       .single();
 
     if (error || !res) {
+      console.error("Eroare Supabase:", error);
       if (msg) msg.innerText = "Utilizator sau parolă incorectă!";
       return;
     }
 
+    // --- LOGIN REUȘIT ---
     document.getElementById('loginOverlay').style.display = 'none';
-    currentUser = res;
-    localStorage.setItem('santierUser', JSON.stringify(res));  
+    
+    // Mapăm datele primite (cu Litera Mare) în obiectul nostru local (cu litera mica)
+    // pentru a păstra restul codului funcțional
+    currentUser = {
+        nume: res.Nume,
+        user: res["Email/User"],
+        rol: res.Rol
+    };
+    
+    localStorage.setItem('santierUser', JSON.stringify(currentUser));  
 
-    await supabaseClient.from('Logs').insert([{ nume: res.nume, rol: res.rol, actiune: 'Login' }]);
+    // Log activitate (coloanele din tabelul Logs trebuie să existe și ele)
+    await supabaseClient.from('Logs').insert([
+      { nume: res.Nume, rol: res.Rol, actiune: 'Login' }
+    ]);
 
-    document.getElementById('navLog').style.display = (res.rol === 'ADMIN') ? 'flex' : 'none';
+    // Actualizăm interfața folosind noile nume de proprietăți
+    document.getElementById('navLog').style.display = (res.Rol === 'ADMIN') ? 'flex' : 'none';
     document.getElementById('userBadge').style.display = 'block';
-    document.getElementById('u_display_rol').innerText = res.rol;
-    const initials = res.nume.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+    document.getElementById('u_display_rol').innerText = res.Rol;
+    
+    const initials = res.Nume.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
     document.getElementById('u_initials').innerText = initials;
 
     const navUtil = document.getElementById('navUtilizatori');
-    if (navUtil) navUtil.style.display = (res.rol === 'ADMIN') ? 'flex' : 'none';
+    if (navUtil) {
+        navUtil.style.display = (res.Rol === 'ADMIN') ? 'flex' : 'none';
+    }
 
+    // Pornim restul aplicației
     setSaptamanaCurenta();
     load(); 
+    
     if (window.lucide) lucide.createIcons();
     
-    Swal.fire({ icon: 'success', title: 'Bun venit, ' + res.nume + '!', showConfirmButton: false, timer: 1500 });
+    Swal.fire({
+      icon: 'success',
+      title: 'Bun venit, ' + res.Nume + '!',
+      showConfirmButton: false,
+      timer: 1500
+    });
 
   } catch (err) {
     console.error("Eroare login:", err);
-    if (msg) msg.innerText = "Eroare de conexiune!";
+    if (msg) msg.innerText = "Eroare de conexiune la baza de date!";
   }
 }
-
 function logout() {
   if(confirm("Sigur vrei să te deconectezi?")) {
     localStorage.removeItem('santierUser');
