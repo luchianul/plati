@@ -1,76 +1,93 @@
-// 1. CONFIGURARE
-const SB_URL = "https://uuhbdleietpibjjdkmea.supabase.co"; 
-const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aGJkbGVpZXRwaWJqamRrbWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTUxMjIsImV4cCI6MjA5MDc5MTEyMn0._8dVAyPb0nfB5b7JgWcI1i6PKaSh7h2uX9FGoJ_Es70"; 
+// CONFIGURARE SUPABASE (Asigură-te că datele sunt corecte)
+const SUPABASE_URL = "https://uuhbdleietpibjjdkmea.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aGJkbGVpZXRwaWJqamRrbWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTUxMjIsImV4cCI6MjA5MDc5MTEyMn0._8dVAyPb0nfB5b7JgWcI1i6PKaSh7h2uX9FGoJ_Es70";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
-
-// 2. FUNCȚIA DE AFIȘARE
-async function afiseazaSantiere() {
-    console.log("Încerc să citesc datele din tabelul 'Santiere'...");
-    
+// --- 1. CITIRE DATE (Afișare în listă) ---
+async function citesteDate() {
     const { data, error } = await supabaseClient
-        .from('Santiere') 
+        .from('Planificare')
         .select('*')
         .order('id', { ascending: false });
 
-    const listaDiv = document.getElementById('lista-santiere');
-    
     if (error) {
         console.error("Eroare la citire:", error);
-        listaDiv.innerHTML = "<p style='color:red;'>Eroare: " + error.message + "</p>";
-        return;
+        return [];
     }
-
-    console.log("Date primite de la Supabase:", data);
-
-    if (!data || data.length === 0) {
-        listaDiv.innerHTML = "<p>Baza de date e conectată, dar e goală. Adaugă ceva mai sus!</p>";
-        return;
-    }
-
-    listaDiv.innerHTML = data.map(s => `
-        <div class="card" style="border:1px solid #ccc; margin:10px; padding:10px; border-radius:8px;">
-            <strong>ID: ${s.id} - ${s.nume}</strong><br>
-            📍 Locație: ${s.locatie} | 💰 Buget: ${s.buget} EUR
-        </div>
-    `).join('');
+    return data;
 }
 
-// 3. FUNCȚIA DE SALVARE
-async function salveazaDate() {
-    const n = document.getElementById('nume').value;
-    const l = document.getElementById('locatie').value;
-    const b = document.getElementById('buget').value;
+// --- 2. ADĂUGARE ȘANTIER (Logica ta originală din Code.gs) ---
+async function adaugaInSupabase(d) {
+    // Calcule ore și bani
+    var tarif = Number(d.tarif), incasatTotal = Number(d.incasat);
+    var t1 = d.oraI.split(':'), t2 = d.oraE.split(':');
+    var orePeZi = (Number(t2[0]) + Number(t2[1])/60) - (Number(t1[0]) + Number(t1[1])/60);
+    if (orePeZi < 0) orePeZi += 24;
 
-    if(!n || !l || !b) { 
-        alert("Completează toate câmpurile!"); 
-        return; 
+    var d1 = new Date(d.start), d2 = new Date(d.final);
+    var nrZile = Math.round(Math.abs((d2 - d1) / (24*60*60*1000))) + 1;
+    
+    var incasatPeZi = incasatTotal / nrZile;
+    var totalBaniPeZi = orePeZi * tarif;
+    var restPeZi = totalBaniPeZi - incasatPeZi;
+
+    let rânduriNoi = [];
+    var dataCurenta = new Date(d1);
+
+    // Generăm câte un rând pentru fiecare zi (exact ca în Google Sheets)
+    for (var i = 0; i < nrZile; i++) {
+        var statusCalculat = restPeZi <= 0 ? "PLATIT" : "Rest: " + restPeZi.toFixed(2);
+        
+        rânduriNoi.push({
+            "Client": d.client,
+            "Adresă": d.adresa,
+            "Data Start": dataCurenta.toISOString().split('T')[0],
+            "Data Final": dataCurenta.toISOString().split('T')[0],
+            "Ora Intrare": d.oraI,
+            "Ora Ieșire": d.oraE,
+            "Sumă Încasată": incasatPeZi.toFixed(2),
+            "Tarif/Oră": tarif,
+            "Total de Plată": totalBaniPeZi.toFixed(2),
+            "Rest de Plată": restPeZi.toFixed(2),
+            "Status": statusCalculat,
+            "Total H": orePeZi.toFixed(2),
+            "Mesaj": d.mesaj,
+            "Arhivă": "ACTIV"
+        });
+        dataCurenta.setDate(dataCurenta.getDate() + 1);
     }
 
-    console.log("Trimit spre salvare:", { nume: n, locatie: l, buget: b });
-
-    const { data, error } = await supabaseClient
-        .from('Santiere')
-        .insert([{ 
-            nume: n, 
-            locatie: l, 
-            buget: parseInt(b) 
-        }]);
-
+    const { error } = await supabaseClient.from('Planificare').insert(rânduriNoi);
+    
     if (error) {
-        console.error("Eroare la INSERT:", error);
-        alert("Eroare la salvare: " + error.message);
+        console.error("Eroare Supabase:", error);
+        alert("Eroare: " + error.message);
     } else {
-        console.log("Salvare reușită!");
-        alert("Succes! Șantierul a fost adăugat.");
-        // Resetăm câmpurile
-        document.getElementById('nume').value = "";
-        document.getElementById('locatie').value = "";
-        document.getElementById('buget').value = "";
-        // Reîncărcăm lista
-        afiseazaSantiere();
+        alert("Planificare salvată cu succes!");
+        location.reload();
     }
 }
 
-// Pornim afișarea la încărcarea paginii
-afiseazaSantiere();
+// --- 3. ARHIVARE (Update coloana Arhivă) ---
+async function arhiveazaRand(id) {
+    const { error } = await supabaseClient
+        .from('Planificare')
+        .update({ "Arhivă": "ARHIVAT" })
+        .eq('id', id);
+
+    if (error) alert("Eroare la arhivare");
+    else location.reload();
+}
+
+// --- 4. ȘTERGERE (Delete rând) ---
+async function stergeRand(id) {
+    if (!confirm("Sigur ștergi acest rând?")) return;
+    const { error } = await supabaseClient
+        .from('Planificare')
+        .delete()
+        .eq('id', id);
+
+    if (error) alert("Eroare la ștergere");
+    else location.reload();
+}
