@@ -10,7 +10,7 @@ async function afiseazaSantiere() {
     console.log("Se încarcă datele...");
     
     const { data, error } = await supabase
-        .from('santiere') // Verifică dacă tabelul tău se numește exact așa!
+        .from('Santiere') // Verifică dacă tabelul tău se numește exact așa!
         .select('*')
         .order('id', { ascending: false });
 
