@@ -560,20 +560,22 @@ window.executaLogin = async function() {
     try {
         if (msg) msg.innerText = "Se verifică...";
         
-        // Interogăm Supabase cu numele tale de coloane (Email/User și Parola)
+        // REPARARE: Scoatem ghilimelele manuale. 
+        // Librăria Supabase știe să gestioneze caracterele speciale din numele coloanelor.
         const { data: res, error } = await supabaseClient
             .from('Utilizatori')
             .select('*')
-            .eq('"Email/User"', u) 
-            .eq('"Parola"', p)
+            .eq('Email/User', u) // FĂRĂ ghilimele în interiorul string-ului
+            .eq('Parola', p)     // FĂRĂ ghilimele în interiorul string-ului
             .single();
 
         if (error || !res) {
+            console.error("Eroare Supabase:", error);
             if (msg) msg.innerText = "Utilizator sau parolă incorectă!";
             return;
         }
 
-        // Succes! Salvăm userul
+        // --- DACĂ LOGINUL ESTE SUCCES ---
         currentUser = {
             nume: res.Nume,
             user: res["Email/User"],
@@ -583,10 +585,12 @@ window.executaLogin = async function() {
         localStorage.setItem('santierUser', JSON.stringify(currentUser));
         document.getElementById('loginOverlay').style.display = 'none';
         
-        // Activăm interfața
+        // Log activitate
+        await supabaseClient.from('Logs').insert([
+            { nume: res.Nume, rol: res.Rol, actiune: 'Login' }
+        ]);
+
         initializareInterfata(currentUser);
-        
-        // Încărcăm datele principale
         setSaptamanaCurenta();
         load(); 
 
@@ -594,7 +598,7 @@ window.executaLogin = async function() {
 
     } catch (err) {
         console.error("Eroare Login:", err);
-        if (msg) msg.innerText = "Eroare de conexiune!";
+        if (msg) msg.innerText = "Eroare de conexiune la baza de date!";
     }
 };
 
