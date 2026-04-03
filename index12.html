@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiune Șantiere</title>
+    <style>
+        /* Un pic de design să nu arate ca în 1990 */
+        body { font-family: sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; line-height: 1.6; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
+        button { background: #24b47e; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #1da06d; }
+        .card { border: 1px solid #ddd; padding: 15px; margin-top: 10px; border-radius: 8px; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h2>🏗️ Adaugă Șantier Nou</h2>
+    
+    <form id="form-santier">
+        <div class="form-group">
+            <label>Nume Șantier:</label>
+            <input type="text" id="nume" placeholder="Ex: Bloc Central" required>
+        </div>
+        <div class="form-group">
+            <label>Locație:</label>
+            <input type="text" id="locatie" placeholder="Ex: Str. Libertății 10" required>
+        </div>
+        <div class="form-group">
+            <label>Buget (EUR):</label>
+            <input type="number" id="buget" placeholder="Ex: 50000" required>
+        </div>
+        <button type="submit">Salvează în Baza de Date</button>
+    </form>
+
+    <hr>
+
+    <h2>📋 Listă Șantiere active</h2>
+    <div id="lista-santiere">
+        <p>Se încarcă datele...</p>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
