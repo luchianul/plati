@@ -790,9 +790,44 @@ function logout() {
   }
 
   // --- GESTIUNE SANTIERE (LOGICA EXISTENTA) ---
-  function load() { 
-    google.script.run.withSuccessHandler(d => { allData = d; applyFilters(); }).citesteDate(); 
-  }
+  async function load() { 
+    try {
+        // 1. Interogăm tabelul "Planificare" din Supabase
+        const { data, error } = await supabaseClient
+            .from('Planificare')
+            .select('*')
+            .order('id', { ascending: false }); // Cele mai noi să fie sus
+
+        if (error) throw error;
+        
+        // 2. Transformăm datele din obiecte Supabase în Array-ul pe care îl așteaptă restul codului tău
+        // Această mapare asigură că r[0] e Client, r[1] e Adresă etc., exact ca în Sheet
+        allData = data.map(r => [
+            r["Client"],          // r[0]
+            r["Adresă"],          // r[1]
+            r["Data Start"],      // r[2]
+            r["Data Final"],      // r[3]
+            r["Ora Intrare"],     // r[4]
+            r["Ora Ieșire"],      // r[5]
+            r["Sumă Încasată"],   // r[6]
+            r["Tarif/Oră"],       // r[7]
+            r["Total de Plată"],  // r[8]
+            r["Rest de Plată"],   // r[9]
+            r["Status"],          // r[10]
+            r["Total H"],         // r[11]
+            r["Mesaj"],           // r[12]
+            r["Arhivă"],          // r[13]
+            r["id"]               // r[14] (ID-ul rândului pentru editare/ștergere)
+        ]);
+        
+        // 3. Aplicăm filtrele și rândăm tabelul
+        applyFilters(); 
+
+    } catch (err) {
+        console.error("Eroare la încărcarea datelor din Supabase:", err);
+        Swal.fire('Eroare', 'Nu am putut încărca datele!', 'error');
+    }
+}
 
   function showPage(id) {
   document.querySelectorAll('.app-page').forEach(p => p.style.display = 'none');
