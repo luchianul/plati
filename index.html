@@ -199,13 +199,45 @@
         localStorage.setItem("facturi_gabriel_final", JSON.stringify(facturi));
     }
 
-    // --- FUNCTII AJUTATOARE ---
-    function toggle(i) { facturi[i].status = !facturi[i].status; render(); }
-    function sterge(i) { facturi.splice(i, 1); render(); }
-    function adaugaFactura() {
-        const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
-        if(n.value) { facturi.push({nume: n.value, suma: s.value||0, status: false}); n.value=""; s.value=""; render(); }
+    // Adaugă această funcție de salvare automată (fără pop-up-uri care să te deranjeze)
+async function autoSaveCloud() {
+    console.log("Salvare automată în curs...");
+    try {
+        await fetch(scriptURL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(facturi)
+        });
+    } catch(e) {
+        console.warn("Cloud-ul e ocupat, se va reîncerca la următoarea modificare.");
     }
+}
+    
+    // --- FUNCTII AJUTATOARE ---
+    function toggle(i) { 
+    facturi[i].status = !facturi[i].status; 
+    render(); 
+    autoSaveCloud(); // <--- Salvează instant când bifezi
+}
+
+function sterge(i) { 
+    if(confirm("Ștergi factura?")) {
+        facturi.splice(i, 1); 
+        render(); 
+        autoSaveCloud(); // <--- Salvează instant când ștergi
+    }
+}
+
+function adaugaFactura() {
+    const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
+    if(n.value) { 
+        facturi.push({nume: n.value, suma: s.value||0, status: false}); 
+        n.value=""; s.value=""; 
+        render(); 
+        autoSaveCloud(); // <--- Salvează instant când adaugi
+    }
+}
     function schimbaNume() { 
         const n = prompt("Numele tau:", localStorage.getItem("userName") || "Gabriel");
         if(n) { localStorage.setItem("userName", n); location.reload(); }
