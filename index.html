@@ -186,8 +186,8 @@
         facturi.forEach((f, i) => {
             const card = `<div class="bill-card">
                 <span onclick="sterge(${i})" style="cursor:pointer; opacity:0.3;">✕</span>
-                <div style="font-weight:700; cursor:pointer;" onclick="editeazaNume(${i})">${f.nume} ✏️</div>
-                <div style="font-weight:900; color:var(--season-primary); cursor:pointer;" onclick="editeazaSuma(${i})">${f.suma}€ ✏️</div>
+                <div style="font-weight:700; cursor:pointer;" onclick="editeazaNume(${i})">${f.nume}</div>
+                <div style="font-weight:900; color:var(--season-primary); cursor:pointer;" onclick="editeazaSuma(${i})">${f.suma}€</div>
                 <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'OK':'ACHITĂ'}</button>
             </div>`;
             if(!f.status) ne.innerHTML += card;
@@ -201,15 +201,16 @@
         localStorage.setItem("facturi_gabriel_final", JSON.stringify(facturi));
     }
 
-    // --- FUNCTII DE EDITARE ---
+    // --- FUNCTII DE EDITARE (FĂRĂ ICONIȚE) ---
     async function editeazaNume(i) {
         const { value: nouNume } = await Swal.fire({
-            title: 'Modifică numele',
+            title: 'Redenumește factura',
             input: 'text',
             inputValue: facturi[i].nume,
-            showCancelButton: true
+            showCancelButton: true,
+            confirmButtonColor: 'var(--season-primary)'
         });
-        if (nouNume) {
+        if (nouNume && nouNume !== facturi[i].nume) {
             facturi[i].nume = nouNume;
             render();
             autoSaveCloud();
@@ -218,12 +219,15 @@
 
     async function editeazaSuma(i) {
         const { value: nouaSuma } = await Swal.fire({
-            title: 'Modifică suma (€)',
+            title: 'Modifică Suma',
+            text: `Introdu noua sumă pentru ${facturi[i].nume}`,
             input: 'number',
             inputValue: facturi[i].suma,
-            showCancelButton: true
+            showCancelButton: true,
+            confirmButtonColor: 'var(--season-primary)',
+            inputAttributes: { step: "0.01" }
         });
-        if (nouaSuma) {
+        if (nouaSuma !== undefined && nouaSuma !== null && nouaSuma !== "") {
             facturi[i].suma = parseFloat(nouaSuma).toFixed(2);
             render();
             autoSaveCloud();
