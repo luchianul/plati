@@ -697,16 +697,128 @@ function applyFilters() {
 
 function render(data) {
     const cont = document.getElementById('mainList');
-    if(!cont) return;
-    cont.innerHTML = data.map(r => `
-        <div class="card">
-            <b>${r[0]}</b><br>
-            <small>${r[1]}</small><br>
-            <span>${r[11]}h - ${r[8]}€</span>
-        </div>
-    `).join('');
-}
+    if (!cont) return;
+    
+    // Curățăm lista
+    cont.innerHTML = '';
 
+    data.forEach(r => {
+        // r[14] este ID-ul, r[0] Client, r[1] Adresa, r[11] Ore, r[8] Suma Totala, r[10] Status, r[12] Note
+        const card = document.createElement('div');
+        card.className = `card ${r[13] ? 'is-archived' : ''}`; // r[13] e Arhiva
+        
+        card.innerHTML = `
+            <div>${r[2]}</div>
+            <div style="font-weight:800">${r[0]}</div>
+            <div>${r[1]}</div>
+            <div>${r[11]}h</div>
+            <div style="font-weight:800">${r[8]} €</div>
+            <div><span class="badge ${r[10] === 'PLATIT' ? 'bg-PLATIT' : 'bg-REST'}">${r[10]}</span></div>
+            <div style="font-size:11px; color:var(--text-muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${r[12] || '-'}</div>
+            <div style="text-align:right">
+                <button class="btn-outline" onclick="openEdit(${r[14]})"><i data-lucide="edit-3"></i></button>
+            </div>
+        `;
+        cont.appendChild(card);
+    });
+
+    if(typeof lucide !== 'undefined') lucide.createIcons();
+}
+async function save() {
+    const id = document.getElementById('e_id').value;
+    const payload = {
+        "Client": document.getElementById('e_client').value,
+        "Adresă": document.getElementById('e_adr').value,
+        "Data Start": document.getElementById('e_d1').value,
+        "Data Final": document.getElementById('e_d2').value,
+        "Ora Intrare": document.getElementById('e_t1').value,
+        "Ora Ieșire": document.getElementById('e_t2').value,
+        "Tarif/Oră": parseFloat(document.getElementById('e_tarif').value) || 0,
+        "Sumă Încasată": parseFloat(document.getElementById('e_inc').value) || 0,
+        "Mesaj": document.getElementById('e_msg').value
+    };
+
+    // Calculăm automat Totalul (simplificat)
+    // În mod normal aici ai face diferența de ore, dar pentru demo:
+    payload["Total de Plată"] = payload["Tarif/Oră"] * 8; // Presupunem 8h dacă nu avem logica de calcul
+    payload["Rest de Plată"] = payload["Total de Plată"] - payload["Sumă Încasată"];
+    payload["Status"] = payload["Rest de Plată"] <= 0 ? "PLATIT" : "REST";
+
+    try {
+        let error;
+        if (id) {
+            // Update
+            const { error: err } = await supabaseClient.from('Planificare').update(payload).eq('id', id);
+            error = err;
+        } else {
+            // Insert
+            const { error: err } = await supabaseClient.from('Planificare').insert([payload]);
+            error = err;
+        }
+
+        if (error) throw error;
+
+        Swal.fire('Succes!', 'Datele au fost salvate.', 'success');
+        closeM('editModal');
+        load(); // Reîncărcăm datele
+    } catch (err) {
+        Swal.fire('Eroare', err.message, 'error');
+    }
+}
+  function applyFilters() {
+    const searchVal = document.getElementById('search').value.toLowerCase();
+    const dateFrom = document.getElementById('dateFrom').value;
+    const dateTo = document.getElementById('dateTo').value;
+    const showArchived = document.getElementById('showArchived').checked;
+
+    let filtered = allData.filter(r => {
+        const matchesSearch = r[0].toLowerCase().includes(searchVal) || r[1].toLowerCase().includes(searchVal);
+        const matchesDate = (!dateFrom || r[2] >= dateFrom) && (!dateTo || r[2] <= dateTo);
+        const matchesArchive = showArchived ? true : !r[13]; // r[13] e coloana Arhivă
+        
+        return matchesSearch && matchesDate && matchesArchive;
+    });
+
+    render(filtered);
+    updateStats(filtered); // Funcție pentru a actualiza cardurile de sus
+}
+  // Funcție universală de închidere modale
+window.closeM = function(id) {
+    document.getElementById(id).style.display = 'none';
+};
+
+// Deschide modalul pentru adăugare (gol)
+window.openAdd = function() {
+    document.getElementById('e_id').value = ''; // Important: golim ID-ul pentru a fi INSERT, nu UPDATE
+    document.getElementById('e_client').value = '';
+    document.getElementById('e_adr').value = '';
+    document.getElementById('e_msg').value = '';
+    document.getElementById('e_tarif').value = 50; // Un default
+    document.getElementById('e_inc').value = 0;
+    document.getElementById('mTitle').innerText = "Adaugă Lucrare Nouă";
+    document.getElementById('editModal').style.display = 'block';
+};
+
+// Deschide modalul pentru editare (populat cu datele existente)
+window.openEdit = function(id) {
+    // Găsim rândul în allData după ID (care e pe ultima poziție, r[14])
+    const r = allData.find(item => item[14] === id);
+    if(!r) return;
+
+    document.getElementById('e_id').value = r[14];
+    document.getElementById('e_client').value = r[0];
+    document.getElementById('e_adr').value = r[1];
+    document.getElementById('e_d1').value = r[2];
+    document.getElementById('e_d2').value = r[3];
+    document.getElementById('e_t1').value = r[4];
+    document.getElementById('e_t2').value = r[5];
+    document.getElementById('e_inc').value = r[6];
+    document.getElementById('e_tarif').value = r[7];
+    document.getElementById('e_msg').value = r[12];
+    
+    document.getElementById('mTitle').innerText = "Editare Lucrare";
+    document.getElementById('editModal').style.display = 'block';
+};
 </script>
 </body>
 </html>
