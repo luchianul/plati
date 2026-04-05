@@ -9,11 +9,16 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+    <script>
+        const { createClient } = supabase;
+        const supabaseClient = createClient("https://uuhbdleietpibjjdkmea.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aGJkbGVpZXRwaWJqamRrbWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTUxMjIsImV4cCI6MjA5MDc5MTEyMn0._8dVAyPb0nfB5b7JgWcI1i6PKaSh7h2uX9FGoJ_Es70");
+    </script>
+
     <style>
         :root {
             --p: #6366f1; --p-dark: #4f46e5; --glass: rgba(255, 255, 255, 0.98);
             --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
-            --danger: #ef4444; --sidebar: #0f172a;
+            --danger: #ef4444; --success: #10b981; --sidebar: #0f172a;
         }
 
         body { 
@@ -37,24 +42,26 @@
         header h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--sidebar); }
         #liveClock { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         
-        /* SELECTOR LIMBA - REPARAT VIZUAL */
+        /* Selector Limba - REFACTORED */
         .lang-selector {
-            display: flex; background: #eef2f6; padding: 4px; border-radius: 12px; position: relative; width: 100px; height: 36px; align-items: center;
+            display: flex; background: #e2e8f0; padding: 3px; border-radius: 12px; position: relative; width: 110px; height: 34px; align-items: center;
         }
         .lang-selector button {
-            flex: 1; border: none; background: transparent; font-size: 12px; font-weight: 800; color: #94a3b8; 
+            flex: 1; border: none; background: transparent; font-size: 12px; font-weight: 800; color: #64748b; 
             cursor: pointer; z-index: 2; transition: 0.3s; height: 100%; display: flex; align-items: center; justify-content: center;
         }
         .lang-selector .active-bg {
-            position: absolute; top: 4px; left: 4px; width: 44px; height: 28px; 
-            background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            position: absolute; top: 3px; left: 3px; width: 52px; height: 28px; 
+            background: white; border-radius: 9px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
         }
         .lang-selector button.active { color: var(--p); }
 
-        /* BUTON ADĂUGARE - FIXAT */
+        /* Buton adaugare - FIXED SIZE */
         #btnUniversal { 
-            min-width: 180px; justify-content: center; height: 40px; text-align: center;
+            min-width: 160px; /* Previne redimensionarea la schimbarea limbii */
+            justify-content: center;
+            height: 40px;
         }
 
         .container { padding: 25px 35px; }
@@ -85,6 +92,10 @@
 
         input, select, textarea { width: 100%; padding: 10px 12px; margin-bottom: 12px; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; font-size: 13px; }
         label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 5px; display: block; }
+
+        .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .summary-table th { text-align: left; padding: 15px; background: #f8fafc; font-size: 11px; border-bottom: 2px solid #f1f5f9; color: var(--text-muted); }
+        .summary-table td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; }
 
         #loginOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background: #0f172a; z-index:9999; display:flex; align-items:center; justify-content:center; }
     </style>
@@ -129,182 +140,254 @@
         <div class="container">
             <div id="pageSantiere" class="app-page">
                 <div class="stats-grid">
-                    <div class="stat-card"><h4>ORE TOTAL</h4><div id="statOre">0</div></div>
-                    <div class="stat-card"><h4>ÎNCASAT</h4><div id="statInc">0 €</div></div>
-                    <div class="stat-card"><h4>REST PLATĂ</h4><div id="statRest" style="color:var(--danger)">0 €</div></div>
-                    <div class="stat-card"><h4>ȘANTIERE</h4><div id="statNr">0</div></div>
+                    <div class="stat-card"><h4 data-i18n="stat_hours">ORE</h4><div id="statOre">0</div></div>
+                    <div class="stat-card"><h4 data-i18n="stat_collected">ÎNCASAT</h4><div id="statInc">0 €</div></div>
+                    <div class="stat-card"><h4 data-i18n="stat_due">REST</h4><div id="statRest" style="color:var(--danger)">0 €</div></div>
+                    <div class="stat-card"><h4 data-i18n="stat_sites">SANTIERE</h4><div id="statNr">0</div></div>
                 </div>
                 <div class="toolbar">
                     <input type="text" class="search-box" id="search" onkeyup="applyFilters()" placeholder="Caută...">
                     <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700;">
-                        <input type="checkbox" id="showArchived" onchange="applyFilters()"> <span>Arhivă</span>
+                        <input type="checkbox" id="showArchived" onchange="applyFilters()"> <span data-i18n="show_archive">Arhivă</span>
                     </label>
                 </div>
                 <div class="list-header">
-                    <div>DATA</div><div>CLIENT</div><div>LOCAȚIE</div><div>ORE</div><div>TOTAL</div><div>STATUS</div><div>NOTE</div><div style="text-align:right">ACȚIUNI</div>
+                    <div data-i18n="th_date">DATA</div><div data-i18n="th_client">CLIENT</div><div data-i18n="th_location">LOCAȚIE</div><div>ORE</div><div>TOTAL</div><div>STATUS</div><div>NOTE</div><div style="text-align:right">ACȚIUNI</div>
                 </div>
                 <div id="mainList"></div>
             </div>
 
             <div id="pageClienti" class="app-page" style="display:none;">
-                <div id="clientiList"></div>
+                <table class="summary-table">
+                    <thead><tr><th>CLIENT</th><th>TELEFON</th><th>EMAIL</th><th>ADRESA</th><th style="text-align:right">ACȚIUNI</th></tr></thead>
+                    <tbody id="clientiTableBody"></tbody>
+                </table>
             </div>
 
             <div id="pageUtilizatori" class="app-page" style="display:none;">
-                <div id="usersList"></div>
+                <table class="summary-table">
+                    <thead><tr><th>NUME</th><th>USER</th><th>ROL</th><th>CREAT</th><th style="text-align:right">ACȚIUNI</th></tr></thead>
+                    <tbody id="usersTableBody"></tbody>
+                </table>
             </div>
 
             <div id="pageLogs" class="app-page" style="display:none;">
-                <div id="logsList"></div>
+                <table class="summary-table">
+                    <thead><tr><th>USER</th><th>ROL</th><th>DETALII</th><th>DATA</th></tr></thead>
+                    <tbody id="logsTableBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
 </div>
 
 <div id="editModal" class="modal"><div class="modal-content">
-    <h3 id="modalTitle" style="margin-top:0; color:var(--p);">Detalii Lucrare</h3>
+    <h3 style="margin-top:0; color:var(--p); font-size:18px;">Detalii Lucrare</h3>
     <input type="hidden" id="e_id">
     <label>Client</label><input type="text" id="e_client">
     <label>Locație</label><input type="text" id="e_adr">
     <div style="display:flex; gap:10px;">
         <div style="flex:1"><label>Data Start</label><input type="date" id="e_d1"></div>
+        <div style="flex:1"><label>Data Final</label><input type="date" id="e_d2"></div>
+    </div>
+    <div style="display:flex; gap:10px;">
         <div style="flex:1"><label>Ora Intrare</label><input type="time" id="e_t1"></div>
-    </div>
-    <div style="display:flex; gap:10px;">
         <div style="flex:1"><label>Ora Ieșire</label><input type="time" id="e_t2"></div>
-        <div style="flex:1"><label>Tarif/h</label><input type="number" id="e_tarif"></div>
     </div>
-    <label>Suma Încasată (€)</label><input type="number" id="e_inc">
-    <label>Note</label><textarea id="e_msg" rows="2"></textarea>
     <div style="display:flex; gap:10px;">
+        <div style="flex:1"><label>Tarif/h</label><input type="number" id="e_tarif"></div>
+        <div style="flex:1"><label>Încasat</label><input type="number" id="e_inc"></div>
+    </div>
+    <label>Note</label><textarea id="e_msg" rows="2"></textarea>
+    <div style="display:flex; gap:10px; margin-top:10px;">
         <button class="btn btn-p" style="flex:1" onclick="save()">Salvează</button>
         <button class="btn" style="background:#eee" onclick="closeM('editModal')">Renunță</button>
     </div>
 </div></div>
 
-<script>
-const { createClient } = supabase;
-const supabaseClient = createClient("https://uuhbdleietpibjjdkmea.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1aGJkbGVpZXRwaWJqamRrbWVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMTUxMjIsImV4cCI6MjA5MDc5MTEyMn0._8dVAyPb0nfB5b7JgWcI1i6PKaSh7h2uX9FGoJ_Es70");
+<div id="clientModal" class="modal"><div class="modal-content">
+    <h3 style="margin-top:0; font-size:18px;">Gestionare Client</h3>
+    <input type="hidden" id="c_id">
+    <label>Nume Client</label><input type="text" id="c_nume">
+    <label>Telefon</label><input type="text" id="c_tel">
+    <label>Email</label><input type="text" id="c_email">
+    <label>Adresă</label><textarea id="c_adr_c" rows="2"></textarea>
+    <button class="btn btn-p" style="width:100%" onclick="saveClient()">Salvează</button>
+    <button class="btn" style="width:100%; margin-top:10px; background:#eee" onclick="closeM('clientModal')">Închide</button>
+</div></div>
 
+<div id="userModal" class="modal"><div class="modal-content">
+    <h3 style="margin-top:0; font-size:18px;">Gestionare Utilizator</h3>
+    <input type="hidden" id="u_id">
+    <label>Nume</label><input type="text" id="u_nume">
+    <label>User/Email</label><input type="text" id="u_user">
+    <label>Parolă</label><input type="text" id="u_pass">
+    <label>Rol</label><select id="u_rol"><option value="ADMIN">ADMIN</option><option value="WORKER">WORKER</option></select>
+    <button class="btn btn-p" style="width:100%" onclick="saveUser()">Salvează</button>
+    <button class="btn" style="width:100%; margin-top:10px; background:#eee" onclick="closeM('userModal')">Închide</button>
+</div></div>
+
+<script>
 const i18n = {
-    ro: { title: "ȘantierMaster PRO", btn_add: "+ Adaugă Lucrare" },
-    fr: { title: "MaîtreChantier PRO", btn_add: "+ Nouveau Travail" }
+    ro: { title: "ȘantierMaster PRO", stat_hours: "ORE TOTAL", stat_collected: "ÎNCASAT", stat_due: "REST PLATĂ", stat_sites: "ȘANTIERE", show_archive: "Arhivă", btn_add_job: "+ Adaugă Lucrare", btn_add_client: "+ Client Nou", btn_add_user: "+ User Nou", th_date: "DATA", th_client: "CLIENT", th_location: "LOCAȚIE", th_actions: "ACȚIUNI" },
+    fr: { title: "MaîtreChantier PRO", stat_hours: "HEURES", stat_collected: "ENCAISSÉ", stat_due: "RESTE", stat_sites: "CHANTIERS", show_archive: "Archive", btn_add_job: "+ Travail", btn_add_client: "+ Client", btn_add_user: "+ User", th_date: "DATE", th_client: "CLIENT", th_location: "LIEU", th_actions: "ACTIONS" }
 };
 
-let currentLang = localStorage.getItem('lang') || 'ro', allData = [], currentUser = null;
+let currentLang = localStorage.getItem('lang') || 'ro', currentPage = 'pageSantiere', allData = [], currentUser = null;
+
+function showPage(p) {
+    currentPage = p; document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
+    document.getElementById(p).style.display = 'block';
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    const btn = document.getElementById('btnUniversal'); btn.style.display = 'flex';
+
+    if(p==='pageSantiere'){ document.getElementById('navSantiere').classList.add('active'); btn.innerText=i18n[currentLang].btn_add_job; btn.onclick=openAdd; load(); }
+    if(p==='pageClienti'){ document.getElementById('navClienti').classList.add('active'); btn.innerText=i18n[currentLang].btn_add_client; btn.onclick=openAddClient; loadClienti(); }
+    if(p==='pageUtilizatori'){ document.getElementById('navUtilizatori').classList.add('active'); btn.innerText=i18n[currentLang].btn_add_user; btn.onclick=openAddUser; loadUsers(); }
+    if(p==='pageLogs'){ document.getElementById('navLogs').classList.add('active'); btn.style.display='none'; loadLogs(); }
+    lucide.createIcons();
+}
 
 function changeLang(lang) {
     currentLang = lang; localStorage.setItem('lang', lang);
-    document.getElementById('langBg').style.left = lang === 'ro' ? '4px' : '52px';
+    const bg = document.getElementById('langBg');
+    bg.style.left = lang === 'ro' ? '3px' : '55px'; // Centrat pe butoane
+    
     document.querySelectorAll('.lang-selector button').forEach(b => b.classList.remove('active'));
     document.getElementById('btn' + lang.toUpperCase()).classList.add('active');
+    
     document.getElementById('pageMainTitle').innerText = i18n[lang].title;
-    document.getElementById('btnUniversal').innerText = i18n[lang].btn_add;
-}
-
-function showPage(p) {
-    document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
-    document.getElementById(p).style.display = 'block';
-    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-    document.getElementById('nav' + p.replace('page','')).classList.add('active');
-    if(p === 'pageSantiere') load();
-    lucide.createIcons();
+    showPage(currentPage); // Updateaza textele butoanelor principale
 }
 
 async function executaLogin() {
     const u = document.getElementById('l_user').value, p = document.getElementById('l_pass').value;
     const { data, error } = await supabaseClient.from('Utilizatori').select('*').eq('"Email/User"', u).eq('"Parola"', p).single();
-    if(error){ document.getElementById('loginMsg').innerText="Eroare de conectare!"; return; }
+    if(error){ document.getElementById('loginMsg').innerText="Credentiale incorecte!"; return; }
     currentUser = { nume: data.Nume, user: data["Email/User"], rol: data.Rol };
     localStorage.setItem('santierUser', JSON.stringify(currentUser));
     document.getElementById('loginOverlay').style.display='none';
-    initApp();
+    initializareUI(); load();
 }
 
 async function load() {
     const { data } = await supabaseClient.from('Planificare').select('*').order('id', {ascending: false});
     if(data) {
-        allData = data;
+        allData = data.map(r => [r.Client, r.Adresă, r["Data Start"], r["Data Final"], r["Ora Intrare"], r["Ora Ieșire"], r["Sumă Încasată"], r["Tarif/Oră"], r["Total de Plată"], r["Rest de Plată"], r.Status, r["Total H"], r.Mesaj, r.Arhivă, r.id]);
         applyFilters();
     }
-}
-
-function applyFilters() {
-    const s = document.getElementById('search').value.toLowerCase();
-    const arc = document.getElementById('showArchived').checked;
-    const filtered = allData.filter(r => (r.Client.toLowerCase().includes(s) || r.Adresă.toLowerCase().includes(s)) && (arc ? true : !r.Arhivă));
-    render(filtered);
 }
 
 function render(data) {
     const list = document.getElementById('mainList'); list.innerHTML = '';
     data.forEach(r => {
-        const d = document.createElement('div'); d.className = 'card';
-        d.innerHTML = `<div>${r["Data Start"]}</div><div style="font-weight:800; color:var(--p)">${r.Client}</div><div style="font-size:12px">${r.Adresă}</div><div>${r["Total H"]}h</div><div style="font-weight:800">${r["Total de Plată"]}€</div><div><span class="badge ${r.Status==='PLATIT'?'bg-PLATIT':'bg-REST'}">${r.Status}</span></div><div style="font-size:11px; color:var(--text-muted)">${r.Mesaj||''}</div>
+        const d = document.createElement('div'); d.className = 'card'; if(r[13]) d.style.opacity = '0.5';
+        d.innerHTML = `<div>${r[2]}</div><div style="font-weight:800; color:var(--p)">${r[0]}</div><div style="font-size:12px">${r[1]}</div><div>${r[11]}h</div><div style="font-weight:800">${r[8]}€</div><div><span class="badge ${r[10]==='PLATIT'?'bg-PLATIT':'bg-REST'}">${r[10]}</span></div><div style="font-size:11px; color:var(--text-muted); overflow:hidden;">${r[12]||''}</div>
         <div style="text-align:right; display:flex; gap:6px; justify-content:flex-end;">
-            <button class="btn-outline" onclick="openEdit(${r.id})"><i data-lucide="edit-2" style="width:14px"></i></button>
-            <button class="btn-outline btn-danger-light" onclick="deleteRow(${r.id})"><i data-lucide="trash-2" style="width:14px"></i></button>
+            <button class="btn-outline" onclick="openEdit(${r[14]})"><i data-lucide="edit-2" style="width:14px"></i></button>
+            <button class="btn-outline btn-danger-light" onclick="deleteRow(${r[14]})"><i data-lucide="trash-2" style="width:14px"></i></button>
         </div>`;
         list.appendChild(d);
     });
-    updateStats(data);
     lucide.createIcons();
 }
 
-function updateStats(data) {
-    document.getElementById('statOre').innerText = data.reduce((a,b)=>a+(parseFloat(b["Total H"])||0),0).toFixed(1);
-    document.getElementById('statInc').innerText = data.reduce((a,b)=>a+(parseFloat(b["Sumă Încasată"])||0),0).toFixed(0) + " €";
-    document.getElementById('statRest').innerText = data.reduce((a,b)=>a+(parseFloat(b["Rest de Plată"])||0),0).toFixed(0) + " €";
-    document.getElementById('statNr').innerText = data.length;
+async function loadClienti() {
+    const { data } = await supabaseClient.from('Clienti').select('*').order('Nume Client');
+    if(data) {
+        document.getElementById('clientiTableBody').innerHTML = data.map(c => `<tr><td style="font-weight:800">${c["Nume Client"]}</td><td>${c.Telefon||'-'}</td><td>${c.Email||'-'}</td><td>${c["Adresa Sediu"]||'-'}</td><td style="text-align:right"><button class="btn-outline" onclick="editClient(${c.id})" style="margin-right:5px"><i data-lucide="edit-3" style="width:14px"></i></button><button class="btn-outline btn-danger-light" onclick="deleteClient(${c.id})"><i data-lucide="trash-2" style="width:14px"></i></button></td></tr>`).join('');
+        lucide.createIcons();
+    }
 }
 
-function openAdd() { 
-    document.getElementById('e_id').value=''; 
-    document.getElementById('editModal').style.display='block'; 
+async function loadUsers() {
+    const { data } = await supabaseClient.from('Utilizatori').select('*').order('Nume');
+    if(data) {
+        document.getElementById('usersTableBody').innerHTML = data.map(u => `<tr><td style="font-weight:800">${u.Nume}</td><td>${u["Email/User"]}</td><td><span class="badge" style="background:#f1f5f9">${u.Rol}</span></td><td>${u.Creat||''}</td><td style="text-align:right"><button class="btn-outline" onclick="editUser(${u.id})" style="margin-right:5px"><i data-lucide="edit-3" style="width:14px"></i></button><button class="btn-outline btn-danger-light" onclick="deleteUser(${u.id})"><i data-lucide="trash-2" style="width:14px"></i></button></td></tr>`).join('');
+        lucide.createIcons();
+    }
 }
 
+async function loadLogs() {
+    const { data } = await supabaseClient.from('Logs').select('*').order('id', {ascending: false}).limit(50);
+    if(data) document.getElementById('logsTableBody').innerHTML = data.map(l => `<tr><td style="font-weight:800">${l.Nume}</td><td>${l.Rol}</td><td>${l.Login}</td><td>${new Date(l.creat_la).toLocaleString()}</td></tr>`).join('');
+}
+
+function openAdd() { document.getElementById('e_id').value=''; document.getElementById('editModal').style.display='block'; }
 function openEdit(id) {
-    const r = allData.find(x => x.id == id);
-    document.getElementById('e_id').value=r.id; 
-    document.getElementById('e_client').value=r.Client;
-    document.getElementById('e_adr').value=r.Adresă;
-    document.getElementById('e_d1').value=r["Data Start"];
-    document.getElementById('e_t1').value=r["Ora Intrare"];
-    document.getElementById('e_t2').value=r["Ora Ieșire"];
-    document.getElementById('e_tarif').value=r["Tarif/Oră"];
-    document.getElementById('e_inc').value=r["Sumă Încasată"];
-    document.getElementById('e_msg').value=r.Mesaj;
+    const r = allData.find(x => x[14] == id);
+    document.getElementById('e_id').value=r[14]; document.getElementById('e_client').value=r[0]; document.getElementById('e_adr').value=r[1];
+    document.getElementById('e_d1').value=r[2]; document.getElementById('e_t1').value=r[4]; document.getElementById('e_t2').value=r[5];
+    document.getElementById('e_tarif').value=r[7]; document.getElementById('e_inc').value=r[6]; document.getElementById('e_msg').value=r[12];
     document.getElementById('editModal').style.display='block';
+}
+
+async function editClient(id) {
+    const { data } = await supabaseClient.from('Clienti').select('*').eq('id', id).single();
+    if(data){
+        document.getElementById('c_id').value=data.id; document.getElementById('c_nume').value=data["Nume Client"];
+        document.getElementById('c_tel').value=data.Telefon; document.getElementById('c_email').value=data.Email;
+        document.getElementById('c_adr_c').value=data["Adresa Sediu"]; document.getElementById('clientModal').style.display='block';
+    }
+}
+
+async function editUser(id) {
+    const { data } = await supabaseClient.from('Utilizatori').select('*').eq('id', id).single();
+    if(data){
+        document.getElementById('u_id').value=data.id; document.getElementById('u_nume').value=data.Nume;
+        document.getElementById('u_user').value=data["Email/User"]; document.getElementById('u_pass').value=data.Parola;
+        document.getElementById('u_rol').value=data.Rol; document.getElementById('userModal').style.display='block';
+    }
 }
 
 async function save() {
     const id = document.getElementById('e_id').value;
-    const obj = { 
-        Client: document.getElementById('e_client').value, 
-        Adresă: document.getElementById('e_adr').value, 
-        "Data Start": document.getElementById('e_d1').value, 
-        "Ora Intrare": document.getElementById('e_t1').value, 
-        "Ora Ieșire": document.getElementById('e_t2').value, 
-        "Tarif/Oră": document.getElementById('e_tarif').value, 
-        "Sumă Încasată": document.getElementById('e_inc').value, 
-        Mesaj: document.getElementById('e_msg').value 
-    };
-    if(id) await supabaseClient.from('Planificare').update(obj).eq('id', id);
-    else await supabaseClient.from('Planificare').insert([obj]);
-    closeM('editModal'); load();
+    const obj = { Client: document.getElementById('e_client').value, Adresă: document.getElementById('e_adr').value, "Data Start": document.getElementById('e_d1').value, "Ora Intrare": document.getElementById('e_t1').value, "Ora Ieșire": document.getElementById('e_t2').value, "Tarif/Oră": document.getElementById('e_tarif').value, "Sumă Încasată": document.getElementById('e_inc').value, Mesaj: document.getElementById('e_msg').value };
+    const { error } = id ? await supabaseClient.from('Planificare').update(obj).eq('id', id) : await supabaseClient.from('Planificare').insert([obj]);
+    if(!error){ closeM('editModal'); load(); }
+}
+
+async function saveClient() {
+    const id = document.getElementById('c_id').value;
+    const obj = { "Nume Client": document.getElementById('c_nume').value, Telefon: document.getElementById('c_tel').value, Email: document.getElementById('c_email').value, "Adresa Sediu": document.getElementById('c_adr_c').value };
+    const { error } = id ? await supabaseClient.from('Clienti').update(obj).eq('id', id) : await supabaseClient.from('Clienti').insert([obj]);
+    if(!error){ closeM('clientModal'); loadClienti(); }
+}
+
+async function saveUser() {
+    const id = document.getElementById('u_id').value;
+    const obj = { Nume: document.getElementById('u_nume').value, "Email/User": document.getElementById('u_user').value, Parola: document.getElementById('u_pass').value, Rol: document.getElementById('u_rol').value };
+    const { error } = id ? await supabaseClient.from('Utilizatori').update(obj).eq('id', id) : await supabaseClient.from('Utilizatori').insert([obj]);
+    if(!error){ closeM('userModal'); loadUsers(); }
 }
 
 async function deleteRow(id) { if(confirm('Ștergi lucrarea?')) { await supabaseClient.from('Planificare').delete().eq('id', id); load(); } }
+async function deleteClient(id) { if(confirm('Ștergi clientul?')) { await supabaseClient.from('Clienti').delete().eq('id', id); loadClienti(); } }
+async function deleteUser(id) { if(confirm('Ștergi utilizatorul?')) { await supabaseClient.from('Utilizatori').delete().eq('id', id); loadUsers(); } }
+
+function openAddClient() { document.getElementById('c_id').value=''; document.getElementById('clientModal').style.display='block'; }
+function openAddUser() { document.getElementById('u_id').value=''; document.getElementById('userModal').style.display='block'; }
 function closeM(id) { document.getElementById(id).style.display='none'; }
+function applyFilters() {
+    const s = document.getElementById('search').value.toLowerCase();
+    const arc = document.getElementById('showArchived').checked;
+    const filtered = allData.filter(r => (r[0].toLowerCase().includes(s) || r[1].toLowerCase().includes(s)) && (arc ? true : !r[13]));
+    render(filtered); updateStats(filtered);
+}
+function updateStats(data) {
+    document.getElementById('statOre').innerText = data.reduce((a,b)=>a+(parseFloat(b[11])||0),0).toFixed(1);
+    document.getElementById('statInc').innerText = data.reduce((a,b)=>a+(parseFloat(b[6])||0),0).toFixed(0) + " €";
+    document.getElementById('statRest').innerText = data.reduce((a,b)=>a+(parseFloat(b[9])||0),0).toFixed(0) + " €";
+    document.getElementById('statNr').innerText = data.length;
+}
+function initializareUI() { document.getElementById('userBadge').style.display='block'; document.getElementById('u_initials').innerText=currentUser.nume.substring(0,2).toUpperCase(); }
 function logout() { localStorage.clear(); location.reload(); }
-function initApp() { document.getElementById('userBadge').style.display='block'; document.getElementById('u_initials').innerText=currentUser.nume.substring(0,2).toUpperCase(); load(); }
 
 window.onload = () => {
     setInterval(()=> { document.getElementById('liveClock').innerText = new Date().toLocaleString(); }, 1000);
     const s = localStorage.getItem('santierUser');
-    if(s){ currentUser=JSON.parse(s); document.getElementById('loginOverlay').style.display='none'; initApp(); }
+    if(s){ currentUser=JSON.parse(s); document.getElementById('loginOverlay').style.display='none'; initializareUI(); load(); }
     changeLang(currentLang);
-    lucide.createIcons();
 };
 </script>
 </body>
