@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ȘantierMaster PRO</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,71 +16,93 @@
 
     <style>
         :root {
-            --p: #6366f1; --p-dark: #4f46e5; --glass: rgba(255, 255, 255, 0.95);
-            --border: rgba(226, 232, 240, 0.8); --text: #0f172a; --text-muted: #64748b;
+            --p: #6366f1; --p-dark: #4f46e5; --glass: rgba(255, 255, 255, 0.98);
+            --border: #e2e8f0; --text: #0f172a; --text-muted: #64748b;
             --danger: #ef4444; --success: #10b981; --sidebar: #0f172a;
         }
 
         body { 
             font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; background: #f1f5f9;
-            background-image: radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%);
             height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden;
+            color: var(--text); font-size: 13px;
         }
 
         .app-window {
-            width: 98vw; height: 95vh; background: var(--glass); border-radius: 24px; 
-            display: flex; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); overflow: hidden;
+            width: 98vw; height: 96vh; background: var(--glass); border-radius: 20px; 
+            display: flex; box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid var(--border); overflow: hidden;
         }
 
-        nav { width: 80px; background: var(--sidebar); display: flex; flex-direction: column; align-items: center; padding: 30px 0; gap: 20px; }
-        nav a { color: #94a3b8; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; border-radius: 16px; transition: 0.3s; cursor: pointer; }
+        nav { width: 72px; background: var(--sidebar); display: flex; flex-direction: column; align-items: center; padding: 25px 0; gap: 15px; }
+        nav a { color: #94a3b8; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; transition: 0.3s; cursor: pointer; }
         nav a:hover { background: rgba(255,255,255,0.1); color: white; }
-        nav a.active { background: var(--p); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.4); }
+        nav a.active { background: var(--p); color: white; box-shadow: 0 8px 15px rgba(99, 102, 241, 0.3); }
 
         .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; }
-        header { padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+        header { padding: 12px 35px; display: flex; justify-content: space-between; align-items: center; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; min-height: 70px; }
+        header h2 { margin: 0; font-size: 18px; font-weight: 800; color: var(--sidebar); }
+        #liveClock { font-size: 11px; color: var(--text-muted); font-weight: 600; }
         
-        .container { padding: 30px 40px; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid var(--border); }
-        .stat-card div { font-size: 22px; font-weight: 800; margin-top: 8px; }
+        /* Selector Limba Compact */
+        .lang-selector {
+            display: flex; background: #f1f5f9; padding: 2px; border-radius: 10px; position: relative; width: 84px; height: 30px; align-items: center; border: 1px solid var(--border);
+        }
+        .lang-selector button {
+            flex: 1; border: none; background: transparent; font-size: 11px; font-weight: 800; color: #64748b; 
+            cursor: pointer; z-index: 2; transition: 0.3s; height: 100%; display: flex; align-items: center; justify-content: center; font-family: inherit;
+        }
+        .lang-selector .active-bg {
+            position: absolute; top: 2px; left: 2px; width: 38px; height: 24px; 
+            background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
+        }
+        .lang-selector button.active { color: var(--p); }
 
-        .toolbar { display: flex; gap: 15px; align-items: center; margin-bottom: 25px; background: white; padding: 15px 25px; border-radius: 20px; border: 1px solid var(--border); }
-        .search-box { flex: 1; padding: 12px; border: 1px solid #e2e8f0; border-radius: 12px; }
+        /* Buton adaugare FIX */
+        #btnUniversal { min-width: 170px; justify-content: center; height: 38px; font-size: 13px; }
 
-        .list-header { display: grid; grid-template-columns: 100px 1.5fr 2fr 80px 100px 100px 1.2fr 120px; gap: 15px; padding: 15px 25px; background: #f8fafc; font-weight: 700; font-size: 11px; border-radius: 12px; }
-        .card { display: grid; grid-template-columns: 100px 1.5fr 2fr 80px 100px 100px 1.2fr 120px; gap: 15px; align-items: center; padding: 15px 25px; background: white; border-radius: 16px; margin-top: 10px; border: 1px solid transparent; transition: 0.2s; }
-        .card:hover { border-color: var(--p); transform: translateY(-2px); }
+        .container { padding: 20px 35px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 16px; border: 1px solid var(--border); }
+        .stat-card h4 { margin: 0; font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-card div { font-size: 18px; font-weight: 800; margin-top: 4px; }
 
-        .btn { padding: 12px 20px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .toolbar { display: flex; gap: 12px; align-items: center; margin-bottom: 15px; background: white; padding: 10px 20px; border-radius: 15px; border: 1px solid var(--border); }
+        .search-box { flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px; outline: none; }
+
+        .list-header { display: grid; grid-template-columns: 90px 1.2fr 1.5fr 70px 90px 90px 1fr 110px; gap: 10px; padding: 10px 20px; background: #f8fafc; font-weight: 700; font-size: 10px; color: var(--text-muted); border-radius: 10px; }
+        .card { display: grid; grid-template-columns: 90px 1.2fr 1.5fr 70px 90px 90px 1fr 110px; gap: 10px; align-items: center; padding: 12px 20px; background: white; border-radius: 12px; margin-top: 6px; border: 1px solid transparent; transition: 0.2s; font-size: 12.5px; }
+        .card:hover { border-color: var(--p); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+
+        .btn { padding: 8px 16px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
         .btn-p { background: var(--p); color: white; }
-        .btn-outline { background: #f1f5f9; color: var(--text); padding: 8px; border-radius: 10px; border:none; cursor:pointer; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-danger { color: var(--danger); background: #fee2e2; }
+        .btn-outline { background: #f1f5f9; color: var(--text); padding: 6px; border-radius: 8px; border:none; cursor:pointer; }
+        .btn-danger-light { color: var(--danger); background: #fee2e2; }
 
-        .badge { padding: 6px 10px; border-radius: 8px; font-size: 10px; font-weight: 800; }
+        .badge { padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; }
         .bg-PLATIT { background: #dcfce7; color: #15803d; }
         .bg-REST { background: #fee2e2; color: #b91c1c; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; backdrop-filter: blur(8px); }
-        .modal-content { background: white; width: 450px; margin: 5vh auto; padding: 30px; border-radius: 24px; max-height: 85vh; overflow-y: auto; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.5); z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: white; width: 400px; margin: 6vh auto; padding: 25px; border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
 
-        input, select, textarea { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #e2e8f0; border-radius: 10px; font-family: inherit; }
-        label { font-size: 10px; font-weight: 800; color: var(--text-muted); margin-bottom: 5px; display: block; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #e2e8f0; border-radius: 8px; font-family: inherit; font-size: 13px; }
+        label { font-size: 10px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; display: block; }
 
-        #loginOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background: var(--sidebar); z-index:9999; display:flex; align-items:center; justify-content:center; }
-        .summary-table { width: 100%; border-collapse: collapse; }
-        .summary-table th { text-align: left; padding: 15px; font-size: 12px; color: var(--text-muted); border-bottom: 2px solid #f1f5f9; }
-        .summary-table td { padding: 15px; border-bottom: 1px solid #f1f5f9; }
+        .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .summary-table th { text-align: left; padding: 12px; background: #f8fafc; font-size: 10px; color: var(--text-muted); border-bottom: 2px solid #f1f5f9; }
+        .summary-table td { padding: 10px 12px; border-bottom: 1px solid #f1f5f9; }
+
+        #loginOverlay { position:fixed; top:0; left:0; width:100%; height:100%; background: #0f172a; z-index:9999; display:flex; align-items:center; justify-content:center; }
     </style>
 </head>
 <body>
 
 <div id="loginOverlay">
-    <div style="background:white; padding:40px; border-radius:28px; width:320px; text-align:center;">
-        <h2 style="margin-bottom:25px; font-weight:800;">ȘantierMaster</h2>
-        <input type="text" id="l_user" placeholder="Email / Utilizator">
+    <div style="background:white; padding:40px; border-radius:24px; width:300px; text-align:center;">
+        <h2 style="margin-bottom:25px; font-weight:800; font-size:24px;">ȘantierMaster</h2>
+        <input type="text" id="l_user" placeholder="Utilizator">
         <input type="password" id="l_pass" placeholder="Parolă">
-        <button class="btn btn-p" style="width:100%; justify-content:center;" onclick="executaLogin()">Conectare</button>
+        <button class="btn btn-p" style="width:100%; justify-content:center; height:45px;" onclick="executaLogin()">Conectare</button>
         <div id="loginMsg" style="color:var(--danger); margin-top:15px; font-size:12px;"></div>
     </div>
 </div>
@@ -92,7 +114,7 @@
         <a id="navUtilizatori" onclick="showPage('pageUtilizatori')"><i data-lucide="shield-check"></i></a>
         <a id="navLogs" onclick="showPage('pageLogs')"><i data-lucide="clipboard-list"></i></a>
         <div style="margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-            <div id="userBadge" style="display:none;"><div id="u_initials" style="width: 40px; height: 40px; background: var(--p); color: white; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 800;">??</div></div>
+            <div id="userBadge" style="display:none;"><div id="u_initials" style="width: 36px; height: 36px; background: var(--p); color: white; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px;">??</div></div>
             <a onclick="logout()" style="color: var(--danger);"><i data-lucide="power"></i></a>
         </div>
     </nav>
@@ -101,9 +123,10 @@
         <header>
             <div><h2 id="pageMainTitle">ȘantierMaster PRO</h2><div id="liveClock"></div></div>
             <div style="display: flex; align-items: center; gap: 15px;">
-                <div style="display:flex; background:#f1f5f9; padding:4px; border-radius:10px;">
-                    <button class="btn-outline lang-btn" id="btnRO" onclick="changeLang('ro')" style="font-size:10px; font-weight:800;">RO</button>
-                    <button class="btn-outline lang-btn" id="btnFR" onclick="changeLang('fr')" style="font-size:10px; font-weight:800;">FR</button>
+                <div class="lang-selector">
+                    <div class="active-bg" id="langBg"></div>
+                    <button id="btnRO" onclick="changeLang('ro')">RO</button>
+                    <button id="btnFR" onclick="changeLang('fr')">FR</button>
                 </div>
                 <button class="btn btn-p" id="btnUniversal" onclick="openAdd()">+ Adaugă Lucrare</button>
             </div>
@@ -119,7 +142,7 @@
                 </div>
                 <div class="toolbar">
                     <input type="text" class="search-box" id="search" onkeyup="applyFilters()" placeholder="Caută...">
-                    <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:700; margin:0;">
                         <input type="checkbox" id="showArchived" onchange="applyFilters()"> <span data-i18n="show_archive">Arhivă</span>
                     </label>
                 </div>
@@ -154,7 +177,7 @@
 </div>
 
 <div id="editModal" class="modal"><div class="modal-content">
-    <h3 style="margin-top:0; color:var(--p)">Detalii Lucrare</h3>
+    <h3 style="margin-top:0; color:var(--p); font-size:16px;">Detalii Lucrare</h3>
     <input type="hidden" id="e_id">
     <label>Client</label><input type="text" id="e_client">
     <label>Locație</label><input type="text" id="e_adr">
@@ -178,73 +201,112 @@
 </div></div>
 
 <div id="clientModal" class="modal"><div class="modal-content">
-    <h3 style="margin-top:0">Detalii Client</h3>
+    <h3 style="margin-top:0; font-size:16px;">Gestionare Client</h3>
     <input type="hidden" id="c_id">
     <label>Nume Client</label><input type="text" id="c_nume">
     <label>Telefon</label><input type="text" id="c_tel">
     <label>Email</label><input type="text" id="c_email">
     <label>Adresă</label><textarea id="c_adr_c" rows="2"></textarea>
-    <button class="btn btn-p" style="width:100%" onclick="saveClient()">Salvează Client</button>
+    <button class="btn btn-p" style="width:100%" onclick="saveClient()">Salvează</button>
     <button class="btn" style="width:100%; margin-top:10px; background:#eee" onclick="closeM('clientModal')">Închide</button>
 </div></div>
 
 <div id="userModal" class="modal"><div class="modal-content">
-    <h3 style="margin-top:0">Detalii Utilizator</h3>
+    <h3 style="margin-top:0; font-size:16px;">Gestionare Utilizator</h3>
     <input type="hidden" id="u_id">
     <label>Nume</label><input type="text" id="u_nume">
     <label>User/Email</label><input type="text" id="u_user">
     <label>Parolă</label><input type="text" id="u_pass">
     <label>Rol</label><select id="u_rol"><option value="ADMIN">ADMIN</option><option value="WORKER">WORKER</option></select>
-    <button class="btn btn-p" style="width:100%" onclick="saveUser()">Salvează User</button>
+    <button class="btn btn-p" style="width:100%" onclick="saveUser()">Salvează</button>
     <button class="btn" style="width:100%; margin-top:10px; background:#eee" onclick="closeM('userModal')">Închide</button>
 </div></div>
 
 <script>
 const i18n = {
-    ro: { title: "ȘantierMaster PRO", stat_hours: "ORE TOTAL", stat_collected: "ÎNCASAT", stat_due: "REST PLATĂ", stat_sites: "ȘANTIERE", show_archive: "Arhivă", btn_add_job: "+ Adaugă Lucrare", btn_add_client: "+ Client Nou", btn_add_user: "+ User Nou", th_date: "DATA", th_client: "CLIENT", th_location: "LOCAȚIE", th_actions: "ACȚIUNI" },
-    fr: { title: "MaîtreChantier PRO", stat_hours: "HEURES", stat_collected: "ENCAISSÉ", stat_due: "RESTE", stat_sites: "CHANTIERS", show_archive: "Archive", btn_add_job: "+ Travail", btn_add_client: "+ Client", btn_add_user: "+ User", th_date: "DATE", th_client: "CLIENT", th_location: "LIEU", th_actions: "ACTIONS" }
+    ro: { 
+        title: "ȘantierMaster PRO", 
+        title_clients: "Gestiune Clienți", 
+        title_users: "Gestiune Utilizatori", 
+        title_logs: "Jurnal Activitate",
+        stat_hours: "ORE TOTAL", stat_collected: "ÎNCASAT", stat_due: "REST PLATĂ", stat_sites: "ȘANTIERE", 
+        show_archive: "Arhivă", 
+        btn_add_job: "+ Adaugă Lucrare", btn_add_client: "+ Client Nou", btn_add_user: "+ User Nou", 
+        th_date: "DATA", th_client: "CLIENT", th_location: "LOCAȚIE" 
+    },
+    fr: { 
+        title: "MaîtreChantier PRO", 
+        title_clients: "Gestion Clients", 
+        title_users: "Gestion Utilisateurs", 
+        title_logs: "Journal d'Activité",
+        stat_hours: "HEURES", stat_collected: "ENCAISSÉ", stat_due: "RESTE", stat_sites: "CHANTIERS", 
+        show_archive: "Archive", 
+        btn_add_job: "+ Nouveau Travail", btn_add_client: "+ Client", btn_add_user: "+ User", 
+        th_date: "DATE", th_client: "CLIENT", th_location: "LIEU" 
+    }
 };
 
-let currentLang = localStorage.getItem('lang') || 'ro';
-let currentPage = 'pageSantiere';
-let allData = [];
-let currentUser = null;
+let currentLang = localStorage.getItem('lang') || 'ro', currentPage = 'pageSantiere', allData = [], currentUser = null;
 
-// --- NAVIGARE ---
 function showPage(p) {
-    currentPage = p;
-    document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
+    currentPage = p; document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
     document.getElementById(p).style.display = 'block';
     document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
     const btn = document.getElementById('btnUniversal'); btn.style.display = 'flex';
+    const mainT = document.getElementById('pageMainTitle');
 
-    if(p==='pageSantiere'){ document.getElementById('navSantiere').classList.add('active'); btn.innerText=i18n[currentLang].btn_add_job; btn.onclick=openAdd; load(); }
-    if(p==='pageClienti'){ document.getElementById('navClienti').classList.add('active'); btn.innerText=i18n[currentLang].btn_add_client; btn.onclick=openAddClient; loadClienti(); }
-    if(p==='pageUtilizatori'){ document.getElementById('navUtilizatori').classList.add('active'); btn.innerText=i18n[currentLang].btn_add_user; btn.onclick=openAddUser; loadUsers(); }
-    if(p==='pageLogs'){ document.getElementById('navLogs').classList.add('active'); btn.style.display='none'; loadLogs(); }
+    if(p==='pageSantiere'){ 
+        document.getElementById('navSantiere').classList.add('active'); 
+        btn.innerText=i18n[currentLang].btn_add_job; btn.onclick=openAdd; 
+        mainT.innerText = i18n[currentLang].title;
+        load(); 
+    }
+    if(p==='pageClienti'){ 
+        document.getElementById('navClienti').classList.add('active'); 
+        btn.innerText=i18n[currentLang].btn_add_client; btn.onclick=openAddClient; 
+        mainT.innerText = i18n[currentLang].title_clients;
+        loadClienti(); 
+    }
+    if(p==='pageUtilizatori'){ 
+        document.getElementById('navUtilizatori').classList.add('active'); 
+        btn.innerText=i18n[currentLang].btn_add_user; btn.onclick=openAddUser; 
+        mainT.innerText = i18n[currentLang].title_users;
+        loadUsers(); 
+    }
+    if(p==='pageLogs'){ 
+        document.getElementById('navLogs').classList.add('active'); 
+        btn.style.display='none'; 
+        mainT.innerText = i18n[currentLang].title_logs;
+        loadLogs(); 
+    }
     lucide.createIcons();
 }
 
 function changeLang(lang) {
     currentLang = lang; localStorage.setItem('lang', lang);
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn'+lang.toUpperCase()).classList.add('active');
-    document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[lang][el.getAttribute('data-i18n')]);
+    const bg = document.getElementById('langBg');
+    bg.style.left = lang === 'ro' ? '2px' : '42px'; 
+    
+    document.querySelectorAll('.lang-selector button').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn' + lang.toUpperCase()).classList.add('active');
+    
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        el.innerText = i18n[lang][el.getAttribute('data-i18n')];
+    });
+    
     showPage(currentPage);
 }
 
-// --- LOGIN ---
 async function executaLogin() {
     const u = document.getElementById('l_user').value, p = document.getElementById('l_pass').value;
     const { data, error } = await supabaseClient.from('Utilizatori').select('*').eq('"Email/User"', u).eq('"Parola"', p).single();
-    if(error){ document.getElementById('loginMsg').innerText="Eroare!"; return; }
+    if(error){ document.getElementById('loginMsg').innerText="Credentiale incorecte!"; return; }
     currentUser = { nume: data.Nume, user: data["Email/User"], rol: data.Rol };
     localStorage.setItem('santierUser', JSON.stringify(currentUser));
     document.getElementById('loginOverlay').style.display='none';
     initializareUI(); load();
 }
 
-// --- LOADERS ---
 async function load() {
     const { data } = await supabaseClient.from('Planificare').select('*').order('id', {ascending: false});
     if(data) {
@@ -257,10 +319,10 @@ function render(data) {
     const list = document.getElementById('mainList'); list.innerHTML = '';
     data.forEach(r => {
         const d = document.createElement('div'); d.className = 'card'; if(r[13]) d.style.opacity = '0.5';
-        d.innerHTML = `<div>${r[2]}</div><div style="font-weight:800">${r[0]}</div><div style="font-size:11px">${r[1]}</div><div>${r[11]}h</div><div style="font-weight:800">${r[8]}€</div><div><span class="badge ${r[10]==='PLATIT'?'bg-PLATIT':'bg-REST'}">${r[10]}</span></div><div style="font-size:10px">${r[12]||''}</div>
-        <div style="text-align:right; display:flex; gap:5px; justify-content:flex-end;">
+        d.innerHTML = `<div>${r[2]}</div><div style="font-weight:800; color:var(--p)">${r[0]}</div><div style="font-size:11px">${r[1]}</div><div>${r[11]}h</div><div style="font-weight:800">${r[8]}€</div><div><span class="badge ${r[10]==='PLATIT'?'bg-PLATIT':'bg-REST'}">${r[10]}</span></div><div style="font-size:10px; color:var(--text-muted); overflow:hidden;">${r[12]||''}</div>
+        <div style="text-align:right; display:flex; gap:6px; justify-content:flex-end;">
             <button class="btn-outline" onclick="openEdit(${r[14]})"><i data-lucide="edit-2" style="width:14px"></i></button>
-            <button class="btn-outline btn-danger" onclick="deleteRow(${r[14]})"><i data-lucide="trash-2" style="width:14px"></i></button>
+            <button class="btn-outline btn-danger-light" onclick="deleteRow(${r[14]})"><i data-lucide="trash-2" style="width:14px"></i></button>
         </div>`;
         list.appendChild(d);
     });
@@ -270,7 +332,7 @@ function render(data) {
 async function loadClienti() {
     const { data } = await supabaseClient.from('Clienti').select('*').order('Nume Client');
     if(data) {
-        document.getElementById('clientiTableBody').innerHTML = data.map(c => `<tr><td style="font-weight:800">${c["Nume Client"]}</td><td>${c.Telefon||'-'}</td><td>${c.Email||'-'}</td><td>${c["Adresa Sediu"]||'-'}</td><td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;"><button class="btn-outline" onclick="editClient(${c.id})"><i data-lucide="edit-3" style="width:14px"></i></button><button class="btn-outline btn-danger" onclick="deleteClient(${c.id})"><i data-lucide="trash-2" style="width:14px"></i></button></td></tr>`).join('');
+        document.getElementById('clientiTableBody').innerHTML = data.map(c => `<tr><td style="font-weight:800">${c["Nume Client"]}</td><td>${c.Telefon||'-'}</td><td>${c.Email||'-'}</td><td>${c["Adresa Sediu"]||'-'}</td><td style="text-align:right"><button class="btn-outline" onclick="editClient(${c.id})" style="margin-right:5px"><i data-lucide="edit-3" style="width:14px"></i></button><button class="btn-outline btn-danger-light" onclick="deleteClient(${c.id})"><i data-lucide="trash-2" style="width:14px"></i></button></td></tr>`).join('');
         lucide.createIcons();
     }
 }
@@ -278,17 +340,16 @@ async function loadClienti() {
 async function loadUsers() {
     const { data } = await supabaseClient.from('Utilizatori').select('*').order('Nume');
     if(data) {
-        document.getElementById('usersTableBody').innerHTML = data.map(u => `<tr><td style="font-weight:800">${u.Nume}</td><td>${u["Email/User"]}</td><td>${u.Rol}</td><td>${u.Creat||''}</td><td style="text-align:right; display:flex; gap:5px; justify-content:flex-end;"><button class="btn-outline" onclick="editUser(${u.id})"><i data-lucide="edit-3" style="width:14px"></i></button><button class="btn-outline btn-danger" onclick="deleteUser(${u.id})"><i data-lucide="trash-2" style="width:14px"></i></button></td></tr>`).join('');
+        document.getElementById('usersTableBody').innerHTML = data.map(u => `<tr><td style="font-weight:800">${u.Nume}</td><td>${u["Email/User"]}</td><td><span class="badge" style="background:#f1f5f9">${u.Rol}</span></td><td>${u.Creat||''}</td><td style="text-align:right"><button class="btn-outline" onclick="editUser(${u.id})" style="margin-right:5px"><i data-lucide="edit-3" style="width:14px"></i></button><button class="btn-outline btn-danger-light" onclick="deleteUser(${u.id})"><i data-lucide="trash-2" style="width:14px"></i></button></td></tr>`).join('');
         lucide.createIcons();
     }
 }
 
 async function loadLogs() {
     const { data } = await supabaseClient.from('Logs').select('*').order('id', {ascending: false}).limit(50);
-    if(data) document.getElementById('logsTableBody').innerHTML = data.map(l => `<tr><td>${l.Nume}</td><td>${l.Rol}</td><td>${l.Login}</td><td>${new Date(l.creat_la).toLocaleString()}</td></tr>`).join('');
+    if(data) document.getElementById('logsTableBody').innerHTML = data.map(l => `<tr><td style="font-weight:800">${l.Nume}</td><td>${l.Rol}</td><td>${l.Login}</td><td>${new Date(l.creat_la).toLocaleString()}</td></tr>`).join('');
 }
 
-// --- ACTIUNI ---
 function openAdd() { document.getElementById('e_id').value=''; document.getElementById('editModal').style.display='block'; }
 function openEdit(id) {
     const r = allData.find(x => x[14] == id);
@@ -316,7 +377,6 @@ async function editUser(id) {
     }
 }
 
-// --- SALVARI ---
 async function save() {
     const id = document.getElementById('e_id').value;
     const obj = { Client: document.getElementById('e_client').value, Adresă: document.getElementById('e_adr').value, "Data Start": document.getElementById('e_d1').value, "Ora Intrare": document.getElementById('e_t1').value, "Ora Ieșire": document.getElementById('e_t2').value, "Tarif/Oră": document.getElementById('e_tarif').value, "Sumă Încasată": document.getElementById('e_inc').value, Mesaj: document.getElementById('e_msg').value };
@@ -338,18 +398,10 @@ async function saveUser() {
     if(!error){ closeM('userModal'); loadUsers(); }
 }
 
-// --- DELETE ---
-async function deleteRow(id) { 
-    if(confirm('Ștergi lucrarea?')) { await supabaseClient.from('Planificare').delete().eq('id', id); load(); }
-}
-async function deleteClient(id) { 
-    if(confirm('Ștergi clientul?')) { await supabaseClient.from('Clienti').delete().eq('id', id); loadClienti(); }
-}
-async function deleteUser(id) { 
-    if(confirm('Ștergi utilizatorul?')) { await supabaseClient.from('Utilizatori').delete().eq('id', id); loadUsers(); }
-}
+async function deleteRow(id) { if(confirm('Ștergi lucrarea?')) { await supabaseClient.from('Planificare').delete().eq('id', id); load(); } }
+async function deleteClient(id) { if(confirm('Ștergi clientul?')) { await supabaseClient.from('Clienti').delete().eq('id', id); loadClienti(); } }
+async function deleteUser(id) { if(confirm('Ștergi utilizatorul?')) { await supabaseClient.from('Utilizatori').delete().eq('id', id); loadUsers(); } }
 
-// --- UTILS ---
 function openAddClient() { document.getElementById('c_id').value=''; document.getElementById('clientModal').style.display='block'; }
 function openAddUser() { document.getElementById('u_id').value=''; document.getElementById('userModal').style.display='block'; }
 function closeM(id) { document.getElementById(id).style.display='none'; }
