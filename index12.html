@@ -385,15 +385,23 @@ function openAdd() {
 
 function applyFilters() {
     const s = document.getElementById('search').value.toLowerCase();
-    const d1 = document.getElementById('dateFrom').value;
+    const d1 = document.getElementById('dateFrom').value; // Vine sub forma "2026-01-01"
     const d2 = document.getElementById('dateTo').value;
     const arc = document.getElementById('showArchived').checked;
 
     const filtered = allData.filter(r => {
+        // 1. Căutare text (Nume sau Adresă)
         const matchesS = r[0].toLowerCase().includes(s) || r[1].toLowerCase().includes(s);
-        const matchesD = (!d1 || r[2] >= d1) && (!d2 || r[2] <= d2);
+        
+        // 2. Filtru Arhivă
         const matchesA = arc ? true : !r[13];
-        return matchesS && matchesD && matchesA;
+
+        // 3. Filtru Dată (r[2] este coloana "Data Start")
+        let matchesD = true;
+        if (d1 && r[2]) { matchesD = matchesD && (r[2] >= d1); }
+        if (d2 && r[2]) { matchesD = matchesD && (r[2] <= d2); }
+
+        return matchesS && matchesA && matchesD;
     });
 
     render(filtered);
