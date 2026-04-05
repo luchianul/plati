@@ -324,25 +324,27 @@ async function save() {
     }
 
     const tarif = parseFloat(document.getElementById('e_tarif').value) || 0;
-    const incasat = parseFloat(document.getElementById('e_inc').value) || 0;
-    const total = (ore * tarif).toFixed(2);
-    const rest = (total - incasat).toFixed(2);
+const incasat = parseFloat(document.getElementById('e_inc').value) || 0;
 
-    const row = {
-        "Client": document.getElementById('e_client').value,
-        "Adresă": document.getElementById('e_adr').value,
-        "Data Start": document.getElementById('e_d1').value,
-        "Data Final": document.getElementById('e_d2').value,
-        "Ora Intrare": t1,
-        "Ora Ieșire": t2,
-        "Tarif/Oră": tarif,
-        "Sumă Încasată": incasat,
-        "Total de Plată": total,
-        "Rest de Plată": rest,
-        "Status": rest <= 0 ? "PLATIT" : "REST",
-        "Total H": ore,
-        "Mesaj": document.getElementById('e_msg').value
-    };
+// Folosim parseFloat pentru a păstra zecimalele în calcule
+const total = parseFloat((ore * tarif).toFixed(2)); 
+const rest = parseFloat((total - incasat).toFixed(2));
+
+const row = {
+    "Client": document.getElementById('e_client').value,
+    "Adresă": document.getElementById('e_adr').value,
+    "Data Start": document.getElementById('e_d1').value,
+    "Data Final": document.getElementById('e_d2').value,
+    "Ora Intrare": t1,
+    "Ora Ieșire": t2,
+    "Tarif/Oră": tarif,
+    "Sumă Încasată": incasat,
+    "Total de Plată": total, // Acum trimite număr, nu textul "240.00"
+    "Rest de Plată": rest,
+    "Status": rest <= 0 ? "PLATIT" : "REST",
+    "Total H": parseFloat(ore),
+    "Mesaj": document.getElementById('e_msg').value
+};
 
     const { error } = id ? 
         await supabaseClient.from('Planificare').update(row).eq('id', id) : 
