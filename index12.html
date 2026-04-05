@@ -123,6 +123,7 @@
     <a id="navSantiere" class="active" onclick="showPage('pageSantiere')"><i data-lucide="home"></i></a>
     <a id="navClienti" onclick="showPage('pageClienti')"><i data-lucide="users"></i></a>
     <a id="navUtilizatori" onclick="showPage('pageUtilizatori')"><i data-lucide="settings"></i></a>
+    <a id="navLogs" onclick="showPage('pageLogs')"><i data-lucide="history"></i></a>
     <div style="margin-top: auto; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; width: 100%;">
       <div id="userBadge" style="display: none; text-align: center;">
         <div id="u_initials" style="width: 35px; height: 35px; background: var(--p); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 12px; margin-bottom: 5px;">??</div>
@@ -185,6 +186,17 @@
               <tr><th>NUME</th><th>EMAIL/USER</th><th>ROL</th><th>CREAT LA</th><th style="text-align:right">ACȚIUNI</th></tr>
             </thead>
             <tbody id="usersTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="pageLogs" class="app-page" style="display:none;">
+        <div class="summary-section">
+          <table class="summary-table">
+            <thead>
+              <tr><th>UTILIZATOR</th><th>ROL</th><th>DETALII LOGIN</th><th>DATA & ORA</th></tr>
+            </thead>
+            <tbody id="logsTableBody"></tbody>
           </table>
         </div>
       </div>
@@ -277,6 +289,14 @@ async function executaLogin() {
 
         currentUser = { nume: data.Nume, user: data["Email/User"], rol: data.Rol };
         localStorage.setItem('santierUser', JSON.stringify(currentUser));
+        
+        // SALVARE IN TABELUL LOGS (FARA COLOANA DATA, SE PUNE AUTOMAT)
+        await supabaseClient.from('Logs').insert([{
+            "Nume": data.Nume,
+            "Rol": data.Rol,
+            "login": data["Email/User"]
+        }]);
+
         document.getElementById('loginOverlay').style.display = 'none';
         initializareUI();
         load();
@@ -437,6 +457,24 @@ function editUser(id) {
     document.getElementById('userModal').style.display = 'block';
 }
 
+// --- 5. LOAD LOGS ---
+async function loadLogs() {
+    const { data, error } = await supabaseClient.from('Logs').select('*').order('id', { ascending: false }).limit(100);
+    if (!error) {
+        const tbody = document.getElementById('logsTableBody');
+        tbody.innerHTML = data.map(l => {
+            const d = l.Data ? new Date(l.Data).toLocaleString('ro-RO') : '-';
+            return `
+            <tr>
+                <td style="font-weight:800">${l.Nume}</td>
+                <td><span class="badge" style="background:#f1f5f9">${l.Rol}</span></td>
+                <td>${l.login || '-'}</td>
+                <td style="color:var(--text-muted)">${d}</td>
+            </tr>`;
+        }).join('');
+    }
+}
+
 // --- UTILS GENERALE ---
 function showPage(p) {
     document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
@@ -444,6 +482,8 @@ function showPage(p) {
     document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
     
     const btn = document.getElementById('btnUniversal');
+    btn.style.display = 'flex'; // Reset display
+
     if(p === 'pageSantiere') { 
         document.getElementById('navSantiere').classList.add('active'); 
         btn.innerText = "+ Adaugă Lucrare"; btn.onclick = openAdd; load(); 
@@ -455,6 +495,11 @@ function showPage(p) {
     if(p === 'pageUtilizatori') { 
         document.getElementById('navUtilizatori').classList.add('active'); 
         btn.innerText = "+ User Nou"; btn.onclick = openAddUser; loadUsers(); 
+    }
+    if(p === 'pageLogs') { 
+        document.getElementById('navLogs').classList.add('active'); 
+        btn.style.display = 'none'; // Ascundem butonul pe pagina de logs
+        loadLogs(); 
     }
 }
 
