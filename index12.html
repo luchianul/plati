@@ -502,11 +502,23 @@ function updateStats(data) {
 }
 
 function showPage(p) {
+    // Ascunde toate paginile
     document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
+    // Arată pagina cerută
     document.getElementById(p).style.display = 'block';
+    
+    // Update meniu navigare
     document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-    if(p==='pageSantiere') document.getElementById('navSantiere').classList.add('active');
-    if(p==='pageClienti') document.getElementById('navClienti').classList.add('active');
+    
+    if(p === 'pageSantiere') {
+        document.getElementById('navSantiere').classList.add('active');
+        load(); // Încarcă șantierele
+    }
+    
+    if(p === 'pageClienti') {
+        document.getElementById('navClienti').classList.add('active');
+        loadClienti(); // <--- ACEASTA ESTE LINIA CRUCIALĂ
+    }
 }
 
 function closeM(id) { document.getElementById(id).style.display = 'none'; }
@@ -539,18 +551,35 @@ window.onload = () => {
 
 // 1. Încărcarea clienților
 async function loadClienti() {
-    const { data, error } = await supabaseClient
-        .from('Clienti')
-        .select('*')
-        .order('Nume Client', { ascending: true });
+    const tbody = document.getElementById('clientiTableBody');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Se încarcă clienții...</td></tr>';
 
-    if (!error) {
+    try {
+        const { data, error } = await supabaseClient
+            .from('Clienti')
+            .select('*')
+            .order('Nume Client', { ascending: true });
+
+        if (error) throw error;
+
         listaClienti = data;
-        renderClienti();
-        actualizeazaDropdownClienti(); // Opțional: pentru a-i alege în formularul de șantier
+        
+        if (data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nu există clienți înregistrați.</td></tr>';
+        } else {
+            renderClienti();
+        }
+        
+        // Dacă ai pus dropdown în pagina de șantiere, îl actualizăm și pe acela
+        if (typeof actualizeazaDropdownClienti === "function") {
+            actualizeazaDropdownClienti();
+        }
+
+    } catch (err) {
+        console.error("Eroare Clienti:", err);
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Eroare la încărcare! Verifică consola.</td></tr>';
     }
 }
-
 // 2. Afișarea în tabel
 function renderClienti() {
     const tbody = document.getElementById('clientiTableBody');
@@ -559,19 +588,20 @@ function renderClienti() {
     listaClienti.forEach(c => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td style="font-weight:800">${c["Nume Client"]}</td>
+            <td style="font-weight:800; padding: 12px;">${c["Nume Client"] || 'Fără Nume'}</td>
             <td>${c["Telefon"] || '-'}</td>
             <td>${c["Email"] || '-'}</td>
             <td>${c["Adresa Sediu"] || '-'}</td>
             <td style="text-align:right">
-                <button class="btn-outline" onclick="editClient(${c.id})"><i data-lucide="edit-3" style="width:14px"></i></button>
+                <button class="btn-outline" onclick="editClient(${c.id})">
+                    <i data-lucide="edit-3" style="width:14px"></i>
+                </button>
             </td>
         `;
         tbody.appendChild(tr);
     });
     lucide.createIcons();
 }
-
 // 3. Salvarea (Add/Edit)
 async function saveClient() {
     const id = document.getElementById('c_id').value;
@@ -594,7 +624,19 @@ async function saveClient() {
         Swal.fire('Eroare', error.message, 'error');
     }
 }
+// 4. functia edit client
+  function editClient(id) {
+    const c = listaClienti.find(x => x.id == id);
+    if (!c) return;
 
+    document.getElementById('c_id').value = c.id;
+    document.getElementById('c_nume').value = c["Nume Client"];
+    document.getElementById('c_tel').value = c["Telefon"] || '';
+    document.getElementById('c_email').value = c["Email"] || '';
+    document.getElementById('c_adr').value = c["Adresa Sediu"] || '';
+    
+    document.getElementById('clientModal').style.display = 'block';
+}
 // Utils pentru Modal Client
 function openAddClient() {
     document.getElementById('c_id').value = '';
