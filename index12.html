@@ -294,7 +294,7 @@ async function executaLogin() {
         await supabaseClient.from('Logs').insert([{
             "Nume": data.Nume,
             "Rol": data.Rol,
-            "login": data["Email/User"]
+            "Login": data["Email/User"]
         }]);
 
         document.getElementById('loginOverlay').style.display = 'none';
@@ -459,17 +459,31 @@ function editUser(id) {
 
 // --- 5. LOAD LOGS ---
 async function loadLogs() {
-    const { data, error } = await supabaseClient.from('Logs').select('*').order('id', { ascending: false }).limit(100);
-    if (!error) {
-        const tbody = document.getElementById('logsTableBody');
+    const { data, error } = await supabaseClient
+        .from('Logs')
+        .select('Nume, Rol, Login, creat_la') // Folosim numele tale exacte
+        .order('id', { ascending: false })
+        .limit(100);
+
+    if (error) {
+        console.error("Eroare la încărcare loguri:", error.message);
+        return;
+    }
+
+    const tbody = document.getElementById('logsTableBody');
+    if (data) {
         tbody.innerHTML = data.map(l => {
-            const d = l.Data ? new Date(l.Data).toLocaleString('ro-RO') : '-';
+            // Formatăm data creat_la (care vine de la now() din DB)
+            const dataFormatata = l.creat_la 
+                ? new Date(l.creat_la).toLocaleString('ro-RO') 
+                : '-';
+
             return `
             <tr>
-                <td style="font-weight:800">${l.Nume}</td>
-                <td><span class="badge" style="background:#f1f5f9">${l.Rol}</span></td>
-                <td>${l.login || '-'}</td>
-                <td style="color:var(--text-muted)">${d}</td>
+                <td style="font-weight:800">${l.Nume || '-'}</td>
+                <td><span class="badge" style="background:#f1f5f9">${l.Rol || '-'}</span></td>
+                <td>${l.Login || '-'}</td>
+                <td style="color:var(--text-muted)">${dataFormatata}</td>
             </tr>`;
         }).join('');
     }
