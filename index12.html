@@ -75,7 +75,7 @@
     position: absolute; 
     top: 3px; 
     left: 3px; 
-    width: 80px; /* Jumătate din selector minus padding */
+    width: 38px; /* Jumătate din selector minus padding */
     height: 28px; 
     background: white; 
     border-radius: 9px; 
@@ -282,7 +282,7 @@ function showPage(p) {
 function changeLang(lang) {
     currentLang = lang; localStorage.setItem('lang', lang);
     const bg = document.getElementById('langBg');
-    bg.style.left = lang === 'ro' ? '3px' : '52px'; // Centrat pe butoane
+    bg.style.left = lang === 'ro' ? '3px' : '42px'; // Centrat pe butoane
     
     document.querySelectorAll('.lang-selector button').forEach(b => b.classList.remove('active'));
     document.getElementById('btn' + lang.toUpperCase()).classList.add('active');
