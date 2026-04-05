@@ -203,7 +203,43 @@
                 <h2>Gestiune Clienți</h2>
                 <button class="btn btn-p" onclick="Swal.fire('Info', 'Modul in lucru', 'info')">+ Client Nou</button>
             </div>
-            <div class="summary-section">Datele se vor incarca aici...</div>
+            <div id="pageClienti" class="app-page" style="display:none;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2 style="margin:0; color:var(--text)">Gestiune Clienți</h2>
+        <button class="btn btn-p" onclick="openAddClient()">+ Client Nou</button>
+    </div>
+    
+    <div class="summary-section">
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>NUME CLIENT</th>
+                    <th>TELEFON</th>
+                    <th>EMAIL</th>
+                    <th>ADRESĂ SEDIU</th>
+                    <th style="text-align:right">ACȚIUNI</th>
+                </tr>
+            </thead>
+            <tbody id="clientiTableBody">
+                </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="clientModal" class="modal">
+  <div class="modal-content">
+    <h3 style="margin-top:0; color:var(--p)">Detalii Client</h3>
+    <input type="hidden" id="c_id">
+    <label>Nume Client</label><input type="text" id="c_nume">
+    <label>Telefon</label><input type="text" id="c_tel">
+    <label>Email</label><input type="email" id="c_email">
+    <label>Adresă Sediu</label><textarea id="c_adr" rows="2"></textarea>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-p" style="flex:2" onclick="saveClient()">💾 Salvează Client</button>
+      <button class="btn" style="flex:1; background:#eee" onclick="closeM('clientModal')">Anulează</button>
+    </div>
+  </div>
+</div>
         </div>
 
         <div id="pageUtilizatori" class="app-page" style="display:none;">
@@ -498,6 +534,94 @@ window.onload = () => {
         load();
     }
 };
+  // Acici e sectiunea de incarca si adauga clienti
+  let listaClienti = [];
+
+// 1. Încărcarea clienților
+async function loadClienti() {
+    const { data, error } = await supabaseClient
+        .from('Clienti')
+        .select('*')
+        .order('Nume Client', { ascending: true });
+
+    if (!error) {
+        listaClienti = data;
+        renderClienti();
+        actualizeazaDropdownClienti(); // Opțional: pentru a-i alege în formularul de șantier
+    }
+}
+
+// 2. Afișarea în tabel
+function renderClienti() {
+    const tbody = document.getElementById('clientiTableBody');
+    tbody.innerHTML = '';
+    
+    listaClienti.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="font-weight:800">${c["Nume Client"]}</td>
+            <td>${c["Telefon"] || '-'}</td>
+            <td>${c["Email"] || '-'}</td>
+            <td>${c["Adresa Sediu"] || '-'}</td>
+            <td style="text-align:right">
+                <button class="btn-outline" onclick="editClient(${c.id})"><i data-lucide="edit-3" style="width:14px"></i></button>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+    lucide.createIcons();
+}
+
+// 3. Salvarea (Add/Edit)
+async function saveClient() {
+    const id = document.getElementById('c_id').value;
+    const clientData = {
+        "Nume Client": document.getElementById('c_nume').value,
+        "Telefon": document.getElementById('c_tel').value,
+        "Email": document.getElementById('c_email').value,
+        "Adresa Sediu": document.getElementById('c_adr').value
+    };
+
+    const { error } = id ? 
+        await supabaseClient.from('Clienti').update(clientData).eq('id', id) :
+        await supabaseClient.from('Clienti').insert([clientData]);
+
+    if (!error) {
+        Swal.fire('Succes', 'Clientul a fost salvat!', 'success');
+        closeM('clientModal');
+        loadClienti();
+    } else {
+        Swal.fire('Eroare', error.message, 'error');
+    }
+}
+
+// Utils pentru Modal Client
+function openAddClient() {
+    document.getElementById('c_id').value = '';
+    document.getElementById('c_nume').value = '';
+    document.getElementById('c_tel').value = '';
+    document.getElementById('c_email').value = '';
+    document.getElementById('c_adr').value = '';
+    document.getElementById('clientModal').style.display = 'block';
+}
+
+// Funcție pentru a schimba paginile (o actualizăm pe cea existentă)
+function showPage(p) {
+    document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
+    document.getElementById(p).style.display = 'block';
+    
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    
+    if(p === 'pageSantiere') {
+        document.getElementById('navSantiere').classList.add('active');
+        load(); // Reîncărcăm șantierele
+    }
+    if(p === 'pageClienti') {
+        document.getElementById('navClienti').classList.add('active');
+        loadClienti(); // Încărcăm clienții când deschidem pagina
+    }
+}
+  // aici se termina sectiune de adauga clienti
 </script>
 </body>
 </html>
