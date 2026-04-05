@@ -300,66 +300,80 @@ const i18n = {
 };
 
 let currentLang = localStorage.getItem('lang') || 'ro';
-
-function changeLang(lang) {
-    currentLang = lang;
-    localStorage.setItem('lang', lang);
-    
-    // Update Buttons UI
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn' + lang.toUpperCase()).classList.add('active');
-
-    // Update Text Elements
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        el.innerText = i18n[lang][key];
-    });
-
-    document.getElementById('pageMainTitle').innerText = i18n[lang].title;
-    document.getElementById('search').placeholder = i18n[lang].search_placeholder;
-    
-    // Refresh UI labels for buttons
-    showPage(currentPage); 
-}
-
-// Restul logicii rămâne identică cu versiunea ta, dar adaptată pentru Limbi
 let currentPage = 'pageSantiere';
 let allData = [];
 let currentUser = null;
 
+// --- NAVIGARE PAGINI ---
+function showPage(p) {
+    currentPage = p;
+    document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
+    document.getElementById(p).style.display = 'block';
+    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
+    
+    const btn = document.getElementById('btnUniversal');
+    btn.style.display = 'flex';
+
+    if(p === 'pageSantiere') { 
+        document.getElementById('navSantiere').classList.add('active'); 
+        btn.innerText = i18n[currentLang].btn_add_job; btn.onclick = openAdd; load(); 
+    }
+    if(p === 'pageClienti') { 
+        document.getElementById('navClienti').classList.add('active'); 
+        btn.innerText = i18n[currentLang].btn_add_client; btn.onclick = openAddClient; loadClienti(); 
+    }
+    if(p === 'pageUtilizatori') { 
+        document.getElementById('navUtilizatori').classList.add('active'); 
+        btn.innerText = i18n[currentLang].btn_add_user; btn.onclick = openAddUser; loadUsers(); 
+    }
+    if(p === 'pageLogs') { 
+        document.getElementById('navLogs').classList.add('active'); 
+        btn.style.display = 'none'; loadLogs(); 
+    }
+    lucide.createIcons();
+}
+
+// --- LIMBA ---
+function changeLang(lang) {
+    currentLang = lang;
+    localStorage.setItem('lang', lang);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn' + lang.toUpperCase()).classList.add('active');
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.innerText = i18n[lang][key];
+    });
+    document.getElementById('pageMainTitle').innerText = i18n[lang].title;
+    document.getElementById('search').placeholder = i18n[lang].search_placeholder;
+    showPage(currentPage); 
+}
+
+// --- LOGIN ---
 async function executaLogin() {
     const u = document.getElementById('l_user').value.trim();
     const p = document.getElementById('l_pass').value.trim();
-    const msg = document.getElementById('loginMsg');
-    
     try {
-        const { data, error } = await supabaseClient.from('Utilizatori')
-            .select('*').eq('"Email/User"', u).eq('"Parola"', p).single();
-
+        const { data, error } = await supabaseClient.from('Utilizatori').select('*').eq('"Email/User"', u).eq('"Parola"', p).single();
         if (error || !data) {
-            msg.innerText = currentLang === 'ro' ? "Date incorecte!" : "Données incorrectes!";
+            document.getElementById('loginMsg').innerText = currentLang === 'ro' ? "Date incorecte!" : "Données incorrectes!";
             return;
         }
-
         currentUser = { nume: data.Nume, user: data["Email/User"], rol: data.Rol };
         localStorage.setItem('santierUser', JSON.stringify(currentUser));
-        
         await supabaseClient.from('Logs').insert([{ "Nume": data.Nume, "Rol": data.Rol, "Login": data["Email/User"] }]);
-
         document.getElementById('loginOverlay').style.display = 'none';
         initializareUI();
         load();
-    } catch (e) { msg.innerText = "Error!"; }
+    } catch (e) { console.error(e); }
 }
 
+// --- DATE SANTIERE ---
 async function load() {
     const { data, error } = await supabaseClient.from('Planificare').select('*').order('id', { ascending: false });
     if (!error) {
         allData = data.map(r => [
-            r["Client"], r["Adresă"], r["Data Start"], r["Data Final"], 
-            r["Ora Intrare"], r["Ora Ieșire"], r["Sumă Încasată"], 
-            r["Tarif/Oră"], r["Total de Plată"], r["Rest de Plată"], 
-            r["Status"], r["Total H"], r["Mesaj"], r["Arhivă"], r["id"]
+            r["Client"], r["Adresă"], r["Data Start"], r["Data Final"], r["Ora Intrare"], r["Ora Ieșire"], r["Sumă Încasată"], 
+            r["Tarif/Oră"], r["Total de Plată"], r["Rest de Plată"], r["Status"], r["Total H"], r["Mesaj"], r["Arhivă"], r["id"]
         ]);
         applyFilters();
     }
@@ -382,65 +396,66 @@ function render(data) {
             <div style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${r[12] || '-'}</div>
             <div style="text-align:right">
                 <button class="btn-outline" onclick="openEdit(${r[14]})"><i data-lucide="edit-2" style="width:14px"></i></button>
-            </div>
-        `;
+            </div>`;
         cont.appendChild(div);
     });
     lucide.createIcons();
 }
 
-function showPage(p) {
-    currentPage = p;
-    document.querySelectorAll('.app-page').forEach(pg => pg.style.display = 'none');
-    document.getElementById(p).style.display = 'block';
-    document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-    
-    const btn = document.getElementById('btnUniversal');
-    btn.style.display = 'flex';
-
-    if(p === 'pageSantiere') { 
-        document.getElementById('navSantiere').classList.add('active'); 
-        btn.innerText = i18n[currentLang].btn_add_job; btn.onclick = openAdd; load(); 
+// --- CLIENTI ---
+async function loadClienti() {
+    const { data, error } = await supabaseClient.from('Clienti').select('*').order('Nume Client');
+    if (!error) {
+        const tbody = document.getElementById('clientiTableBody');
+        tbody.innerHTML = data.map(c => `
+            <tr>
+                <td style="padding:15px; font-weight:800">${c["Nume Client"]}</td>
+                <td>${c["Telefon"] || '-'}</td>
+                <td>${c["Email"] || '-'}</td>
+                <td>${c["Adresa Sediu"] || '-'}</td>
+                <td style="padding:15px; text-align:right">
+                    <button class="btn-outline" onclick="editClient(${c.id})"><i data-lucide="edit-3" style="width:14px"></i></button>
+                </td>
+            </tr>`).join('');
+        lucide.createIcons();
     }
-    if(p === 'pageClienti') { 
-        document.getElementById('navClienti').classList.add('active'); 
-        btn.innerText = i18n[currentLang].btn_add_client; btn.onclick = () => Swal.fire('Info','Adaugare Client...','info'); 
+}
+
+// --- UTILIZATORI ---
+async function loadUsers() {
+    const { data, error } = await supabaseClient.from('Utilizatori').select('*').order('Nume');
+    if (!error) {
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = data.map(u => `
+            <tr>
+                <td style="padding:15px; font-weight:800">${u.Nume}</td>
+                <td>${u["Email/User"]}</td>
+                <td><span class="badge" style="background:#f1f5f9">${u.Rol}</span></td>
+                <td>${u.Creat || '-'}</td>
+                <td style="padding:15px; text-align:right">
+                    <button class="btn-outline" onclick="editUser(${u.id})"><i data-lucide="edit-3" style="width:14px"></i></button>
+                </td>
+            </tr>`).join('');
+        lucide.createIcons();
     }
-    if(p === 'pageLogs') { 
-        document.getElementById('navLogs').classList.add('active'); 
-        btn.style.display = 'none'; 
-        loadLogs(); 
+}
+
+// --- LOGS ---
+async function loadLogs() {
+    const { data } = await supabaseClient.from('Logs').select('*').order('id', { ascending: false }).limit(50);
+    const tbody = document.getElementById('logsTableBody');
+    if(data) {
+        tbody.innerHTML = data.map(l => `
+            <tr>
+                <td style="padding:15px; font-weight:800">${l.Nume}</td>
+                <td><span class="badge" style="background:#f1f5f9">${l.Rol}</span></td>
+                <td>${l.Login}</td>
+                <td>${new Date(l.creat_la).toLocaleString()}</td>
+            </tr>`).join('');
     }
-    lucide.createIcons();
 }
 
-function initializareUI() {
-    document.getElementById('userBadge').style.display = 'block';
-    document.getElementById('u_initials').innerText = currentUser.nume.substring(0,2).toUpperCase();
-}
-
-function openAdd() { 
-    document.getElementById('e_id').value = ''; 
-    document.getElementById('editModal').style.display = 'block'; 
-}
-
-function openEdit(id) {
-    const r = allData.find(x => x[14] == id);
-    document.getElementById('e_id').value = r[14];
-    document.getElementById('e_client').value = r[0];
-    document.getElementById('e_adr').value = r[1];
-    document.getElementById('e_d1').value = r[2];
-    document.getElementById('e_t1').value = r[4];
-    document.getElementById('e_t2').value = r[5];
-    document.getElementById('e_inc').value = r[6];
-    document.getElementById('e_tarif').value = r[7];
-    document.getElementById('e_msg').value = r[12];
-    document.getElementById('editModal').style.display = 'block';
-}
-
-function closeM(id) { document.getElementById(id).style.display = 'none'; }
-function logout() { localStorage.clear(); location.reload(); }
-
+// --- FUNCTII UTILS ---
 function applyFilters() {
     const s = document.getElementById('search').value.toLowerCase();
     const arc = document.getElementById('showArchived').checked;
@@ -463,17 +478,31 @@ function updateStats(data) {
     document.getElementById('statNr').innerText = data.length;
 }
 
-async function loadLogs() {
-    const { data } = await supabaseClient.from('Logs').select('*').order('id', { ascending: false }).limit(50);
-    const tbody = document.getElementById('logsTableBody');
-    tbody.innerHTML = data.map(l => `
-        <tr>
-            <td style="padding:15px; font-weight:800">${l.Nume}</td>
-            <td><span class="badge" style="background:#f1f5f9">${l.Rol}</span></td>
-            <td>${l.Login}</td>
-            <td>${new Date(l.creat_la).toLocaleString()}</td>
-        </tr>`).join('');
+function initializareUI() {
+    document.getElementById('userBadge').style.display = 'block';
+    document.getElementById('u_initials').innerText = currentUser.nume.substring(0,2).toUpperCase();
 }
+
+function openAdd() { document.getElementById('e_id').value = ''; document.getElementById('editModal').style.display = 'block'; }
+function openEdit(id) {
+    const r = allData.find(x => x[14] == id);
+    document.getElementById('e_id').value = r[14];
+    document.getElementById('e_client').value = r[0];
+    document.getElementById('e_adr').value = r[1];
+    document.getElementById('e_d1').value = r[2];
+    document.getElementById('e_t1').value = r[4];
+    document.getElementById('e_t2').value = r[5];
+    document.getElementById('e_inc').value = r[6];
+    document.getElementById('e_tarif').value = r[7];
+    document.getElementById('e_msg').value = r[12];
+    document.getElementById('editModal').style.display = 'block';
+}
+
+function openAddClient() { Swal.fire('Info', 'Deschide modal client...', 'info'); }
+function openAddUser() { Swal.fire('Info', 'Deschide modal user...', 'info'); }
+function closeM(id) { document.getElementById(id).style.display = 'none'; }
+function logout() { localStorage.clear(); location.reload(); }
+function resetareFiltreDate() { document.getElementById('dateFrom').value = ''; document.getElementById('dateTo').value = ''; applyFilters(); }
 
 window.onload = () => {
     setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleString(); }, 1000);
