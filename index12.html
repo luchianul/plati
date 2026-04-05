@@ -42,20 +42,51 @@
         header h2 { margin: 0; font-size: 20px; font-weight: 800; color: var(--sidebar); }
         #liveClock { font-size: 12px; color: var(--text-muted); font-weight: 600; }
         
-        /* Selector Limba - REFACTORED */
-        .lang-selector {
-            display: flex; background: #e2e8f0; padding: 3px; border-radius: 12px; position: relative; width: 110px; height: 34px; align-items: center;
-        }
-        .lang-selector button {
-            flex: 1; border: none; background: transparent; font-size: 12px; font-weight: 800; color: #64748b; 
-            cursor: pointer; z-index: 2; transition: 0.3s; height: 100%; display: flex; align-items: center; justify-content: center;
-        }
-        .lang-selector .active-bg {
-            position: absolute; top: 3px; left: 3px; width: 52px; height: 28px; 
-            background: white; border-radius: 9px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1;
-        }
-        .lang-selector button.active { color: var(--p); }
+       /* Selector Limba - DESIGN NOU */
+.lang-selector {
+    display: flex; 
+    background: #e2e8f0; 
+    padding: 3px; 
+    border-radius: 12px; 
+    position: relative; 
+    width: 104px; /* Fixat pentru 2 butoane de 50px */
+    height: 34px; 
+    align-items: center;
+}
+
+.lang-selector button {
+    flex: 1; 
+    border: none; 
+    background: transparent; 
+    font-size: 12px; 
+    font-weight: 800; 
+    color: #64748b; 
+    cursor: pointer; 
+    z-index: 2; 
+    transition: 0.3s; 
+    height: 100%; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    font-family: inherit;
+}
+
+.lang-selector .active-bg {
+    position: absolute; 
+    top: 3px; 
+    left: 3px; 
+    width: 49px; /* Jumătate din selector minus padding */
+    height: 28px; 
+    background: white; 
+    border-radius: 9px; 
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    z-index: 1;
+}
+
+.lang-selector button.active { 
+    color: var(--p); 
+}
 
         /* Buton adaugare - FIXED SIZE */
         #btnUniversal { 
@@ -251,7 +282,7 @@ function showPage(p) {
 function changeLang(lang) {
     currentLang = lang; localStorage.setItem('lang', lang);
     const bg = document.getElementById('langBg');
-    bg.style.left = lang === 'ro' ? '3px' : '55px'; // Centrat pe butoane
+    bg.style.left = lang === 'ro' ? '3px' : '52px'; // Centrat pe butoane
     
     document.querySelectorAll('.lang-selector button').forEach(b => b.classList.remove('active'));
     document.getElementById('btn' + lang.toUpperCase()).classList.add('active');
