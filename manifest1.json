@@ -1,0 +1,18 @@
+{
+  "name": "Workspace Infinity Floating",
+  "short_name": "Workspace",
+  "description": "Platformă de management operațional - VerTech",
+  "start_url": "new 1.html",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#2563eb",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=W&background=2563eb&color=fff&size=512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
