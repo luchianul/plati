@@ -8,455 +8,394 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="manifest" href="manifest-finance.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     
     <style>
         :root {
-            --season-primary: #5865f2;
-            --season-glow: rgba(88, 101, 242, 0.2);
-            --glass: rgba(255, 255, 255, 0.88);
-            --text-dark: #0f172a;
-            --urgent: #ef4444;
-            --cyber-blue: #38bdf8;
+            --season-primary: #10b981;
+            --season-glow: rgba(16, 185, 129, 0.2);
+            --glass: rgba(255, 255, 255, 0.85);
+            --text-dark: #1e293b;
+            --urgent: #ff4757;
+            --bg-dynamic: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
         }
 
-        /* STILURI LANDING PAGE - ASAMBLARE ȘI BALANS 3D */
-        #payment-hero {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #020617; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-family: 'Orbitron', sans-serif;
-            transition: all 0.8s cubic-bezier(0.7, 0, 0.3, 1);
-            overflow: hidden;
-            perspective: 1000px;
-        }
-
-        #payment-card {
-            position: relative; width: 320px; height: 190px; 
-            background: rgba(56, 189, 248, 0.05); 
-            border: 2px solid rgba(56, 189, 248, 0.4); 
-            border-radius: 15px; backdrop-filter: blur(15px); 
-            opacity: 0; transform: translateY(-100vh) rotateX(20deg); 
-            transition: opacity 1s, transform 1s cubic-bezier(0.17, 0.89, 0.32, 1.2);
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.1);
-            transform-style: preserve-3d;
-        }
-
-        @keyframes cardBalance {
-            0% { transform: rotateX(5deg) rotateY(-5deg); }
-            50% { transform: rotateX(-5deg) rotateY(5deg); }
-            100% { transform: rotateX(5deg) rotateY(-5deg); }
-        }
-
-        .balancing { animation: cardBalance 6s ease-in-out infinite; }
-
-        .scanner-line {
-            position: absolute; width: 100%; height: 4px;
-            background: var(--cyber-blue); box-shadow: 0 0 15px var(--cyber-blue);
-            top: 0; left: 0; animation: scan 3s infinite linear; opacity: 0.5;
-        }
-
-        @keyframes scan { 0% { top: 0; } 50% { top: 100%; } 100% { top: 0; } }
-
-        .btn-scan {
-            padding: 15px 50px; background: transparent; border: 2px solid var(--cyber-blue);
-            color: var(--cyber-blue); cursor: pointer; font-family: 'Orbitron';
-            font-weight: bold; border-radius: 50px; transition: 0.3s;
-            letter-spacing: 2px; margin-top: 30px;
-        }
-        .btn-scan:hover { background: rgba(56, 189, 248, 0.1); box-shadow: 0 0 20px var(--cyber-blue); }
-
-        /* STILURI APLICAȚIE */
         body { 
             margin: 0; font-family: 'Inter', sans-serif; 
-            background-image: url('manga.jpg'); background-size: cover;
-            background-position: center; background-attachment: fixed;
+            background: var(--bg-dynamic);
             min-height: 100vh; display: flex; flex-direction: column; 
             align-items: center; padding: 20px; box-sizing: border-box;
+            transition: background 1.5s ease;
+            color: var(--text-dark);
+            overflow-x: hidden;
         }
 
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(180deg, rgba(15,23,42,0.2) 0%, rgba(15,23,42,0.5) 100%);
-            backdrop-filter: blur(3px); z-index: -1;
+        /* LANDING PAGE */
+        #payment-hero {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.8s ease;
         }
 
-        .main-wrapper { width: 100%; max-width: 450px; z-index: 1; display: none; opacity: 0; transition: 1s; }
+        .status-alert-active {
+            animation: alert-bg 2s infinite ease-in-out;
+        }
+        @keyframes alert-bg {
+            0%, 100% { background-color: white; }
+            50% { background-color: #fff5f5; }
+        }
+
+        #season-effects {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1;
+        }
+
+        .particle {
+            position: absolute; top: -10%; user-select: none;
+            animation: fall linear forwards; z-index: 2;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg) translateX(0); }
+            100% { transform: translateY(110vh) rotate(360deg) translateX(50px); }
+        }
+
+        /* CARD */
+        #payment-card {
+            position: relative; width: 320px; height: 190px; 
+            background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); 
+            border-radius: 24px;
+            opacity: 0; transform: translateY(30px) rotateX(10deg);
+            transition: all 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.12), inset 0 0 0 1px rgba(255,255,255,0.5);
+            z-index: 5;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 25px; box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        .card-chip {
+            width: 50px; height: 38px; 
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            border-radius: 8px; position: relative;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .scanner-line {
+            position: absolute; width: 100%; height: 3px;
+            background: var(--season-primary); top: 0; left: 0;
+            animation: scan 3s infinite linear; opacity: 0.4;
+            box-shadow: 0 0 15px var(--season-primary);
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        .btn-scan {
+            padding: 16px 45px; background: var(--text-dark); border: none;
+            color: white; cursor: pointer; font-family: 'Orbitron';
+            font-weight: bold; border-radius: 50px; transition: 0.4s;
+            margin-top: 40px; box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+            letter-spacing: 2px; font-size: 14px;
+        }
+
+        .urgent-text {
+            color: var(--urgent);
+            animation: text-shake 0.5s infinite;
+            display: inline-block;
+        }
+        @keyframes text-shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+            100% { transform: translateX(0); }
+        }
+
+        /* APP CONTENT */
+        .main-wrapper { width: 100%; max-width: 450px; z-index: 2; display: none; opacity: 0; transition: 0.6s; }
 
         .frost-panel {
-            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15), 0 0 80px var(--season-glow);
-            padding: 25px; margin-bottom: 20px; text-align: center;
+            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.7); border-radius: 28px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.04);
+            padding: 25px; margin-bottom: 5px; text-align: center;
         }
 
-        .urgent-glow { animation: pulse-red 2s infinite; border: 2px solid var(--urgent) !important; }
-        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+        .vertech-signature {
+            font-family: 'Caveat'; font-size: 1.1rem; opacity: 0.5; margin-bottom: 20px;
+        }
 
         .app-icon {
             width: 65px; height: 65px; background: white; border-radius: 20px;
             display: flex; justify-content: center; align-items: center;
             font-size: 30px; font-weight: 900; color: var(--season-primary);
-            margin: 0 auto 15px auto; box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            margin: 0 auto 15px auto; box-shadow: 0 8px 20px rgba(0,0,0,0.05);
         }
 
+        /* EVIDENȚIERE SECȚIUNI */
+        .section-header {
+            display: flex; align-items: center; gap: 10px; margin: 25px 0 15px 5px;
+        }
+        .section-header h3 { 
+            font-size: 13px; text-transform: uppercase; color: #475569; 
+            margin: 0; letter-spacing: 1.5px; font-weight: 900; 
+        }
+        .section-line { height: 2px; flex: 1; background: rgba(0,0,0,0.05); border-radius: 2px; }
+
         .bill-card { 
-            background: rgba(255, 255, 255, 0.75); border-radius: 20px; padding: 15px; margin-bottom: 12px;
-            display: grid; grid-template-columns: 40px 1fr 65px 90px; align-items: center; gap: 10px; border: 1px solid rgba(255,255,255,0.5);
+            background: white; border-radius: 18px; padding: 18px; margin-bottom: 12px;
+            display: grid; grid-template-columns: 30px 1fr 65px 90px; align-items: center; gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             transition: 0.3s;
         }
 
-        .btn-pay { padding: 10px; border-radius: 12px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .unpaid { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
-        .paid { background: var(--season-primary); color: white; }
+        /* Stil diferit pentru Istoric */
+        .history-item { opacity: 0.75; transform: scale(0.98); background: rgba(255,255,255,0.5); }
 
-        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
-        .input-group input { background: white; border: none; padding: 15px; border-radius: 15px; font-size: 14px; outline: none; flex: 1; }
-        .btn-add { background: var(--season-primary); color: white; border: none; width: 50px; height: 50px; border-radius: 15px; font-size: 24px; cursor: pointer; }
-        
-        h3 { font-size: 12px; text-transform: uppercase; color: white; background: var(--season-primary); padding: 5px 15px; border-radius: 10px; margin: 20px 0 10px 0; display: inline-block; }
-        .total-box { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
-@keyframes pulse-text {
-    0% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.7; transform: scale(1.05); }
-    100% { opacity: 1; transform: scale(1); }
-}
-@keyframes moon-glow {
-    0% { text-shadow: 0 0 5px rgba(56, 189, 248, 0.4); transform: scale(1); }
-    50% { text-shadow: 0 0 20px rgba(56, 189, 248, 0.9); transform: scale(1.02); }
-    100% { text-shadow: 0 0 5px rgba(56, 189, 248, 0.4); transform: scale(1); }
-}
+        .btn-pay { padding: 12px; border-radius: 12px; border: none; font-size: 11px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .unpaid { background: #f8fafc; color: #94a3b8; border: 1px solid #e2e8f0; }
+        .paid { background: var(--season-primary); color: white; box-shadow: 0 5px 15px var(--season-glow); }
 
-.luna-puls {
-    display: inline-block; /* Necesar pentru ca transform/scale să funcționeze */
-    color: #ffffff;
-    font-weight: 900;
-    animation: moon-glow 3s ease-in-out infinite;
-}
+        .input-group { display: flex; gap: 10px; margin-bottom: 25px; margin-top: 15px;}
+        .input-group input { background: white; border: 1px solid rgba(0,0,0,0.05); padding: 14px; border-radius: 15px; flex: 1; outline: none; box-shadow: 0 4px 10px rgba(0,0,0,0.02);}
+        .btn-add { background: var(--season-primary); color: white; border: none; width: 50px; border-radius: 15px; font-size: 22px; cursor: pointer; }
+
+        .luna-puls { animation: pulse 2s infinite; font-weight: 900; color: var(--season-primary); }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
     </style>
 </head>
-<body onpointerdown="reseteazaCronometru()"> <!-- Monitorizăm orice atingere -->
+<body onpointerdown="reseteazaCronometru()">
 
-<!-- 1. LANDING PAGE -->
 <div id="payment-hero">
+    <div id="season-effects"></div>
+    
     <div id="payment-card">
-        <div id="card-chip" style="position:absolute; top:35px; left:25px; width:45px; height:35px; background:linear-gradient(135deg, #ffd700, #b8860b); border-radius:5px; opacity:0; transform: scale(0) translateZ(20px); transition: 0.8s 0.5s cubic-bezier(0.17, 0.89, 0.32, 1.5);"></div>
-        <div id="card-text-1" style="position:absolute; bottom:25px; left:25px; color:rgba(255,255,255,0.7); letter-spacing:2px; font-size:0.7rem; opacity:0; transform: translateX(-20px) translateZ(10px); transition: 0.6s 0.8s;">GABRIEL FINANCE</div>
-        <div id="card-text-2" style="position:absolute; bottom:25px; right:25px; color:#38bdf8; font-size:1.1rem; font-weight: bold; opacity:0; transform: translateX(20px) translateZ(10px); transition: 0.6s 1s;">2026</div>
+        <div class="card-chip"></div>
+        <div style="font-size: 1.1rem; letter-spacing: 4px; color: #cbd5e1; margin-top: 10px;">**** **** **** 2026</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div style="color:#94a3b8; font-size:0.6rem; letter-spacing:2px;">GABRIEL FINANCE</div>
+            <div id="card-year" style="color:var(--season-primary); font-weight:bold; font-size: 1.2rem;">2026</div>
+        </div>
         <div class="scanner-line"></div>
     </div>
 
-    <div id="hero-content" style="text-align:center; margin-top:40px; opacity:0; transform: translateY(20px); transition: 1s 1.2s;">
-        <!-- În loc de <h1>SYSTEM READY</h1> pune asta: -->
-<h1 id="status-message" style="color:white; font-size:1.2rem; letter-spacing:5px; margin-bottom:10px; transition: 0.5s;">
-    INITIALIZING...
-</h1>
-        <div id="hero-month-label" style="color:#38bdf8; font-size: 0.9rem; opacity:0.7;">INITIALIZING...</div>
+    <div id="hero-content" style="text-align:center; margin-top:40px; z-index: 5;">
+        <h1 id="status-message" style="font-size:1.1rem; letter-spacing:4px; margin-bottom:8px; font-weight: 900;">INITIALIZING</h1>
+        <div id="hero-month-label" style="font-size: 0.85rem; opacity:0.6;">SITUATION REPORT</div>
         <button onclick="autorizeazaAcces()" class="btn-scan">CONNECT</button>
-        <div style="margin-top:20px; font-family:'Caveat'; color:white; opacity:0.4;">power by VerTech</div>
+        <div style="margin-top:25px; font-family:'Caveat'; opacity:0.4; font-size: 1.2rem;">power by VerTech</div>
     </div>
 </div>
 
-<!-- 2. APLICAȚIA PRINCIPALĂ -->
 <div class="main-wrapper" id="mainApp">
-    <div style="display:flex; justify-content:space-between; margin-bottom:15px; color:white; font-weight:800; font-size:14px;">
-        <span id="welcomeUser">Welcome, Gabriel</span>
-        <span onclick="schimbaNume()" style="cursor:pointer">⚙️</span>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; color:#64748b; font-weight:700; font-size:13px;">
+        <span id="welcomeUser">Gabriel!</span>
+        <div onclick="schimbaNume()" style="cursor:pointer; background:white; padding:8px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.03);">⚙️</div>
     </div>
 
     <div id="statusPanel" class="frost-panel">
         <div class="app-icon" id="dynamicLetter">G</div>
-        <h1 style="margin:0; font-size: 24px; font-weight: 900;">Management Plăți</h1>
-        <div style="font-family:'Caveat'; color:var(--season-primary); font-size:20px;">power by VerTech</div>
-        <div id="headerMonth" style="font-size:11px; font-weight:900; text-transform:uppercase; color:var(--season-primary); background:rgba(255,255,255,0.8); padding:5px 15px; border-radius:50px; display:inline-block; margin-top:10px; border:1px solid var(--season-primary);">--</div>
+        <h2 style="margin:0; font-size: 22px; letter-spacing: -0.5px;">Plăți Lunare</h2>
+        <div id="headerMonth" style="font-size:11px; font-weight:900; margin-top:12px; border: 1px solid var(--season-primary); padding: 5px 15px; border-radius: 25px; display: inline-block; color: var(--season-primary);">--</div>
     </div>
+    
+    <div class="vertech-signature" style="text-align:center;">power by VerTech</div>
 
     <div class="input-group">
-        <input type="text" id="newFactura" placeholder="Nume factură...">
-        <input type="number" id="newSuma" placeholder="€" style="max-width: 80px;">
+        <input type="text" id="newFactura" placeholder="Nume plată...">
+        <input type="number" id="newSuma" placeholder="€" style="width: 80px;">
         <button class="btn-add" onclick="adaugaFactura()">+</button>
     </div>
 
     <div id="mainContent">
-        <h3>De achitat acum</h3>
+        <div class="section-header">
+            <h3>De Plătit</h3>
+            <div class="section-line"></div>
+        </div>
         <div id="containerNeplatite"></div>
-        <h3>Istoric Lună</h3>
+
+        <div class="section-header">
+            <h3>Istoric Plăți</h3>
+            <div class="section-line"></div>
+        </div>
         <div id="containerPlatite"></div>
     </div>
 
-    <div class="frost-panel total-box">
-        <span style="font-size:11px; font-weight:900; opacity:0.6;">TOTAL ACHITAT</span>
-        <div id="totalSumaPlatita" style="font-weight:900; font-size:28px;">0.00 €</div>
+    <div class="frost-panel" style="display:flex; justify-content:space-between; align-items:center; padding: 20px 30px; margin-top: 20px;">
+        <span style="font-size:11px; font-weight:900; color:#94a3b8; letter-spacing: 1px;">TOTAL ACHITAT</span>
+        <div id="totalSumaPlatita" style="font-weight:900; font-size:24px; color: var(--text-dark);">0.00 €</div>
     </div>
 </div>
 
 <script>
     const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
-	// LISTA TA DE PLĂȚI FIXE (CORRECTATĂ)
     const PLATI_FIXE_MODEL = [
         { nume: "Internet", suma: 78, status: false },
         { nume: "Factura GSM", suma: 108, status: false },
         { nume: "Garaj Trimestru", suma: 500, status: false },
         { nume: "Rata Impozit", suma: 500, status: false },
         { nume: "Chirie", suma: 925, status: false },
-        { nume: "Electricitate si Gaz", suma: 198, status: false }, // Am adăugat virgulă aici
+        { nume: "Electricitate si Gaz", suma: 198, status: false },
         { nume: "Factura Apa", suma: 108, status: false }
     ];
 
     let facturi = [];
     let timpInactivitate = 0;
 
-    // Monitorizare activitate pentru resetare
-    function reseteazaCronometru() {
-        timpInactivitate = 0;
-    }
+    function reseteazaCronometru() { timpInactivitate = 0; }
 
-    function initSmartSync() {
-        setInterval(() => {
-            timpInactivitate++;
-			incarcaDate(); // Asta va trage datele noi în fundal la fiecare minut
-            const acum = new Date();
-
-            // 1. Refresh total la ora 03:00 dimineața
-            if (acum.getHours() === 3 && acum.getMinutes() === 0) {
-                location.reload();
-            }
-
-            // 2. Auto-Lock / Refresh la Landing Page după 10 minute de inactivitate
-            // 10 minute * 60 secunde = 600 verificări (dacă intervalul e de 1s, dar aici e de 1 min)
-            // Pentru precizie, folosim verificarea la 1 minut:
-            if (timpInactivitate >= 10) { 
-                location.reload(); 
-            }
-        }, 60000); // Verifică în fiecare minut
-    }
-
- window.addEventListener('DOMContentLoaded', () => {
-    // 1. Aplicăm tema vizuală a lunii (culorile) imediat ce se încarcă structura
-    applySeasonUI(); 
-
-    const card = document.getElementById('payment-card');
-    const chip = document.getElementById('card-chip');
-    const t1 = document.getElementById('card-text-1');
-    const t2 = document.getElementById('card-text-2');
-    const content = document.getElementById('hero-content');
-    const heroLabel = document.getElementById('hero-month-label');
-    
-    // MODIFICARE AICI: Am adăugat year: 'numeric' pentru a afișa "MAI 2026"
-    const dataCurenta = new Date().toLocaleString('ro-RO', { month: 'long', year: 'numeric' }).toUpperCase();
-    
-    if (heroLabel) {
-        heroLabel.innerHTML = `SITUAȚIE PLĂȚI: <span class="luna-puls">${dataCurenta}</span>`;
-    }
-
-    // Gestionarea animațiilor de intrare pentru cardul vizual
-    setTimeout(() => {
-        if (card) {
-            card.style.opacity = "1";
-            card.style.transform = "translateY(0) scale(1)";
-        }
-        
-        setTimeout(() => {
-            if (chip) {
-                chip.style.opacity = "0.8";
-                chip.style.transform = "scale(1) translateZ(20px)";
-            }
-            if (t1) {
-                t1.style.opacity = "1"; 
-                t1.style.transform = "translateX(0) translateZ(10px)";
-            }
-            if (t2) {
-                t2.style.opacity = "1"; 
-                t2.style.transform = "translateX(0) translateZ(10px)";
-            }
-            if (content) {
-                content.style.opacity = "1"; 
-                content.style.transform = "translateY(0)";
-            }
-            if (card) card.classList.add('balancing');
-        }, 1000);
-    }, 300);
-
-    // Pornirea sincronizării datelor și a verificării de inactivitate
-    initSmartSync();
-});
-
-    function autorizeazaAcces() {
-        if (window.navigator.vibrate) window.navigator.vibrate([20, 50, 20]);
-        const hero = document.getElementById('payment-hero');
-        const app = document.getElementById('mainApp');
-        hero.style.opacity = "0";
-        hero.style.transform = "scale(1.2)";
-        setTimeout(() => {
-            hero.style.display = "none";
-            app.style.display = "block";
-            setTimeout(() => { app.style.opacity = "1"; }, 50);
-            incarcaDate(); 
-        }, 800);
-    }
-
-    // --- LOGICA DE CALCUL ȘI RENDER ---
     function applySeasonUI() {
-    const acum = new Date();
-    const lunaCurenta = acum.getMonth(); 
-    // Generăm textul (ex: MAI 2026)
-    const textData = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' }).toUpperCase();
-    
-    const schemeCulori = [
-        "#00d4ff", // Ianuarie
-        "#a855f7", // Februarie
-        "#f472b6", // Martie
-        "#4ade80", // Aprilie
-        "#10b981", // MAI 
-        "#facc15", // Iunie
-        "#fb923c", // Iulie
-        "#f87171", // August
-        "#a78bfa", // Septembrie
-        "#d97706", // Octombrie
-        "#4b5563", // Noiembrie
-        "#2563eb"  // Decembrie
-    ];
+        const acum = new Date();
+        const luna = acum.getMonth();
+        const scheme = ["#3b82f6", "#8b5cf6", "#ec4899", "#22c55e", "#10b981", "#eab308", "#f97316", "#ef4444", "#a855f7", "#d97706", "#64748b", "#2563eb"];
+        const bgs = [
+            "linear-gradient(135deg, #f0f9ff 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #f5f3ff 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #fdf2f8 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #f0fdf4 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #ecfdf5 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #fefce8 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #fff7ed 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #fef2f2 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #f5f3ff 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #fff7ed 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)",
+            "linear-gradient(135deg, #eff6ff 0%, #e2e8f0 100%)"
+        ];
 
-    const culoareaLunii = schemeCulori[lunaCurenta];
-    const glowLunii = culoareaLunii + "33"; 
+        document.documentElement.style.setProperty('--season-primary', scheme[luna]);
+        document.documentElement.style.setProperty('--bg-dynamic', bgs[luna]);
 
-    // Aplicăm culorile în variabilele CSS
-    document.documentElement.style.setProperty('--season-primary', culoareaLunii);
-    document.documentElement.style.setProperty('--season-glow', glowLunii);
-    document.documentElement.style.setProperty('--cyber-blue', culoareaLunii);
-
-    // FIX PENTRU CELE DOUĂ LINII (--):
-    // Căutăm elementul de sub "power by VerTech" din interiorul aplicației
-    const headerMonth = document.getElementById('headerMonth');
-    if (headerMonth) {
-        headerMonth.innerText = textData; // Aici punem MAI 2026 în loc de --
-        headerMonth.style.color = culoareaLunii;
-        headerMonth.style.borderColor = culoareaLunii;
+        const textData = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' }).toUpperCase();
+        if (document.getElementById('headerMonth')) document.getElementById('headerMonth').innerText = textData;
+        if (document.getElementById('hero-month-label')) {
+            document.getElementById('hero-month-label').innerHTML = `SITUAȚIE: <span class="luna-puls">${textData}</span>`;
+        }
     }
-}
+
+    function pornesteAtmosfera() {
+        const container = document.getElementById('season-effects');
+        const luna = new Date().getMonth();
+        let simbol = '🌸';
+        if ([11, 0, 1].includes(luna)) simbol = '❄️';
+        else if ([5, 6, 7].includes(luna)) simbol = '✨';
+        else if ([8, 9, 10].includes(luna)) simbol = '🍂';
+
+        setInterval(() => {
+            if (document.getElementById('payment-hero').style.display === 'none') return;
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.innerHTML = simbol;
+            p.style.left = Math.random() * 100 + 'vw';
+            p.style.fontSize = (Math.random() * 20 + 15) + 'px';
+            p.style.opacity = Math.random() * 0.5 + 0.3;
+            p.style.animationDuration = (Math.random() * 4 + 5) + 's';
+            container.appendChild(p);
+            setTimeout(() => p.remove(), 6000);
+        }, 500);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        applySeasonUI();
+        pornesteAtmosfera();
+        setTimeout(() => {
+            const card = document.getElementById('payment-card');
+            card.style.opacity = "1";
+            card.style.transform = "translateY(0) rotateX(0deg)";
+        }, 600);
+        incarcaDate();
+    });
+
+    async function incarcaDate() {
+        const user = localStorage.getItem("userName") || "Gabriel";
+        document.getElementById('welcomeUser').innerText = user + "!";
+        document.getElementById('dynamicLetter').innerText = user[0];
+        try {
+            const r = await fetch(scriptURL + "?t=" + new Date().getTime());
+            const dateCloud = await r.json();
+            facturi = (!dateCloud || dateCloud.length === 0) ? JSON.parse(JSON.stringify(PLATI_FIXE_MODEL)) : dateCloud;
+            render();
+            actualizeazaStatusLandingPage();
+        } catch(e) {
+            const local = localStorage.getItem("facturi_gabriel_final");
+            facturi = local ? JSON.parse(local) : JSON.parse(JSON.stringify(PLATI_FIXE_MODEL));
+            render();
+            actualizeazaStatusLandingPage();
+        }
+    }
+
+    function actualizeazaStatusLandingPage() {
+        const statusMsg = document.getElementById('status-message');
+        const heroPage = document.getElementById('payment-hero');
+        const areNeplatite = facturi.some(f => !f.status);
+        
+        if (areNeplatite) {
+            statusMsg.innerHTML = '<span class="urgent-text">PLĂȚI REZIDUALE</span>';
+            heroPage.classList.add('status-alert-active');
+        } else {
+            statusMsg.innerHTML = '<span style="color:var(--season-primary)">SISTEM CURAT</span>';
+            heroPage.classList.remove('status-alert-active');
+        }
+    }
 
     function render() {
         const ne = document.getElementById("containerNeplatite"), pl = document.getElementById("containerPlatite");
         ne.innerHTML = ""; pl.innerHTML = "";
         let total = 0;
-
         facturi.forEach((f, i) => {
-            const card = `<div class="bill-card">
-                <span onclick="sterge(${i})" style="cursor:pointer; opacity:0.3;">✕</span>
-                <div style="font-weight:700; cursor:pointer;" onclick="editeazaNume(${i})">${f.nume}</div>
-                <div style="font-weight:900; color:var(--season-primary); cursor:pointer;" onclick="editeazaSuma(${i})">${f.suma}€</div>
-                <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'OK':'ACHITĂ'}</button>
+            const isHistory = f.status;
+            const card = `<div class="bill-card ${isHistory ? 'history-item' : ''}">
+                <span onclick="sterge(${i})" style="opacity:0.2; cursor:pointer;">✕</span>
+                <div style="font-weight:600; font-size:14px; color:#475569;" onclick="editeazaNume(${i})">${f.nume}</div>
+                <div style="font-weight:900; color:var(--season-primary); font-size:15px;" onclick="editeazaSuma(${i})">${f.suma}€</div>
+                <button class="btn-pay ${f.status?'paid':'unpaid'}" onclick="toggle(${i})">${f.status?'ACHITAT':'PLĂTEȘTE'}</button>
             </div>`;
             if(!f.status) ne.innerHTML += card;
             else { pl.innerHTML += card; total += parseFloat(f.suma) || 0; }
         });
-
-        const hasUnpaid = facturi.some(f => !f.status);
-        document.getElementById('statusPanel').className = hasUnpaid ? "frost-panel urgent-glow" : "frost-panel";
         document.getElementById("totalSumaPlatita").innerText = total.toFixed(2) + " €";
         localStorage.setItem("facturi_gabriel_final", JSON.stringify(facturi));
     }
 
+    function autorizeazaAcces() {
+        const hero = document.getElementById('payment-hero');
+        const app = document.getElementById('mainApp');
+        hero.style.transform = "scale(1.1)";
+        hero.style.opacity = "0";
+        setTimeout(() => {
+            hero.style.display = "none";
+            app.style.display = "block";
+            setTimeout(() => { app.style.opacity = "1"; }, 50);
+        }, 500);
+    }
+
     async function autoSaveCloud() {
         try {
-            await fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(facturi)
-            });
-        } catch(e) { console.warn("Cloud error"); }
+            await fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(facturi) });
+        } catch(e) {}
     }
 
-    function toggle(i) { facturi[i].status = !facturi[i].status; render(); autoSaveCloud(); }
-    function sterge(i) { if(confirm("Ștergi factura?")) { facturi.splice(i, 1); render(); autoSaveCloud(); } }
+    function toggle(i) { facturi[i].status = !facturi[i].status; render(); autoSaveCloud(); actualizeazaStatusLandingPage(); }
+    function sterge(i) { if(confirm("Ștergi această intrare?")) { facturi.splice(i, 1); render(); autoSaveCloud(); actualizeazaStatusLandingPage(); } }
     function adaugaFactura() {
         const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
-        if(n.value) { 
-            facturi.push({nume: n.value, suma: s.value||0, status: false}); 
-            n.value=""; s.value=""; 
-            render(); autoSaveCloud();
-        }
+        if(n.value) { facturi.push({nume: n.value, suma: s.value||0, status: false}); n.value=""; s.value=""; render(); autoSaveCloud(); actualizeazaStatusLandingPage(); }
     }
-
-    async function incarcaDate() {
-    applySeasonUI();
-    const user = localStorage.getItem("userName") || "Gabriel";
-    document.getElementById('welcomeUser').innerText = "Welcome, " + user;
-    document.getElementById('dynamicLetter').innerText = user[0];
-    
-    try {
-        const r = await fetch(scriptURL + "?t=" + new Date().getTime());
-        const dateCloud = await r.json();
-
-        // LOGICĂ RESTAURARE: Dacă în cloud nu e nimic (lună nouă), punem plățile fixe
-        if (!dateCloud || dateCloud.length === 0) {
-            console.log("Lună nouă detectată. Restaurăm plățile fixe...");
-            facturi = JSON.parse(JSON.stringify(PLATI_FIXE_MODEL)); // Copiem modelul
-            autoSaveCloud(); // Salvăm imediat în cloud lista nouă pentru luna asta
-        } else {
-            facturi = dateCloud;
-        }
-
-        render();
-        actualizeazaStatusLandingPage();
-    } catch(e) { 
-        console.warn("Eroare conexiune, încercăm local...");
-        facturi = JSON.parse(localStorage.getItem("facturi_gabriel_final")) || [];
-        render();
-        actualizeazaStatusLandingPage();
-    }
-}
-
-function restabileștePlățiFixe() {
-    if(confirm("Vrei să reîncarci lista de plăți fixe pentru luna curentă?")) {
-        facturi = JSON.parse(JSON.stringify(PLATI_FIXE_MODEL));
-        render();
-        autoSaveCloud();
-        Swal.fire("Succes", "Lista fixă a fost restaurată!", "success");
-    }
-}
 
     async function editeazaNume(i) {
-        const { value: nouNume } = await Swal.fire({ title: 'Redenumește', input: 'text', inputValue: facturi[i].nume });
-        if (nouNume) { facturi[i].nume = nouNume; render(); autoSaveCloud(); }
+        const { value: n } = await Swal.fire({ title: 'Redenumire', input: 'text', inputValue: facturi[i].nume, confirmButtonColor: '#10b981' });
+        if (n) { facturi[i].nume = n; render(); autoSaveCloud(); }
     }
 
     async function editeazaSuma(i) {
-        const { value: nouaSuma } = await Swal.fire({ title: 'Suma', input: 'number', inputValue: facturi[i].suma });
-        if (nouaSuma) { facturi[i].suma = parseFloat(nouaSuma).toFixed(2); render(); autoSaveCloud(); }
+        const { value: s } = await Swal.fire({ title: 'Modificare Sumă', input: 'number', inputValue: facturi[i].suma, confirmButtonColor: '#10b981' });
+        if (s) { facturi[i].suma = s; render(); autoSaveCloud(); }
     }
 
-    function schimbaNume() { 
-        const n = prompt("Numele tau:", localStorage.getItem("userName") || "Gabriel");
-        if(n) { 
-            localStorage.setItem("userName", n); 
-            document.getElementById('welcomeUser').innerText = "Welcome, " + n;
-            document.getElementById('dynamicLetter').innerText = n[0];
-        }
+    function schimbaNume() {
+        const n = prompt("Cum vrei să îți spunem?", localStorage.getItem("userName") || "Gabriel");
+        if(n) { localStorage.setItem("userName", n); location.reload(); }
     }
-	function actualizeazaStatusLandingPage() {
-    const statusMsg = document.getElementById('status-message');
-    if (!statusMsg) return;
-
-    // Verificăm dacă există facturi neplătite
-    const areNeplatite = facturi.some(f => !f.status);
-
-    if (facturi.length === 0) {
-        statusMsg.innerText = "NO DATA";
-        statusMsg.style.color = "white";
-        statusMsg.style.animation = "none";
-    } else if (areNeplatite) {
-        statusMsg.innerText = "PLĂȚI PENDENTE";
-        statusMsg.style.color = "#ef4444"; // Roșu urgent
-        statusMsg.style.animation = "pulse-text 1.5s infinite";
-    } else {
-        statusMsg.innerText = "TOTUL ACHITAT";
-        statusMsg.style.color = "#10b981"; // Verde succes
-        statusMsg.style.animation = "none";
-    }
-}
 </script>
-
 </body>
 </html>
