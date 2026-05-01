@@ -297,40 +297,42 @@
 
     // --- LOGICA DE CALCUL ȘI RENDER ---
     function applySeasonUI() {
-    const lunaCurenta = new Date().getMonth(); // 0 = Ianuarie, 1 = Februarie... 4 = Mai
+    const acum = new Date();
+    const lunaCurenta = acum.getMonth(); 
+    // Generăm textul (ex: MAI 2026)
+    const textData = acum.toLocaleString('ro-RO', { month: 'long', year: 'numeric' }).toUpperCase();
     
-    // Aici definești culoarea ta preferată pentru fiecare lună (Cod HEX)
     const schemeCulori = [
-        "#10b981", // Ianuarie (Albastru de gheață)
-        "#a855f7", // Februarie (Violet/Ametist)
-        "#f472b6", // Martie (Roz primăvară)
-        "#4ade80", // Aprilie (Verde crud)
-        "#00d4ff", // MAI (Verde Smarald - culoarea care va predomina acum)
-        "#facc15", // Iunie (Galben solar)
-        "#fb923c", // Iulie (Portocaliu foc)
-        "#f87171", // August (Roșu vară)
-        "#a78bfa", // Septembrie (Lavandă)
-        "#d97706", // Octombrie (Aramă/Toamnă)
-        "#4b5563", // Noiembrie (Gri antracit)
-        "#2563eb"  // Decembrie (Albastru regal)
+        "#00d4ff", // Ianuarie
+        "#a855f7", // Februarie
+        "#f472b6", // Martie
+        "#4ade80", // Aprilie
+        "#10b981", // MAI 
+        "#facc15", // Iunie
+        "#fb923c", // Iulie
+        "#f87171", // August
+        "#a78bfa", // Septembrie
+        "#d97706", // Octombrie
+        "#4b5563", // Noiembrie
+        "#2563eb"  // Decembrie
     ];
 
     const culoareaLunii = schemeCulori[lunaCurenta];
-    const glowLunii = culoareaLunii + "33"; // Adaugă transparență pentru umbre (33 = 20% opacitate)
+    const glowLunii = culoareaLunii + "33"; 
 
-    // Aplicăm culoarea peste tot unde este nevoie
+    // Aplicăm culorile în variabilele CSS
     document.documentElement.style.setProperty('--season-primary', culoareaLunii);
     document.documentElement.style.setProperty('--season-glow', glowLunii);
     document.documentElement.style.setProperty('--cyber-blue', culoareaLunii);
 
-    // Colorăm manual elementele specifice pentru siguranță
+    // FIX PENTRU CELE DOUĂ LINII (--):
+    // Căutăm elementul de sub "power by VerTech" din interiorul aplicației
     const headerMonth = document.getElementById('headerMonth');
-    if(headerMonth) {
+    if (headerMonth) {
+        headerMonth.innerText = textData; // Aici punem MAI 2026 în loc de --
         headerMonth.style.color = culoareaLunii;
         headerMonth.style.borderColor = culoareaLunii;
     }
-
-    // "G"-ul din iconiță și textul "power by" vor prelua automat --season-primary din CSS
 }
 
     function render() {
