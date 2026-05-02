@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Contrôle Flux | Liviu</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>VoltPay | Liviu 2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root { 
             --electric-yellow: #f1c40f; 
+            --tesla-red: #E81922;
             --dark-panel: #1e272e;
             --copper: #e67e22;
             --circuit-green: #2ecc71;
             --danger-red: #e74c3c;
             --text-main: #ecf0f1;
+            --neon-red: #ff0000;
         }
 
         body { 
@@ -23,16 +25,78 @@
             background-size: 25px 25px;
             min-height: 100vh; display: flex; flex-direction: column; 
             align-items: center; color: var(--text-main); padding: 15px; box-sizing: border-box;
+            overflow-x: hidden;
         }
 
-        .main-wrapper { width: 100%; max-width: 450px; }
+        /* --- LANDING PAGE STYLES --- */
+        #payment-hero {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #speed-lines {
+            position: absolute; width: 100%; height: 100%;
+            overflow: hidden; pointer-events: none;
+        }
+        .line {
+            position: absolute; background: rgba(241, 196, 15, 0.1);
+            width: 2px; height: 100px; animation: speed 2s linear infinite;
+        }
+        @keyframes speed {
+            0% { transform: translateY(-110vh); }
+            100% { transform: translateY(110vh); }
+        }
+
+        #payment-card {
+            position: relative; width: 320px; height: 195px; 
+            background: var(--tesla-red); border-radius: 15px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            padding: 25px; box-sizing: border-box;
+            box-shadow: 0 25px 50px rgba(232, 25, 34, 0.4);
+            z-index: 5; transition: 1s ease;
+            transform: translateY(30px); opacity: 0; overflow: hidden;
+        }
+
+        .scanner-line {
+            position: absolute; width: 100%; height: 4px;
+            background: rgba(255, 255, 255, 0.6); top: 0; left: 0;
+            animation: scan 3s infinite linear;
+            box-shadow: 0 0 20px white; z-index: 6;
+        }
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+        .tesla-logo { color: white; font-size: 1.5rem; font-weight: 900; letter-spacing: -2px; }
+
+        .neon-pulse {
+            color: var(--tesla-red) !important;
+            font-weight: 900 !important;
+            animation: neon-glow 1.5s infinite ease-in-out;
+            text-transform: uppercase;
+        }
+        @keyframes neon-glow {
+            0%, 100% { text-shadow: 0 0 5px var(--neon-red); opacity: 1; }
+            50% { text-shadow: 0 0 20px var(--neon-red); opacity: 0.8; }
+        }
+
+        .btn-scan {
+            padding: 16px 50px; background: var(--tesla-red); border: none;
+            color: white; cursor: pointer; font-family: 'Orbitron';
+            font-weight: bold; border-radius: 5px; transition: 0.4s;
+            margin-top: 40px; letter-spacing: 2px; font-size: 13px;
+        }
+
+        /* --- APP CONTENT STYLES --- */
+        .main-wrapper { width: 100%; max-width: 450px; display: none; opacity: 0; transition: 0.6s; }
 
         .mike-header {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 20px; width: 100%;
         }
 
-        .welcome-text { font-size: 13px; font-weight: 700; color: var(--electric-yellow); text-transform: uppercase; }
+        .welcome-text { font-size: 11px; font-weight: 700; color: var(--electric-yellow); text-transform: uppercase; letter-spacing: 1px; }
 
         .frost-panel {
             background: rgba(30, 39, 46, 0.95); border: 1px solid #444;
@@ -47,7 +111,7 @@
             font-size: 32px; font-weight: 900; color: #000; margin: 0 auto 15px auto;
         }
 
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 18px; margin: 0; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 18px; margin: 0; letter-spacing: 1px; }
 
         .add-slim { display: flex; gap: 8px; margin: 20px 0; }
         .add-slim input { 
@@ -71,7 +135,7 @@
         .item-suma-box {
             background: #000; color: var(--electric-yellow);
             border-radius: 5px; padding: 5px; text-align: center;
-            font-family: 'Orbitron', sans-serif; font-size: 12px;
+            font-family: 'Orbitron', sans-serif; font-size: 11px;
         }
 
         .btn-pay { padding: 8px 0; border-radius: 6px; border: none; font-size: 10px; font-weight: 800; text-transform: uppercase; cursor: pointer;}
@@ -98,7 +162,29 @@
 </head>
 <body>
 
-<div class="main-wrapper">
+<!-- LANDING PAGE -->
+<div id="payment-hero">
+    <div id="speed-lines"></div>
+    
+    <div id="payment-card">
+        <div class="scanner-line"></div>
+        <div class="tesla-logo">T</div>
+        <div style="font-size: 1.1rem; letter-spacing: 4px; color: rgba(255,255,255,0.7);">**** **** **** 2026</div>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+            <div id="card-name" style="color:white; font-size:0.6rem; letter-spacing:2px; text-transform: uppercase;">LIVIU ILCIUC</div>
+            <div style="color:white; font-weight:bold; font-size: 0.9rem;">Tesla</div>
+        </div>
+    </div>
+
+    <div style="text-align:center; margin-top:40px; z-index: 5;">
+        <h1 id="status-message" style="font-size:0.9rem; letter-spacing:4px; margin-bottom:8px; font-weight: 700; color: white;">VÉRIFICATION SYSTÈME</h1>
+        <div id="hero-month-label" class="neon-pulse" style="font-size: 0.85rem; letter-spacing: 2px;">--</div>
+        <button onclick="autorizeazaAcces()" class="btn-scan">DÉMARRER</button>
+    </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="main-wrapper" id="mainApp">
     <div class="mike-header">
         <span class="welcome-text" id="welcomeUser">Statut: Connecté</span>
         <span onclick="schimbaNume()" style="cursor:pointer; font-size:20px;">⚙️</span>
@@ -141,53 +227,93 @@
     let facturi = [];
     let editIndex = -1;
 
+    // --- CONFIGURARE LISTA FIXĂ ---
+    const LISTA_FIXA = [
+        { nume: "Internet", suma: 0 },
+        { nume: "Apă", suma: 0 },
+        { nume: "Casa credit", suma: 0 },
+        { nume: "Casa credit 1", suma: 0 },
+        { nume: "Casa credit 2", suma: 0 }
+    ];
+
+    // Helper: Create Speed Lines
+    function createLines() {
+        const container = document.getElementById('speed-lines');
+        for(let i=0; i<20; i++) {
+            const line = document.createElement('div');
+            line.className = 'line';
+            line.style.left = Math.random() * 100 + 'vw';
+            line.style.animationDelay = Math.random() * 2 + 's';
+            container.appendChild(line);
+        }
+    }
+
+    function autorizeazaAcces() {
+        const hero = document.getElementById('payment-hero');
+        const app = document.getElementById('mainApp');
+        hero.style.opacity = "0";
+        hero.style.transform = "scale(1.1)";
+        setTimeout(() => { 
+            hero.style.display = "none"; 
+            app.style.display = "block"; 
+            setTimeout(() => app.style.opacity = "1", 50); 
+        }, 600);
+    }
+
     function actualizeazaInterfataNume(nume) {
         if(!nume) return;
         document.getElementById('welcomeUser').innerText = `Équipe: ${nume}`;
+        document.getElementById('card-name').innerText = `${nume} ILCIUC`;
         document.getElementById('dynamicLetter').innerText = nume.charAt(0).toUpperCase();
     }
 
-    function schimbaNume() {
-        Swal.fire({
-            title: 'Nom Électricien',
-            input: 'text',
-            inputValue: localStorage.getItem("userName") || "Liviu",
-            confirmButtonText: 'Sauver',
-            confirmButtonColor: '#f1c40f', background: '#1e272e', color: '#fff'
-        }).then((result) => {
-            if (result.value) {
-                localStorage.setItem("userName", result.value);
-                actualizeazaInterfataNume(result.value);
-            }
-        });
+    function actualizeazaStatusLanding() {
+        const msg = document.getElementById('status-message');
+        const areNeplatite = facturi.some(f => !f.status);
+        msg.innerHTML = areNeplatite ? '<span style="color:var(--tesla-red)">RECHARGE REQUISE</span>' : '<span style="color:#2ecc71">SYSTÈME OK</span>';
     }
 
-    // Această funcție arată pop-up-ul de sincronizare la deschidere, exact ca la tine
+    // LOGICA PENTRU GENERARE LUNARĂ
+    function verificaSiIncarcaListaFixa() {
+        const dataAcum = new Date();
+        const lunaAnCurent = `${dataAcum.getMonth() + 1}-${dataAcum.getFullYear()}`;
+        const ultimaLunaIncarcata = localStorage.getItem("ultima_luna_generata");
+
+        if (ultimaLunaIncarcata !== lunaAnCurent) {
+            LISTA_FIXA.forEach(item => {
+                // Adăugăm elementele fixe ca fiind neplătite (status: false)
+                // Verificăm să nu le dublăm dacă există deja în array-ul descărcat
+                const existaDeja = facturi.some(f => f.nume === item.nume && f.status === false);
+                if (!existaDeja) {
+                    facturi.push({ nume: item.nume, suma: item.suma, status: false });
+                }
+            });
+
+            localStorage.setItem("ultima_luna_generata", lunaAnCurent);
+            render();
+            // Salvăm automat în cloud lista nouă generată
+            fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) });
+        }
+    }
+
     async function incarcaDate() {
-        Swal.fire({ 
-            title: 'Synchronisation...', 
-            didOpen: () => Swal.showLoading(), 
-            background: '#1e272e', 
-            color: '#fff',
-            allowOutsideClick: false 
-        });
-        
         actualizeazaInterfataNume(localStorage.getItem("userName") || "Liviu");
         
         try {
             const r = await fetch(scriptURL + "?t=" + new Date().getTime());
             const data = await r.json();
-            if (Array.isArray(data) && data.length > 0) {
-                facturi = data;
-            } else {
-                facturi = JSON.parse(localStorage.getItem("facturi_liviu")) || [];
-            }
+            facturi = (Array.isArray(data) && data.length > 0) ? data : (JSON.parse(localStorage.getItem("facturi_liviu")) || []);
+            
+            // Verificăm lista fixă imediat după ce am primit datele
+            verificaSiIncarcaListaFixa();
+            
             render();
-            Swal.close();
+            actualizeazaStatusLanding();
         } catch (e) {
             facturi = JSON.parse(localStorage.getItem("facturi_liviu")) || [];
+            verificaSiIncarcaListaFixa();
             render();
-            Swal.fire({ icon: 'info', title: 'Mode Local', timer: 1000, showConfirmButton: false, background: '#1e272e', color: '#fff' });
+            actualizeazaStatusLanding();
         }
     }
 
@@ -216,13 +342,15 @@
     function trimiteDate() {
         Swal.fire({ title: 'Sauvegarde...', background: '#1e272e', color: '#fff', didOpen: () => Swal.showLoading() });
         fetch(scriptURL, { method: "POST", mode: "no-cors", body: JSON.stringify(facturi) })
-        .then(() => Swal.fire({ icon: 'success', title: 'Mis à jour!', timer: 1000, showConfirmButton: false, background: '#1e272e', color: '#fff' }));
+        .then(() => {
+            Swal.fire({ icon: 'success', title: 'Mis à jour!', timer: 1000, showConfirmButton: false, background: '#1e272e', color: '#fff' });
+            actualizeazaStatusLanding();
+        });
     }
 
     function adaugaFactura() {
         const n = document.getElementById("newFactura"), s = document.getElementById("newSuma");
         if(!n.value.trim()) return;
-        
         if(editIndex > -1) { 
             facturi[editIndex].nume = n.value; 
             facturi[editIndex].suma = parseFloat(s.value) || 0; 
@@ -231,7 +359,6 @@
         } else { 
             facturi.push({nume: n.value.trim(), suma: parseFloat(s.value)||0, status: false}); 
         }
-        
         n.value = ""; s.value = ""; 
         render();
         trimiteDate();
@@ -253,77 +380,48 @@
 
     function confirmSterge(i) {
         Swal.fire({
-            title: 'Supprimer?',
-            text: facturi[i].nume,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Oui',
-            cancelButtonText: 'Non',
-            background: '#1e272e', color: '#fff'
+            title: 'Supprimer?', text: facturi[i].nume, icon: 'warning',
+            showCancelButton: true, confirmButtonText: 'Oui', background: '#1e272e', color: '#fff'
         }).then((result) => {
-            if (result.isConfirmed) {
-                facturi.splice(i, 1);
-                render();
-                trimiteDate();
+            if (result.isConfirmed) { facturi.splice(i, 1); render(); trimiteDate(); }
+        });
+    }
+
+    function schimbaNume() {
+        Swal.fire({
+            title: 'Nom Électricien', input: 'text',
+            inputValue: localStorage.getItem("userName") || "Liviu",
+            confirmButtonText: 'Sauver', background: '#1e272e', color: '#fff'
+        }).then((result) => {
+            if (result.value) {
+                localStorage.setItem("userName", result.value);
+                actualizeazaInterfataNume(result.value);
             }
         });
     }
 
     function resetareLocala() {
         Swal.fire({
-            title: 'Tout effacer?',
-            icon: 'error',
-            showCancelButton: true,
-            confirmButtonText: 'Reset',
-            background: '#1e272e', color: '#fff'
-        }).then((r) => {
-            if(r.isConfirmed) { localStorage.clear(); location.reload(); }
-        });
+            title: 'Tout effacer?', icon: 'error', showCancelButton: true,
+            confirmButtonText: 'Reset', background: '#1e272e', color: '#fff'
+        }).then((r) => { if(r.isConfirmed) { localStorage.clear(); location.reload(); } });
     }
-
-function verificaAlertaRecurenta() {
-    const facturiNeplatite = facturi.filter(f => !f.status);
-    
-    // Dacă nu are nimic neplătit, nu îl batem la cap
-    if (facturiNeplatite.length === 0) return;
-
-    const ultimaAlerta = localStorage.getItem('ultimaAlertaData');
-    const acum = new Date().getTime();
-    const zeceZileInMs = 10 * 24 * 60 * 60 * 1000; // 10 zile transformate în milisecunde
-
-    // Dacă nu a mai primit alerta NICIODATĂ sau au trecut mai mult de 10 zile
-    if (!ultimaAlerta || (acum - ultimaAlerta > zeceZileInMs)) {
-        
-        Swal.fire({
-            title: 'Attention! ⚡',
-            text: `Vous avez ${facturiNeplatite.length} circuits encore ouverts (impayés). N'oubliez pas de les vérifier!`,
-            icon: 'warning',
-            confirmButtonText: 'D\'accord',
-            confirmButtonColor: '#f1c40f',
-            background: '#1e272e',
-            color: '#fff'
-        });
-
-        // Salvăm data actuală ca fiind "ultima alertă trimisă"
-        localStorage.setItem('ultimaAlertaData', acum);
-    }
-}
 
     window.onload = () => {
-    const data = new Date();
-    document.getElementById('headerMonth').innerText = data.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
-    
-    // 1. Încarcă datele
-    incarcaDate().then(() => {
-        // 2. După ce s-au încărcat datele, verifică dacă trebuie să dea alerta
-        // O verificăm imediat la deschidere
-        verificaAlertaRecurenta();
+        createLines();
+        const data = new Date();
+        const dateStr = data.toLocaleString('fr-FR', { month: 'long', year: 'numeric' }).toUpperCase();
+        document.getElementById('headerMonth').innerText = dateStr;
+        document.getElementById('hero-month-label').innerText = dateStr;
         
-        // 3. Verificăm și la fiecare 1 oră dacă aplicația e lăsată deschisă
-        setInterval(verificaAlertaRecurenta, 3600000); 
-    });
-};
+        incarcaDate(); 
+        
+        setTimeout(() => { 
+            const card = document.getElementById('payment-card');
+            card.style.opacity = "1"; 
+            card.style.transform = "translateY(0)"; 
+        }, 500);
+    };
 </script>
 </body>
-
 </html>
