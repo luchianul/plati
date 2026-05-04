@@ -396,6 +396,14 @@
         const n = prompt("Cum vrei să îți spunem?", localStorage.getItem("userName") || "Gabriel");
         if(n) { localStorage.setItem("userName", n); location.reload(); }
     }
+    // 1. Verificăm inactivitatea la fiecare secundă
+setInterval(function() {
+    timpInactivitate++;
+    // 600 secunde = 10 minute
+    if (timpInactivitate >= 600) {
+        window.location.reload(); 
+    }
+}, 1000);
 </script>
 </body>
 </html>
