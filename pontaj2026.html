@@ -3,6 +3,7 @@
 <head>
   <base target="_top">
   <meta charset="UTF-8">
+  <!-- ✅ PWA / Full-screen pe mobil - elimina banner-ul albastru Google -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,6 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Pontaj Gabi">
   <meta name="theme-color" content="#020617">
   <meta name="application-name" content="Pontaj Gabi">
+  <!-- ✅ Ascunde bara de adresa Chrome cand e instalata ca PWA -->
   <meta name="HandheldFriendly" content="true">
   <meta name="format-detection" content="telephone=no">
 
@@ -19,9 +21,8 @@
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-
   <style>
-:root {
+:root { 
   --primary: #2563eb;
   --primary-soft: rgba(37, 99, 235, 0.12);
   --accent: #06b6d4;
@@ -34,34 +35,59 @@
   --blur: blur(16px);
   --neon-glow: rgba(16, 185, 129, 0.6);
   --blue-glow-card: rgba(37, 99, 235, 0.4);
+  /* ✅ Safe area pentru telefoane cu notch */
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-.swal2-popup { border-radius: 32px !important; font-family: 'Inter', sans-serif !important; padding: 2rem !important; }
-.swal2-confirm { border-radius: 16px !important; font-weight: 700 !important; padding: 12px 30px !important; }
-.swal2-cancel { border-radius: 16px !important; font-weight: 700 !important; }
+.swal2-popup {
+  border-radius: 32px !important;
+  font-family: 'Inter', sans-serif !important;
+  padding: 2rem !important;
+}
+.swal2-confirm {
+  border-radius: 16px !important;
+  font-weight: 700 !important;
+  padding: 12px 30px !important;
+}
+.swal2-cancel {
+  border-radius: 16px !important;
+  font-weight: 700 !important;
+}
 
-body {
+/* ✅ Body cu safe area pentru notch si bara de jos */
+body { 
   background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%);
-  font-family: 'Inter', sans-serif;
-  padding-bottom: calc(140px + var(--safe-bottom));
+  font-family: 'Inter', sans-serif; 
+  padding-bottom: calc(140px + var(--safe-bottom)); 
   padding-top: 0;
   color: var(--text-main);
   min-height: 100vh;
+  /* Impiedica scroll bounce pe iOS */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: touch;
 }
 
-* { -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
-input, textarea, select { -webkit-touch-callout: default; }
+/* ✅ Previne highlight-ul albastru la tap pe mobil */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+input, textarea, select {
+  -webkit-touch-callout: default;
+}
 
 .view-section { display: none; animation: fadeIn 0.35s ease-out; }
 .view-section.active { display: block; }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes fadeIn { 
+  from { opacity: 0; transform: translateY(10px); } 
+  to { opacity: 1; transform: translateY(0); } 
+}
 
-.app-header {
+/* ✅ Header sticky cu padding pentru safe area (notch) */
+.app-header { 
   position: sticky; top: 0;
   backdrop-filter: var(--blur);
   -webkit-backdrop-filter: var(--blur);
@@ -72,175 +98,419 @@ input, textarea, select { -webkit-touch-callout: default; }
   border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
-.app-header h1 {
-  font-size: 26px; font-weight: 900; margin: 0; letter-spacing: -1px;
+.app-header h1 { 
+  font-size: 26px;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -1px;
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.week-separator {
-  margin: 28px 20px 12px; font-size: 11px; font-weight: 800;
-  color: var(--primary); text-transform: uppercase; letter-spacing: 2px;
-  display: flex; align-items: center; gap: 10px;
+.week-separator { 
+  margin: 28px 20px 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 .week-separator::after {
-  content: ''; flex: 1; height: 2px;
-  background: linear-gradient(to right, var(--primary-soft), transparent); border-radius: 2px;
+  content: '';
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(to right, var(--primary-soft), transparent);
+  border-radius: 2px;
 }
 
-.pro-card {
+.pro-card { 
   background: var(--card);
-  backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-  border-radius: 24px; padding: 20px; margin: 0 16px 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.12), 0 4px 10px rgba(0,0,0,0.08);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative;
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-radius: 24px; 
+  padding: 20px; 
+  margin: 0 16px 18px; 
+  border: 1px solid rgba(15, 23, 42, 0.08); 
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12), 0 4px 10px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
 }
-.pro-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
 
-.card-cash {
+.pro-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+}
+
+.card-cash { 
   border: 2px solid var(--cash) !important;
   background: linear-gradient(165deg, rgba(16,185,129,0.1), rgba(255,255,255,0.8)) !important;
   animation: neonPulse 2s infinite alternate ease-in-out;
 }
+
 @keyframes neonPulse {
   from { box-shadow: 0 0 10px rgba(16,185,129,0.2); }
   to { box-shadow: 0 0 25px var(--neon-glow); transform: scale(1.01); }
 }
 
-.badge-cash {
-  background: var(--cash); color: white; font-weight: 800; font-size: 10px;
-  padding: 5px 12px; border-radius: 999px; box-shadow: 0 4px 10px rgba(16,185,129,0.4);
+.badge-cash { 
+  background: var(--cash);
+  color: white;
+  font-weight: 800;
+  font-size: 10px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  box-shadow: 0 4px 10px rgba(16,185,129,0.4);
 }
 
 .stat-card {
-  background: white; border-radius: 30px; padding: 25px; margin: 0 16px 20px;
-  border: 1.5px solid rgba(37,99,235,0.2); box-shadow: 0 10px 30px rgba(37,99,235,0.1);
-  position: relative; overflow: hidden; z-index: 1; transition: all 0.3s ease;
+  background: white;
+  border-radius: 30px;
+  padding: 25px;
+  margin: 0 16px 20px;
+  border: 1.5px solid rgba(37, 99, 235, 0.2);
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1);
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: all 0.3s ease;
 }
-.stat-card:hover { box-shadow: 0 15px 35px var(--blue-glow-card); border-color: var(--primary); }
 
-.stat-total { font-size: 36px; font-weight: 900; color: var(--primary); letter-spacing: -1.5px; display: block; }
-.stat-subtitle { font-size: 12px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+.stat-card:hover {
+  box-shadow: 0 15px 35px var(--blue-glow-card);
+  border-color: var(--primary);
+}
 
-.hours-tag {
-  background: #0f172a; color: #22d3ee; font-weight: 800; font-size: 15px;
-  border-radius: 14px; padding: 7px 15px; box-shadow: 0 5px 15px rgba(15,23,42,0.2);
+.stat-card::before { display: none; }
+
+.stat-total {
+  font-size: 36px;
+  font-weight: 900;
+  color: var(--primary);
+  letter-spacing: -1.5px;
+  display: block;
+}
+
+.stat-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hours-tag { 
+  background: #0f172a;
+  color: #22d3ee;
+  font-weight: 800;
+  font-size: 15px;
+  border-radius: 14px;
+  padding: 7px 15px;
+  box-shadow: 0 5px 15px rgba(15, 23, 42, 0.2);
 }
 
 .card-title { font-size: 17px; font-weight: 800; margin-bottom: 2px; }
 .card-subtitle { font-size: 14px; font-weight: 600; color: var(--primary); margin-bottom: 12px; }
 
-.info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.05); }
-.info-item { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-main); font-weight: 600; }
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-main);
+  font-weight: 600;
+}
 .info-item i { color: var(--primary); font-size: 15px; }
 
-.app-nav {
-  position: fixed; bottom: calc(25px + var(--safe-bottom)); left: 20px; right: 20px;
-  background: rgba(255,255,255,0.8); backdrop-filter: var(--blur); -webkit-backdrop-filter: var(--blur);
-  border-radius: 30px; padding: 15px 0; display: flex;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.5); z-index: 1001;
+/* ✅ Nav cu safe area pentru iPhone cu bara de jos */
+.app-nav { 
+  position: fixed;
+  bottom: calc(25px + var(--safe-bottom));
+  left: 20px; right: 20px;
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-radius: 30px;
+  padding: 15px 0;
+  display: flex;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.1);
+  border: 1px solid rgba(255,255,255,0.5);
+  z-index: 1001;
 }
 
 .nav-item {
-  flex: 1; text-align: center; color: var(--text-muted); font-size: 11px; font-weight: 700;
-  text-decoration: none; transition: 0.3s; padding: 4px 0; cursor: pointer;
+  flex: 1;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: 0.3s;
+  /* ✅ Zona de tap mai mare pe mobil */
+  padding: 4px 0;
+  cursor: pointer;
 }
+
 .nav-item.active { color: var(--primary); transform: translateY(-3px); }
 .nav-item i { font-size: 24px; display: block; margin-bottom: 2px; }
 
-.fab {
-  position: fixed; bottom: calc(135px + var(--safe-bottom)); right: 20px;
+/* ✅ FAB cu safe area */
+.fab { 
+  position: fixed; 
+  bottom: calc(155px + var(--safe-bottom));
+  right: 20px;
   width: 62px; height: 62px;
   background: linear-gradient(135deg, var(--primary), var(--accent));
-  border-radius: 20px; display: flex; align-items: center; justify-content: center;
-  font-size: 28px; color: white; box-shadow: 0 12px 28px rgba(37,99,235,0.4);
-  border: none; z-index: 999; transition: all 0.2s ease; cursor: pointer;
+  border-radius: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px; color: white;
+  box-shadow: 0 12px 28px rgba(37,99,235,0.4);
+  border: none;
+  z-index: 999;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
+
 .fab:active { transform: scale(0.9); }
 
-.card-actions { position: absolute; top: 15px; right: 15px; display: flex; gap: 8px; }
+.card-actions {
+  position: absolute; top: 15px; right: 15px;
+  display: flex; gap: 8px;
+}
 .btn-action {
-  background: white; border-radius: 12px; width: 36px; height: 36px;
-  border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  display: flex; align-items: center; justify-content: center; cursor: pointer;
+  background: white;
+  border-radius: 12px;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
 }
 .btn-edit { color: var(--primary); }
 .btn-delete { color: var(--danger); }
 
 .modal-content { border-radius: 32px; border: none; }
 .modal-header { background: #f8fafc; padding: 25px; border-bottom: 1px solid #eee; }
-.btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); border: none; border-radius: 18px; padding: 16px; font-weight: 800; }
+.btn-primary { 
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  border: none; border-radius: 18px; padding: 16px; font-weight: 800;
+}
 
 .search-wrapper { margin-top: 10px; }
 #searchBar {
-  border-radius: 15px; border: 1px solid rgba(0,0,0,0.05);
-  background: rgba(255,255,255,0.8); padding: 10px 15px; font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s ease;
+  border-radius: 15px;
+  border: 1px solid rgba(0,0,0,0.05);
+  background: rgba(255,255,255,0.8);
+  padding: 10px 15px;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: all 0.3s ease;
 }
-#searchBar:focus { border-color: var(--primary); box-shadow: 0 4px 15px var(--primary-soft); outline: none; }
+#searchBar:focus {
+  border-color: var(--primary);
+  box-shadow: 0 4px 15px var(--primary-soft);
+  outline: none;
+}
 
 .an-pulsat {
-  display: inline-block !important; color: var(--primary) !important;
-  background: var(--primary-soft) !important; -webkit-text-fill-color: var(--primary) !important;
-  font-weight: 800 !important; font-size: 0.65em !important; margin-left: 10px !important;
-  padding: 4px 12px !important; border-radius: 12px !important;
-  border: 1px solid rgba(37,99,235,0.2) !important; vertical-align: middle !important;
-  animation: pulse-an 2s infinite ease-in-out; box-shadow: 0 4px 10px rgba(37,99,235,0.1);
+  display: inline-block !important;
+  color: var(--primary) !important; 
+  background: var(--primary-soft) !important;
+  -webkit-text-fill-color: var(--primary) !important; 
+  font-weight: 800 !important;
+  font-size: 0.65em !important;
+  margin-left: 10px !important;
+  padding: 4px 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(37, 99, 235, 0.2) !important;
+  vertical-align: middle !important;
+  animation: pulse-an 2s infinite ease-in-out;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.1);
 }
 
-.btn-glow-start { animation: pulse-blue 2s infinite; transition: all 0.3s ease; }
+.btn-glow-start {
+  animation: pulse-blue 2s infinite;
+  transition: all 0.3s ease;
+}
+
 @keyframes pulse-blue {
-  0% { box-shadow: 0 0 0 0 rgba(56,189,248,0.4); transform: scale(1); }
-  50% { box-shadow: 0 0 20px 10px rgba(56,189,248,0.2); transform: scale(1.05); }
-  100% { box-shadow: 0 0 0 0 rgba(56,189,248,0.4); transform: scale(1); }
+  0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); transform: scale(1); }
+  50% { box-shadow: 0 0 20px 10px rgba(56, 189, 248, 0.2); transform: scale(1.05); }
+  100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.4); transform: scale(1); }
 }
 
-#hero-section.exit-anim { opacity: 0; pointer-events: none; transform: scale(2) rotate(5deg); }
+#hero-section.exit-anim {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(2) rotate(5deg);
+}
 
 .clock-digit {
-  position: absolute; width: 100%; height: 100%; text-align: center;
-  padding: 12px; box-sizing: border-box; font-weight: bold; font-size: 1rem; color: #38bdf8;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  padding: 12px;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #38bdf8;
 }
 
 .factura-card {
-  background: white; border-radius: 24px; padding: 20px; margin-bottom: 16px;
-  border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 10px 20px rgba(0,0,0,0.03); transition: transform 0.2s ease;
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.03);
+  transition: transform 0.2s ease;
 }
+
 .factura-card:active { transform: scale(0.98); }
+
 .fw-800 { font-weight: 800; }
 
-.badge-factura-restant { background: rgba(239,68,68,0.12); color: var(--danger); font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(239,68,68,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-factura-incasat { background: rgba(16,185,129,0.12); color: var(--cash); font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(16,185,129,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-factura-partial { background: rgba(245,158,11,0.12); color: #f59e0b; font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(245,158,11,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
-.badge-factura-cash { background: rgba(6,182,212,0.12); color: var(--accent); font-size: 10px; font-weight: 800; padding: 5px 12px; border-radius: 999px; border: 1px solid rgba(6,182,212,0.3); text-transform: uppercase; letter-spacing: 0.5px; }
+.badge-factura-restant {
+  background: rgba(239,68,68,0.12);
+  color: var(--danger);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(239,68,68,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-.factura-restant { border-left: 4px solid var(--danger) !important; box-shadow: 0 10px 25px rgba(239,68,68,0.1) !important; }
-.factura-incasat { border-left: 4px solid var(--cash) !important; box-shadow: 0 10px 25px rgba(16,185,129,0.1) !important; }
-.factura-partial { border-left: 4px solid #f59e0b !important; box-shadow: 0 10px 25px rgba(245,158,11,0.1) !important; }
-.factura-cash { border-left: 4px solid var(--accent) !important; box-shadow: 0 10px 25px rgba(6,182,212,0.1) !important; }
+.badge-factura-incasat {
+  background: rgba(16,185,129,0.12);
+  color: var(--cash);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(16,185,129,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
 
-.sapt-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 0.5px solid #f0f0f0; }
+.badge-factura-partial {
+  background: rgba(245,158,11,0.12);
+  color: #f59e0b;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(245,158,11,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-factura-cash {
+  background: rgba(6,182,212,0.12);
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(6,182,212,0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.factura-restant {
+  border-left: 4px solid var(--danger) !important;
+  box-shadow: 0 10px 25px rgba(239,68,68,0.1) !important;
+}
+.factura-incasat {
+  border-left: 4px solid var(--cash) !important;
+  box-shadow: 0 10px 25px rgba(16,185,129,0.1) !important;
+}
+.factura-partial {
+  border-left: 4px solid #f59e0b !important;
+  box-shadow: 0 10px 25px rgba(245,158,11,0.1) !important;
+}
+.factura-cash {
+  border-left: 4px solid var(--accent) !important;
+  box-shadow: 0 10px 25px rgba(6,182,212,0.1) !important;
+}
+
+.sapt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 0.5px solid #f0f0f0;
+}
 .sapt-row:last-of-type { border-bottom: none; }
-.sapt-status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; flex-shrink: 0; }
 
+.sapt-status-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  flex-shrink: 0;
+}
+
+/* ✅ Banner PWA - apare prima data cand e deschis scriptul */
 #pwa-banner {
-  position: fixed; bottom: 0; left: 0; right: 0; background: #0f172a; color: white;
-  padding: 16px 20px; padding-bottom: calc(16px + var(--safe-bottom));
-  z-index: 10000; display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  font-family: 'Inter', sans-serif; box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
-  transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: #0f172a;
+  color: white;
+  padding: 16px 20px;
+  padding-bottom: calc(16px + var(--safe-bottom));
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-family: 'Inter', sans-serif;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #pwa-banner.show { transform: translateY(0); }
 #pwa-banner .banner-text { font-size: 13px; font-weight: 600; flex: 1; line-height: 1.4; }
 #pwa-banner .banner-text strong { color: #38bdf8; display: block; font-size: 14px; }
-#pwa-banner .btn-install { background: #38bdf8; color: #0f172a; border: none; border-radius: 12px; padding: 10px 18px; font-weight: 800; font-size: 13px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
-#pwa-banner .btn-close-banner { background: none; border: none; color: #64748b; font-size: 20px; cursor: pointer; padding: 4px; line-height: 1; }
+#pwa-banner .btn-install {
+  background: #38bdf8;
+  color: #0f172a;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#pwa-banner .btn-close-banner {
+  background: none;
+  border: none;
+  color: #64748b;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+}
   </style>
 </head>
 <body>
 
-<!-- BANNER PWA -->
+<!-- ✅ BANNER INSTALARE PWA - apare automat pe mobil -->
 <div id="pwa-banner">
   <div class="banner-text">
     <strong>📱 Instalează aplicația</strong>
@@ -250,30 +520,32 @@ input, textarea, select { -webkit-touch-callout: default; }
   <button class="btn-close-banner" onclick="inchideBanner()">✕</button>
 </div>
 
-<!-- HERO / SPLASH -->
-<div id="hero-section" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#020617;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:all 0.8s cubic-bezier(0.7,0,0.3,1);font-family:'Orbitron',sans-serif;">
-  <div id="clock-container" style="position:relative;width:300px;height:300px;border:10px solid #1e293b;border-radius:50%;background:#0f172a;box-shadow:0 0 50px rgba(56,189,248,0.3);display:flex;justify-content:center;align-items:center;opacity:0;transition:transform 1s cubic-bezier(0.17,0.89,0.32,1.28),opacity 1.2s ease;">
-    <div id="clock-face" style="position:absolute;width:100%;height:100%;"></div>
-    <div style="position:absolute;top:65%;width:100%;text-align:center;font-family:'Dancing Script',cursive;color:#38bdf8;opacity:0.6;font-size:0.9rem;">power by VerTech</div>
-    <div id="hr-hand" style="position:absolute;bottom:50%;left:50%;transform-origin:bottom center;width:7px;height:60px;background:white;border-radius:4px;z-index:3;"></div>
-    <div id="min-hand" style="position:absolute;bottom:50%;left:50%;transform-origin:bottom center;width:4px;height:85px;background:#38bdf8;border-radius:4px;z-index:2;"></div>
-    <div id="sec-hand" style="position:absolute;bottom:50%;left:50%;transform-origin:bottom center;width:2px;height:100px;background:#ef4444;border-radius:4px;z-index:1;"></div>
-    <div style="position:absolute;width:12px;height:12px;background:white;border-radius:50%;z-index:10;box-shadow:0 0 10px white;"></div>
+<!-- HERO / SPLASH SCREEN -->
+<div id="hero-section" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#020617; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; transition: all 0.8s cubic-bezier(0.7, 0, 0.3, 1); font-family:'Orbitron', sans-serif;">
+  
+  <div id="clock-container" style="position:relative; width:300px; height:300px; border:10px solid #1e293b; border-radius:50%; background:#0f172a; box-shadow:0 0 50px rgba(56, 189, 248, 0.3); display:flex; justify-content:center; align-items:center; opacity:0; transition: transform 1s cubic-bezier(0.17, 0.89, 0.32, 1.28), opacity 1.2s ease;">
+    <div id="clock-face" style="position:absolute; width:100%; height:100%;"></div>
+    <div style="position:absolute; top:65%; width:100%; text-align:center; font-family:'Dancing Script', cursive; color:#38bdf8; opacity:0.6; font-size:0.9rem;">power by VerTech</div>
+    <div id="hr-hand" style="position:absolute; bottom:50%; left:50%; transform-origin:bottom center; width:7px; height:60px; background:white; border-radius:4px; z-index:3;"></div>
+    <div id="min-hand" style="position:absolute; bottom:50%; left:50%; transform-origin:bottom center; width:4px; height:85px; background:#38bdf8; border-radius:4px; z-index:2;"></div>
+    <div id="sec-hand" style="position:absolute; bottom:50%; left:50%; transform-origin:bottom center; width:2px; height:100px; background:#ef4444; border-radius:4px; z-index:1;"></div>
+    <div style="position:absolute; width:12px; height:12px; background:white; border-radius:50%; z-index:10; box-shadow: 0 0 10px white;"></div>
   </div>
-  <div style="text-align:center;margin-top:40px;">
-    <h2 style="color:white;letter-spacing:4px;font-size:1.5rem;margin-bottom:5px;font-family:'Bebas Neue',sans-serif;">PONTAJ GABI</h2>
-    <div id="display-date" style="color:#38bdf8;font-size:1rem;letter-spacing:2px;margin-bottom:30px;opacity:0.9;">-- IANUARIE --</div>
-    <button onclick="intraInAplicatie()" class="btn-glow-start" style="padding:15px 70px;font-family:'Orbitron';color:#38bdf8;border:2px solid #38bdf8;background:transparent;cursor:pointer;font-weight:bold;letter-spacing:3px;border-radius:8px;text-transform:uppercase;">INTRA</button>
+
+  <div style="text-align:center; margin-top:40px;">
+    <h2 style="color:white; letter-spacing:4px; font-size:1.5rem; margin-bottom:5px; font-family:'Bebas Neue', sans-serif;">PONTAJ GABI</h2>
+    <div id="display-date" style="color:#38bdf8; font-size:1rem; letter-spacing:2px; margin-bottom:30px; opacity:0.9;">-- IANUARIE --</div>
+    <button onclick="intraInAplicatie()" class="btn-glow-start" style="padding:15px 70px; font-family:'Orbitron'; color:#38bdf8; border:2px solid #38bdf8; background:transparent; cursor:pointer; font-weight:bold; letter-spacing:3px; border-radius:8px; text-transform:uppercase;">INTRA</button>
   </div>
 </div>
 
 <!-- HEADER -->
 <div class="app-header">
   <div class="d-flex justify-content-between align-items-center mb-2">
-    <h1 id="pageTitle" style="display:flex;align-items:center;gap:8px;margin:0;">
+    <h1 id="pageTitle" style="display: flex; align-items: center; gap: 8px; margin: 0;">
       Jurnal Pontaj <span id="anDinTitlu" class="an-pulsat">2026</span>
     </h1>
-    <div onclick="alegeAnulCuStil()" style="cursor:pointer;background:rgba(37,99,235,0.1);color:var(--primary);width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;border:1px solid rgba(37,99,235,0.1);">
+    <div onclick="alegeAnulCuStil()" style="cursor: pointer; background: rgba(37,99,235,0.1); color: var(--primary); width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; border: 1px solid rgba(37,99,235,0.1);">
       <i class="bi bi-calendar-range"></i>
     </div>
   </div>
@@ -291,7 +563,7 @@ input, textarea, select { -webkit-touch-callout: default; }
 <div id="view-pontaje" class="view-section active">
   <div id="lista-bruta">
     <div class="text-center mt-5">
-      <div class="spinner-border" style="color:var(--primary);" role="status"></div>
+      <div class="spinner-border" style="color: var(--primary);" role="status"></div>
       <p class="mt-3 text-muted fw-semibold">Se încarcă datele...</p>
     </div>
   </div>
@@ -303,20 +575,22 @@ input, textarea, select { -webkit-touch-callout: default; }
     <h2 class="fw-bold mb-0">Statistici</h2>
     <p class="text-muted small">Bilanțul plăților tale pe săptămâni</p>
   </div>
+
   <div class="row g-2 mb-4 px-3">
     <div class="col-6">
-      <div class="p-3 text-center" style="background:white;border-radius:24px;box-shadow:0 10px 20px rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.2);">
-        <div class="small text-muted fw-bold" style="font-size:10px;letter-spacing:0.5px;">DE ÎNCASAT</div>
-        <div id="total-de-incasat" class="h4 fw-bold mb-0" style="color:var(--danger);">0.00 €</div>
+      <div class="p-3 text-center" style="background: white; border-radius: 24px; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2);">
+        <div class="small text-muted fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">DE ÎNCASAT</div>
+        <div id="total-de-incasat" class="h4 fw-bold mb-0" style="color: var(--danger);">0.00 €</div>
       </div>
     </div>
     <div class="col-6">
-      <div class="p-3 text-center" style="background:white;border-radius:24px;box-shadow:0 10px 20px rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2);">
-        <div class="small text-muted fw-bold" style="font-size:10px;letter-spacing:0.5px;">ÎNCASAT</div>
-        <div id="total-incasat" class="h4 fw-bold mb-0" style="color:var(--cash);">0.00 €</div>
+      <div class="p-3 text-center" style="background: white; border-radius: 24px; box-shadow: 0 10px 20px rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2);">
+        <div class="small text-muted fw-bold" style="font-size: 10px; letter-spacing: 0.5px;">ÎNCASAT</div>
+        <div id="total-incasat" class="h4 fw-bold mb-0" style="color: var(--cash);">0.00 €</div>
       </div>
     </div>
   </div>
+
   <div id="lista-stats"></div>
 </div>
 
@@ -331,39 +605,43 @@ input, textarea, select { -webkit-touch-callout: default; }
     <h2 class="fw-bold mb-0">Facturi</h2>
     <p class="text-muted small">Grupează săptămânile în facturi</p>
   </div>
+
   <div class="row g-2 mb-3 px-3">
     <div class="col-4">
-      <div class="p-3 text-center" style="background:white;border-radius:20px;box-shadow:0 6px 15px rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.15);">
-        <div style="font-size:9px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">RESTANT</div>
-        <div id="fact-total-restant" class="fw-bold" style="color:var(--danger);font-size:1rem;">0 €</div>
+      <div class="p-3 text-center" style="background:white; border-radius:20px; box-shadow:0 6px 15px rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.15);">
+        <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">RESTANT</div>
+        <div id="fact-total-restant" class="fw-bold" style="color:var(--danger); font-size:1rem;">0 €</div>
       </div>
     </div>
     <div class="col-4">
-      <div class="p-3 text-center" style="background:white;border-radius:20px;box-shadow:0 6px 15px rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.15);">
-        <div style="font-size:9px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">ÎNCASAT</div>
-        <div id="fact-total-incasat" class="fw-bold" style="color:var(--cash);font-size:1rem;">0 €</div>
+      <div class="p-3 text-center" style="background:white; border-radius:20px; box-shadow:0 6px 15px rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.15);">
+        <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">ÎNCASAT</div>
+        <div id="fact-total-incasat" class="fw-bold" style="color:var(--cash); font-size:1rem;">0 €</div>
       </div>
     </div>
     <div class="col-4">
-      <div class="p-3 text-center" style="background:white;border-radius:20px;box-shadow:0 6px 15px rgba(6,182,212,0.1);border:1px solid rgba(6,182,212,0.15);">
-        <div style="font-size:9px;font-weight:800;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;">CASH</div>
-        <div id="fact-total-cash" class="fw-bold" style="color:var(--accent);font-size:1rem;">0 €</div>
+      <div class="p-3 text-center" style="background:white; border-radius:20px; box-shadow:0 6px 15px rgba(6,182,212,0.1); border:1px solid rgba(6,182,212,0.15);">
+        <div style="font-size:9px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.5px;">CASH</div>
+        <div id="fact-total-cash" class="fw-bold" style="color:var(--accent); font-size:1rem;">0 €</div>
       </div>
     </div>
   </div>
-  <button onclick="toggleFormFactura()" style="display:block;margin:0 16px 16px;padding:16px;background:linear-gradient(135deg,var(--primary),var(--accent));color:white;border:none;border-radius:20px;font-weight:800;font-size:0.95rem;text-align:center;cursor:pointer;width:calc(100% - 32px);box-shadow:0 8px 20px rgba(37,99,235,0.3);">
+
+  <button onclick="toggleFormFactura()" style="display:block; margin: 0 16px 16px; padding: 16px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: white; border: none; border-radius: 20px; font-weight: 800; font-size: 0.95rem; text-align: center; cursor: pointer; width: calc(100% - 32px); box-shadow: 0 8px 20px rgba(37,99,235,0.3);">
     <i class="bi bi-plus-circle"></i> Creare factură nouă
   </button>
-  <div id="form-factura" style="display:none;background:white;border-radius:24px;margin:0 16px 16px;padding:20px;box-shadow:0 10px 25px rgba(0,0,0,0.08);border:1px solid rgba(0,0,0,0.05);">
-    <div style="font-weight:800;font-size:1rem;margin-bottom:14px;color:var(--text-main);">Factură Nouă</div>
-    <input type="text" id="input-num-factura" placeholder="Nume factură (ex: Factura 1)" style="width:100%;margin-bottom:12px;padding:12px 14px;border:1px solid rgba(0,0,0,0.1);border-radius:14px;font-size:0.9rem;background:#f8fafc;font-family:'Inter',sans-serif;">
-    <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Selectează săptămânile:</div>
-    <div id="sapt-checkbox-list" style="background:#f8fafc;border-radius:14px;padding:10px;margin-bottom:12px;max-height:220px;overflow-y:auto;border:1px solid rgba(0,0,0,0.06);"></div>
-    <div id="preview-total-factura" style="font-size:0.9rem;color:var(--primary);font-weight:800;margin-bottom:12px;min-height:20px;"></div>
-    <button onclick="salveazaFactura()" style="background:var(--cash);color:white;border:none;border-radius:14px;padding:14px;width:100%;font-weight:800;font-size:0.9rem;cursor:pointer;font-family:'Inter',sans-serif;">
+
+  <div id="form-factura" style="display:none; background: white; border-radius: 24px; margin: 0 16px 16px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); border: 1px solid rgba(0,0,0,0.05);">
+    <div style="font-weight: 800; font-size: 1rem; margin-bottom: 14px; color: var(--text-main);">Factură Nouă</div>
+    <input type="text" id="input-num-factura" placeholder="Nume factură (ex: Factura 1)" style="width:100%; margin-bottom:12px; padding:12px 14px; border:1px solid rgba(0,0,0,0.1); border-radius:14px; font-size:0.9rem; background:#f8fafc; font-family:'Inter',sans-serif;">
+    <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">Selectează săptămânile:</div>
+    <div id="sapt-checkbox-list" style="background:#f8fafc; border-radius:14px; padding:10px; margin-bottom:12px; max-height:220px; overflow-y:auto; border:1px solid rgba(0,0,0,0.06);"></div>
+    <div id="preview-total-factura" style="font-size:0.9rem; color:var(--primary); font-weight:800; margin-bottom:12px; min-height:20px;"></div>
+    <button onclick="salveazaFactura()" style="background:var(--cash); color:white; border:none; border-radius:14px; padding:14px; width:100%; font-weight:800; font-size:0.9rem; cursor:pointer; font-family:'Inter',sans-serif;">
       <i class="bi bi-check-lg"></i> Salvează Factura
     </button>
   </div>
+
   <div id="facturi-container"></div>
 </div>
 
@@ -392,9 +670,10 @@ input, textarea, select { -webkit-touch-callout: default; }
     <div class="modal-content border-0">
       <div class="modal-body p-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-          <h4 id="modalTitle" class="fw-bolder m-0" style="color:var(--text-main);">Adaugă Zi</h4>
+          <h4 id="modalTitle" class="fw-bolder m-0" style="color: var(--text-main);">Adaugă Zi</h4>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        
         <form id="fMain">
           <div class="mb-3">
             <label class="small fw-bold text-muted mb-1">Cine a fost?</label>
@@ -404,10 +683,12 @@ input, textarea, select { -webkit-touch-callout: default; }
               <option value="Gabi si Ionut">Gabi și Ionuț</option>
             </select>
           </div>
+          
           <div class="mb-3">
             <label class="small fw-bold text-muted mb-1">Data</label>
             <input type="date" id="data" class="form-control" required>
           </div>
+
           <div class="row mb-3">
             <div class="col">
               <label class="small fw-bold text-muted mb-1">Intrare</label>
@@ -418,6 +699,7 @@ input, textarea, select { -webkit-touch-callout: default; }
               <input type="time" id="iesire" class="form-control">
             </div>
           </div>
+
           <div class="mb-3">
             <label class="small fw-bold text-muted mb-1">Locație / Stradă</label>
             <div id="container-adrese">
@@ -427,6 +709,7 @@ input, textarea, select { -webkit-touch-callout: default; }
               </div>
             </div>
           </div>
+
           <div class="mb-4">
             <label class="small fw-bold text-muted mb-1">Kilometri</label>
             <div class="input-group">
@@ -434,12 +717,14 @@ input, textarea, select { -webkit-touch-callout: default; }
               <input type="number" id="km" class="form-control border-start-0 ps-0" placeholder="0">
             </div>
           </div>
+
           <div class="card bg-light border-0 rounded-4 p-3 mb-4">
             <div class="form-check form-switch d-flex align-items-center justify-content-between p-0 m-0">
-              <label class="form-check-label fw-bold m-0" for="isCash" style="color:var(--text-main);">Plată la negru (CASH)</label>
+              <label class="form-check-label fw-bold m-0" for="isCash" style="color: var(--text-main);">Plată la negru (CASH)</label>
               <input class="form-check-input m-0 float-none" type="checkbox" id="isCash">
             </div>
           </div>
+
           <div class="row mb-4">
             <div class="col">
               <label class="small fw-bold text-muted mb-1">Tarif €/H</label>
@@ -450,6 +735,7 @@ input, textarea, select { -webkit-touch-callout: default; }
               <input type="number" id="tK" class="form-control" value="0.45" step="0.01">
             </div>
           </div>
+
           <button type="button" id="btnS" onclick="execSalveaza()" class="btn btn-primary w-100 shadow-sm">SALVEAZĂ DATELE</button>
         </form>
       </div>
@@ -459,39 +745,6 @@ input, textarea, select { -webkit-touch-callout: default; }
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-// ============================================================
-// CONFIG — pune URL-ul tau Apps Script aici
-// ============================================================
-var API_URL = "https://script.google.com/macros/s/AKfycbwxAwOveTp_9fbv2UHxt97zyb4QEZFl84-T6Gyp1mQN757Achwy6rJT3mKmBnW7n8zyBQ/exec";
-
-// ============================================================
-// FUNCTII API — inlocuiesc google.script.run
-// ============================================================
-function apiGet(params) {
-  var url = API_URL + "?" + new URLSearchParams(params).toString();
-  return fetch(url, {
-    method: "GET",
-    redirect: "follow",
-    mode: "cors"
-  }).then(function(r) {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
-  });
-}
-
-function apiPost(body) {
-  return fetch(API_URL, {
-    method: "POST",
-    redirect: "follow",
-    mode: "cors",
-    headers: { "Content-Type": "text/plain;charset=utf-8" },
-    body: JSON.stringify(body)
-  }).then(function(r) {
-    if (!r.ok) throw new Error("HTTP " + r.status);
-    return r.json();
-  });
-}
-
 // ============================================================
 // VARIABILE GLOBALE
 // ============================================================
@@ -504,31 +757,52 @@ var globalData = [];
 var renderedCount = 0;
 var chunkSize = 15;
 var isRendering = false;
+
+// ✅ PWA - variabila pentru evenimentul de instalare
 var deferredPrompt = null;
 
 // ============================================================
-// PWA
+// ✅ PWA - LOGICA INSTALARE
 // ============================================================
 window.addEventListener('beforeinstallprompt', function(e) {
   e.preventDefault();
   deferredPrompt = e;
+  // Arata banner-ul daca nu a fost inchis anterior
   if (!localStorage.getItem('pwa-banner-closed')) {
     setTimeout(function() {
       var banner = document.getElementById('pwa-banner');
       if (banner) banner.classList.add('show');
-    }, 3000);
+    }, 3000); // Asteapta 3s dupa ce intra in app
   }
 });
 
+// Buton instalare din banner
 document.getElementById('btn-pwa-install').addEventListener('click', function() {
   if (deferredPrompt) {
     deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(function() { deferredPrompt = null; inchideBanner(); });
+    deferredPrompt.userChoice.then(function(choiceResult) {
+      deferredPrompt = null;
+      inchideBanner();
+    });
   } else {
+    // Fallback: afiseaza instructiuni manuale
     Swal.fire({
       title: 'Cum instalezi',
-      html: '<div style="text-align:left;font-size:14px;line-height:1.8;"><b>Android Chrome:</b><br>1. Apasă ⋮ (meniu sus-dreapta)<br>2. "Adaugă pe ecranul principal"<br>3. Confirmă cu "Adaugă"<br><br><b>iPhone Safari:</b><br>1. Apasă Share (jos)<br>2. "Adaugă pe ecranul Home"<br>3. Confirmă cu "Adaugă"</div>',
-      confirmButtonText: 'Am înțeles!', confirmButtonColor: 'var(--primary)',
+      html: `
+        <div style="text-align:left; font-size:14px; line-height:1.8;">
+          <b>Android Chrome:</b><br>
+          1. Apasă ⋮ (meniu sus-dreapta)<br>
+          2. "Adaugă pe ecranul principal"<br>
+          3. Confirmă cu "Adaugă"<br><br>
+          <b>iPhone Safari:</b><br>
+          1. Apasă <i class="bi bi-box-arrow-up"></i> (share jos)<br>
+          2. "Adaugă pe ecranul Home"<br>
+          3. Confirmă cu "Adaugă"<br><br>
+          <b>De ce?</b><br>
+          Aplicația se va deschide fără bara Chrome și fără bannerul Google.
+        </div>`,
+      confirmButtonText: 'Am înțeles!',
+      confirmButtonColor: 'var(--primary)',
       customClass: { popup: 'rounded-4' }
     });
     inchideBanner();
@@ -537,23 +811,30 @@ document.getElementById('btn-pwa-install').addEventListener('click', function() 
 
 function inchideBanner() {
   var banner = document.getElementById('pwa-banner');
-  if (banner) { banner.classList.remove('show'); try { localStorage.setItem('pwa-banner-closed','1'); } catch(e){} }
+  if (banner) {
+    banner.classList.remove('show');
+    try { localStorage.setItem('pwa-banner-closed', '1'); } catch(e) {}
+  }
 }
 
+// ✅ Daca e instalata ca PWA, ascunde banner-ul pentru totdeauna
 if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-  try { localStorage.setItem('pwa-banner-closed','1'); } catch(e){}
+  try { localStorage.setItem('pwa-banner-closed', '1'); } catch(e) {}
 }
 
 // ============================================================
 // INIT
 // ============================================================
-window.onload = function() {
-  modalObj = new bootstrap.Modal(document.getElementById('addModal'));
+window.onload = function() { 
+  modalObj = new bootstrap.Modal(document.getElementById('addModal')); 
   genereazaAni();
-  loadData();
+  loadData(); 
+  
   window.addEventListener('scroll', function() {
     if (isRendering || renderedCount >= globalData.length) return;
-    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 600) renderNextChunk();
+    if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 600) {
+      renderNextChunk();
+    }
   }, { passive: true });
 };
 
@@ -563,44 +844,52 @@ window.onload = function() {
 function loadData() {
   var an = document.getElementById('anSelector').value;
   document.getElementById('pageTitle').innerHTML = 'Jurnal Pontaj <span class="an-pulsat">' + an + '</span>';
+
   var lista = document.getElementById('lista-bruta');
-  lista.innerHTML = '<div class="text-center mt-5"><div class="spinner-border" style="color:var(--primary);"></div><p class="mt-3 text-muted fw-semibold">Se încarcă datele...</p></div>';
+  lista.innerHTML = '<div class="text-center mt-5"><div class="spinner-border" style="color: var(--primary);"></div></div>';
 
-  apiGet({ action: "getAppData", an: an })
-    .then(function(data) {
-      globalData = data.istoric || [];
-
-      globalWeeks = {};
+  google.script.run
+    .withSuccessHandler(function(data) {
+      globalData = data.istoric;
+      
+      globalWeeks = {}; 
       globalData.forEach(function(r) {
         var w = getWeek(r[1]);
         if (!globalWeeks[w]) globalWeeks[w] = { h: 0, cash: 0 };
         globalWeeks[w].h += parseFloat(r[5]) || 0;
-        globalWeeks[w].cash += (parseFloat(r[5]) || 0) * 30;
+        var tarifH = parseFloat(document.getElementById('tH').value) || 30;
+globalWeeks[w].cash += (parseFloat(r[5]) || 0) * tarifH; 
       });
 
       statusSaptamani = {};
       if (data.statistici) {
         data.statistici.forEach(function(s) {
-          var cheie = String(s[6]) + "_" + String(s[7]);
+          var sapt = String(s[6]);
+          var anS  = String(s[7]);
+          var cheie = sapt + "_" + anS;
           var suma = parseFloat(s[5]) || 0;
           var status = s[8];
-          if (status && status.toString().toLowerCase().includes("platit")) statusSaptamani[cheie] = "Platit";
-          else if (suma <= 0) statusSaptamani[cheie] = "CASH";
-          else statusSaptamani[cheie] = "RESTANT";
+
+          if (status && status.toString().toLowerCase().includes("platit")) {
+            statusSaptamani[cheie] = "Platit";
+          } else if (suma <= 0) {
+            statusSaptamani[cheie] = "CASH";
+          } else {
+            statusSaptamani[cheie] = "RESTANT";
+          }
         });
       }
 
       renderedCount = 0;
-      lista.innerHTML = '';
+      lista.innerHTML = ''; 
       renderNextChunk();
+      
       if (data.statistici) renderStats(data.statistici);
       if (data.santiere) renderSantiere(data.santiere);
+
       incarcaFacturi();
     })
-    .catch(function(err) {
-      lista.innerHTML = '<div class="text-center mt-5 text-danger"><i class="bi bi-wifi-off" style="font-size:2rem;"></i><p class="mt-3 fw-semibold">Eroare la încărcare. Verifică conexiunea.</p></div>';
-      console.error(err);
-    });
+    .getAppData(an);
 }
 
 // ============================================================
@@ -615,14 +904,16 @@ function getWeek(dStr) {
 }
 
 // ============================================================
-// JURNAL — RENDER CHUNK
+// JURNAL - RENDER CHUNK
 // ============================================================
 function renderNextChunk() {
   if (isRendering) return;
   isRendering = true;
+
   var container = document.getElementById('lista-bruta');
   var fragment = document.createDocumentFragment();
   var nextItems = globalData.slice(renderedCount, renderedCount + chunkSize);
+  
   var lastW = renderedCount > 0 ? getWeek(globalData[renderedCount - 1][1]) : null;
 
   nextItems.forEach(function(r) {
@@ -634,18 +925,20 @@ function renderNextChunk() {
       fragment.appendChild(sep);
       lastW = currW;
     }
+
     var valCash = String(r[8]).toLowerCase().trim();
     var cash = (valCash === "true" || valCash === "adevărat" || valCash === "adevarat");
+    
     var card = document.createElement('div');
     card.className = 'pro-card ' + (cash ? 'card-cash' : '');
-    card.innerHTML =
+    card.innerHTML = 
       '<div class="card-actions">' +
         '<button class="btn-action btn-edit" onclick="pregatesteEdit(' + r[9] + ')"><i class="bi bi-pencil-fill"></i></button>' +
         '<button class="btn-action btn-delete" onclick="confirmSterge(' + r[9] + ', \'' + r[1] + '\', ' + r[5] + ', ' + r[6] + ')"><i class="bi bi-trash3-fill"></i></button>' +
       '</div>' +
-      '<div class="d-flex justify-content-between align-items-start mb-2" style="padding-right:80px;">' +
+      '<div class="d-flex justify-content-between align-items-start mb-2" style="padding-right: 80px;">' +
         '<div>' +
-          '<div class="card-title">' + r[0] + ' <span style="font-weight:400;font-size:14px;">' + r[1] + '</span> ' + (cash ? '<span class="badge-cash"><i class="bi bi-cash-stack"></i> CASH</span>' : '') + '</div>' +
+          '<div class="card-title">' + r[0] + ' <span style="font-weight:400; font-size: 14px;">' + r[1] + '</span> ' + (cash ? '<span class="badge-cash"><i class="bi bi-cash-stack"></i> CASH</span>' : '') + '</div>' +
           '<div class="card-subtitle">' + (r[4] || 'Fără locație') + '</div>' +
         '</div>' +
       '</div>' +
@@ -668,8 +961,10 @@ function renderNextChunk() {
 // ============================================================
 function renderStats(statsArray) {
   var h2 = '';
+  var statsContainer = document.getElementById('lista-stats');
   var anSelectat = document.getElementById('anSelector').value;
-  var sumaDeIncasat = 0, sumaIncasat = 0;
+  var sumaDeIncasat = 0;
+  var sumaIncasat = 0;
 
   if (statsArray && statsArray.length > 0) {
     statsArray.forEach(function(s) {
@@ -678,34 +973,38 @@ function renderStats(statsArray) {
       var ore = s[1] || "0";
       var km = s[2] || "0";
       var statusPlata = s[8];
+
       var estePlatitManual = statusPlata === "Platit";
       var esteVerde = estePlatitManual || valoareSuma <= 0;
+      
+      if (estePlatitManual) {
+        sumaIncasat += valoareSuma;
+      } else {
+        sumaDeIncasat += (valoareSuma > 0 ? valoareSuma : 0);
+      }
 
-      if (estePlatitManual) sumaIncasat += valoareSuma;
-      else sumaDeIncasat += (valoareSuma > 0 ? valoareSuma : 0);
-
-      var culoareGlow = esteVerde ? "rgba(16,185,129,0.2)" : "rgba(239,68,68,0.2)";
+      var culoareGlow = esteVerde ? "rgba(16, 185, 129, 0.2)" : "rgba(239, 68, 68, 0.2)";
       var culoareTextSuma = esteVerde ? "var(--cash)" : "var(--danger)";
       var stilBorder = esteVerde ? "2px solid var(--cash)" : "1px solid " + culoareGlow;
 
-      h2 += '<div class="stat-card" style="border:' + stilBorder + ';box-shadow:0 10px 25px ' + culoareGlow + ';border-top:none;">' +
+      h2 += '<div class="stat-card" style="border: ' + stilBorder + '; box-shadow: 0 10px 25px ' + culoareGlow + '; border-top: none;">' +
         '<div class="d-flex justify-content-between align-items-start mb-3">' +
           '<div>' +
             '<div class="stat-subtitle">Săptămâna ' + sapt + '</div>' +
-            '<div style="font-size:1.5rem;color:' + culoareTextSuma + ';font-weight:800;letter-spacing:-1px;">' +
+            '<div style="font-size: 1.5rem; color: ' + culoareTextSuma + '; font-weight: 800; letter-spacing: -1px;">' +
               ((valoareSuma <= 0 && !estePlatitManual) ? 'PLATIT CASH' : valoareSuma.toFixed(2) + ' €') +
             '</div>' +
           '</div>' +
           '<div>' +
-            (!esteVerde ?
-              '<button class="btn btn-sm" onclick="confirmaPlata(\'' + sapt + '\', \'' + anSelectat + '\')" style="background:var(--danger);color:white;border-radius:12px;padding:8px 15px;font-weight:700;font-size:12px;box-shadow:0 4px 10px rgba(239,68,68,0.3);"><i class="bi bi-cash"></i> ÎNCASEAZĂ</button>' :
-              '<span class="badge-cash" style="background:var(--cash);"><i class="bi bi-check-circle-fill"></i> ' + (estePlatitManual ? 'INCASAT' : 'CASH') + '</span>'
+            (!esteVerde ? 
+              '<button class="btn btn-sm" onclick="confirmaPlata(\'' + sapt + '\', \'' + anSelectat + '\')" style="background: var(--danger); color: white; border-radius: 12px; padding: 8px 15px; font-weight: 700; font-size: 12px; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);"><i class="bi bi-cash"></i> ÎNCASEAZĂ</button>' : 
+              '<span class="badge-cash" style="background: var(--cash);"><i class="bi bi-check-circle-fill"></i> ' + (estePlatitManual ? 'INCASAT' : 'CASH') + '</span>'
             ) +
           '</div>' +
         '</div>' +
-        '<div class="d-flex justify-content-between pt-2" style="border-top:1px solid rgba(0,0,0,0.05);font-size:13px;">' +
-          '<span style="color:var(--primary);font-weight:600;"><i class="bi bi-clock-history"></i> <span style="color:var(--text-main);">' + ore + ' h</span></span>' +
-          '<span style="color:var(--cash);font-weight:600;"><i class="bi bi-truck"></i> <span style="color:var(--text-main);">' + km + ' km</span></span>' +
+        '<div class="d-flex justify-content-between pt-2" style="border-top: 1px solid rgba(0,0,0,0.05); font-size: 13px;">' +
+          '<span style="color: var(--primary); font-weight: 600;"><i class="bi bi-clock-history"></i> <span style="color: var(--text-main);">' + ore + ' h</span></span>' +
+          '<span style="color: var(--cash); font-weight: 600;"><i class="bi bi-truck"></i> <span style="color: var(--text-main);">' + km + ' km</span></span>' +
         '</div>' +
       '</div>';
     });
@@ -717,7 +1016,8 @@ function renderStats(statsArray) {
   var elDeIncasat = document.getElementById('total-de-incasat');
   if (elIncasat) elIncasat.innerText = sumaIncasat.toFixed(2) + " €";
   if (elDeIncasat) elDeIncasat.innerText = sumaDeIncasat.toFixed(2) + " €";
-  document.getElementById('lista-stats').innerHTML = h2;
+  
+  statsContainer.innerHTML = h2;
 }
 
 // ============================================================
@@ -726,11 +1026,14 @@ function renderStats(statsArray) {
 function renderSantiere(santiereArray) {
   var container = document.getElementById('lista-santiere');
   var html = '';
+  
   if (santiereArray && santiereArray.length > 0) {
     var ultimeleActivitati = {};
+    
     globalData.forEach(function(r) {
       var locatieJurnal = String(r[4]).toLowerCase();
       var dataInregistrare = new Date(r[1]);
+      
       santiereArray.forEach(function(s) {
         var numeSantier = String(s[0]).toLowerCase();
         if (locatieJurnal.includes(numeSantier)) {
@@ -740,17 +1043,25 @@ function renderSantiere(santiereArray) {
         }
       });
     });
+
     var santiereSortate = [...santiereArray].sort(function(a, b) {
       var dataA = ultimeleActivitati[String(a[0]).toLowerCase()] || new Date(0);
       var dataB = ultimeleActivitati[String(b[0]).toLowerCase()] || new Date(0);
       return dataB - dataA;
     });
+
     santiereSortate.forEach(function(s) {
-      html += '<div class="pro-card" style="box-shadow:0 4px 12px rgba(0,0,0,0.08);border-radius:12px;margin-bottom:15px;border:none;">' +
+      html += '<div class="pro-card" style="box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 12px; margin-bottom: 15px; border: none;">' + 
         '<div class="d-flex justify-content-between align-items-center">' +
-          '<div><div class="card-title" style="font-size:18px;">' + s[0] + '</div><div class="text-muted small fw-bold">An: ' + s[2] + '</div></div>' +
-          '<div class="hours-tag" style="background:var(--primary-soft);color:var(--primary);padding:10px 15px;border-radius:12px;"><i class="bi bi-stopwatch-fill"></i> ' + parseFloat(s[1]).toFixed(2) + ' h</div>' +
-        '</div></div>';
+          '<div>' +
+            '<div class="card-title" style="font-size: 18px;">' + s[0] + '</div>' +
+            '<div class="text-muted small fw-bold">An: ' + s[2] + '</div>' +
+          '</div>' +
+          '<div class="hours-tag" style="background: var(--primary-soft); color: var(--primary); padding: 10px 15px; border-radius: 12px;">' +
+            '<i class="bi bi-stopwatch-fill"></i> ' + parseFloat(s[1]).toFixed(2) + ' h' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     });
   } else {
     html = '<div class="text-center mt-5 text-muted">Nu există date despre șantiere.</div>';
@@ -762,13 +1073,13 @@ function renderSantiere(santiereArray) {
 // FACTURI
 // ============================================================
 function incarcaFacturi() {
-  apiPost({ action: "getFacturi" })
-    .then(function(data) {
-      facturi = data || [];
-      var tabFacturi = document.getElementById('view-facturi');
-      if (tabFacturi && tabFacturi.classList.contains('active')) renderFacturi();
-    })
-    .catch(function() { facturi = []; });
+  google.script.run.withSuccessHandler(function(data) {
+    facturi = data || [];
+    var tabFacturi = document.getElementById('view-facturi');
+    if (tabFacturi && tabFacturi.classList.contains('active')) {
+      renderFacturi();
+    }
+  }).getFacturiGS();
 }
 
 function toggleFormFactura() {
@@ -779,16 +1090,21 @@ function toggleFormFactura() {
 
 function buildCheckboxList() {
   var an = document.getElementById('anSelector').value;
+
   var weekStats = {};
   globalData.forEach(function(r) {
     var w = String(getWeek(r[1]));
     if (!weekStats[w]) weekStats[w] = { h: 0, cash: 0 };
     weekStats[w].h += parseFloat(r[5]) || 0;
-    weekStats[w].cash += (parseFloat(r[5]) || 0) * 30;
+    weekStats[w].cash += (parseFloat(r[5]) || 0) * tarifH;
   });
+
   var sortedWeeks = Object.keys(weekStats).sort(function(a, b) { return b - a; });
+
   var usedWeeks = new Set();
-  facturi.forEach(function(f) { f.saptamani.forEach(function(s) { usedWeeks.add(String(s)); }); });
+  facturi.forEach(function(f) {
+    f.saptamani.forEach(function(s) { usedWeeks.add(String(s)); });
+  });
 
   var html = '';
   sortedWeeks.forEach(function(w) {
@@ -798,14 +1114,17 @@ function buildCheckboxList() {
     var status = statusSaptamani[cheie] || "RESTANT";
     var statusLabel = status === "Platit" ? '✓ Încasat' : status === "CASH" ? '⚡ Cash' : '⏳ Restant';
     var statusColor = status === "Platit" ? 'var(--cash)' : status === "CASH" ? 'var(--accent)' : 'var(--danger)';
-    html += '<div style="display:flex;align-items:center;padding:8px 4px;border-bottom:0.5px solid #f0f0f0;">' +
+
+    html += '<div style="display:flex; align-items:center; padding:8px 4px; border-bottom:0.5px solid #f0f0f0;">' +
       '<input type="checkbox" id="chk_' + w + '" value="' + w + '" ' + (used ? 'disabled' : '') + ' onchange="updatePreviewFactura()" style="width:18px;height:18px;accent-color:var(--primary);margin-right:10px;">' +
-      '<label for="chk_' + w + '" style="flex:1;font-size:0.85rem;font-weight:600;color:' + (used ? '#aaa' : 'var(--text-main)') + ';">Săpt. ' + w + ' ' + (used ? '<span style="color:#ef4444;font-size:0.75rem;">(deja folosit)</span>' : '') +
-        '<span style="font-size:0.75rem;color:' + statusColor + ';margin-left:4px;">' + statusLabel + '</span>' +
+      '<label for="chk_' + w + '" style="flex:1; font-size:0.85rem; font-weight:600; color:' + (used ? '#aaa' : 'var(--text-main)') + ';">' +
+        'Săpt. ' + w + ' ' + (used ? '<span style="color:#ef4444;font-size:0.75rem;">(deja folosit)</span>' : '') +
+        '<span style="font-size:0.75rem; color:' + statusColor + '; margin-left:4px;">' + statusLabel + '</span>' +
       '</label>' +
       '<span style="font-size:0.8rem;color:var(--text-muted);">' + ws.h.toFixed(1) + 'h = ' + ws.cash.toFixed(0) + '€</span>' +
     '</div>';
   });
+
   document.getElementById('sapt-checkbox-list').innerHTML = html || '<div style="color:var(--text-muted);font-size:0.8rem;padding:8px;">Nicio săptămână disponibilă</div>';
   updatePreviewFactura();
 }
@@ -813,23 +1132,35 @@ function buildCheckboxList() {
 function updatePreviewFactura() {
   var checked = [...document.querySelectorAll('#sapt-checkbox-list input:checked')].map(function(c) { return c.value; });
   if (checked.length === 0) { document.getElementById('preview-total-factura').innerText = ''; return; }
+
   var weekStats = {};
   globalData.forEach(function(r) {
     var w = String(getWeek(r[1]));
     if (!weekStats[w]) weekStats[w] = { h: 0, cash: 0 };
     weekStats[w].h += parseFloat(r[5]) || 0;
-    weekStats[w].cash += (parseFloat(r[5]) || 0) * 30;
+    weekStats[w].cash += (parseFloat(r[5]) || 0) * tarifH;
   });
+
   var totalH = 0, totalC = 0;
-  checked.forEach(function(w) { var ws = weekStats[w] || {h:0,cash:0}; totalH += ws.h; totalC += ws.cash; });
+  checked.forEach(function(w) {
+    var ws = weekStats[w] || { h: 0, cash: 0 };
+    totalH += ws.h; totalC += ws.cash;
+  });
   document.getElementById('preview-total-factura').innerText = 'Total: ' + totalH.toFixed(1) + 'h = ' + totalC.toFixed(2) + '€';
 }
 
 function salveazaFactura() {
   var nom = document.getElementById('input-num-factura').value.trim();
   var checked = [...document.querySelectorAll('#sapt-checkbox-list input:checked')].map(function(c) { return c.value; });
-  if (!nom) { Swal.fire({ icon:'warning', title:'Adaugă un nume!', toast:true, position:'top-end', showConfirmButton:false, timer:2000 }); return; }
-  if (checked.length === 0) { Swal.fire({ icon:'warning', title:'Selectează cel puțin o săptămână!', toast:true, position:'top-end', showConfirmButton:false, timer:2000 }); return; }
+  
+  if (!nom) { 
+    Swal.fire({ icon:'warning', title:'Adaugă un nume!', toast:true, position:'top-end', showConfirmButton:false, timer:2000 }); 
+    return; 
+  }
+  if (checked.length === 0) { 
+    Swal.fire({ icon:'warning', title:'Selectează cel puțin o săptămână!', toast:true, position:'top-end', showConfirmButton:false, timer:2000 }); 
+    return; 
+  }
 
   var weekStats = {};
   globalData.forEach(function(r) {
@@ -838,31 +1169,38 @@ function salveazaFactura() {
     weekStats[w].h += parseFloat(r[5]) || 0;
     weekStats[w].cash += (parseFloat(r[5]) || 0) * 30;
   });
+
   var totalH = 0, totalC = 0;
-  checked.forEach(function(w) { var ws = weekStats[w] || {h:0,cash:0}; totalH += ws.h; totalC += ws.cash; });
+  checked.forEach(function(w) { 
+    var ws = weekStats[w] || {h:0,cash:0}; 
+    totalH += ws.h; totalC += ws.cash; 
+  });
+
   var factura = { id: Date.now(), nom: nom, saptamani: checked, totalH: totalH, totalC: totalC };
 
-  apiPost({ action: "salveazaFactura", factura: factura })
-    .then(function() {
-      facturi.push(factura);
-      document.getElementById('form-factura').style.display = 'none';
-      document.getElementById('input-num-factura').value = '';
-      renderFacturi();
-      Swal.fire({ icon:'success', title:'Factură salvată!', toast:true, position:'top-end', showConfirmButton:false, timer:2000 });
-    });
+  google.script.run.withSuccessHandler(function() {
+    facturi.push(factura);
+    document.getElementById('form-factura').style.display = 'none';
+    document.getElementById('input-num-factura').value = '';
+    renderFacturi();
+    Swal.fire({ icon:'success', title:'Factură salvată!', toast:true, position:'top-end', showConfirmButton:false, timer:2000 });
+  }).salveazaFacturaGS(factura);
 }
 
 function stergeFactura(id) {
   Swal.fire({
-    title: 'Ștergi factura?', icon: 'warning', showCancelButton: true,
-    confirmButtonColor: 'var(--danger)', confirmButtonText: 'Da, șterge!', cancelButtonText: 'Anulează'
+    title: 'Ștergi factura?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: 'var(--danger)',
+    confirmButtonText: 'Da, șterge!',
+    cancelButtonText: 'Anulează'
   }).then(function(result) {
     if (result.isConfirmed) {
-      apiPost({ action: "stergeFactura", id: id })
-        .then(function() {
-          facturi = facturi.filter(function(f) { return f.id !== id; });
-          renderFacturi();
-        });
+      google.script.run.withSuccessHandler(function() {
+        facturi = facturi.filter(function(f) { return f.id !== id; });
+        renderFacturi();
+      }).stergeFacturaGS(id);
     }
   });
 }
@@ -870,9 +1208,11 @@ function stergeFactura(id) {
 function renderFacturi() {
   var container = document.getElementById('facturi-container');
   var an = document.getElementById('anSelector').value;
+
   if (facturi.length === 0) {
-    container.innerHTML = '<div class="text-center mt-5 text-muted"><i class="bi bi-receipt" style="font-size:3rem;opacity:0.3;"></i><br><br>Nicio factură creată</div>';
-    updateSumarFacturi(0, 0, 0); return;
+    container.innerHTML = '<div class="text-center mt-5 text-muted"><i class="bi bi-receipt" style="font-size:3rem; opacity:0.3;"></i><br><br>Nicio factură creată</div>';
+    updateSumarFacturi(0, 0, 0);
+    return;
   }
 
   var weekStats = {};
@@ -888,45 +1228,83 @@ function renderFacturi() {
 
   [...facturi].reverse().forEach(function(f) {
     var nrPlatite = 0, nrCash = 0, nrRestante = 0;
+    
     f.saptamani.forEach(function(w) {
-      var st = statusSaptamani[String(w) + "_" + an] || "RESTANT";
+      var cheie = String(w) + "_" + an;
+      var st = statusSaptamani[cheie] || "RESTANT";
       if (st === "Platit") nrPlatite++;
       else if (st === "CASH") nrCash++;
       else nrRestante++;
     });
+
     var total = f.saptamani.length;
     var badgeHtml, cardClass;
-    if (nrRestante === total) { badgeHtml = '<span class="badge-factura-restant"><i class="bi bi-exclamation-circle"></i> DE ÎNCASAT</span>'; cardClass = "factura-restant"; totalRestant += f.totalC; }
-    else if (nrPlatite === total) { badgeHtml = '<span class="badge-factura-incasat"><i class="bi bi-check-circle-fill"></i> ÎNCASAT</span>'; cardClass = "factura-incasat"; totalIncasat += f.totalC; }
-    else if (nrCash === total) { badgeHtml = '<span class="badge-factura-cash"><i class="bi bi-cash-stack"></i> CASH</span>'; cardClass = "factura-cash"; totalCash += f.totalC; }
-    else if (nrRestante === 0) { badgeHtml = '<span class="badge-factura-incasat"><i class="bi bi-check-circle-fill"></i> ACHITAT</span>'; cardClass = "factura-incasat"; totalIncasat += f.totalC; }
-    else { badgeHtml = '<span class="badge-factura-partial"><i class="bi bi-hourglass-split"></i> PARȚIAL ' + nrPlatite + '/' + total + '</span>'; cardClass = "factura-partial"; totalRestant += f.totalC; }
+
+    if (nrRestante === total) {
+      badgeHtml = '<span class="badge-factura-restant"><i class="bi bi-exclamation-circle"></i> DE ÎNCASAT</span>';
+      cardClass = "factura-restant";
+      totalRestant += f.totalC;
+    } else if (nrPlatite === total) {
+      badgeHtml = '<span class="badge-factura-incasat"><i class="bi bi-check-circle-fill"></i> ÎNCASAT</span>';
+      cardClass = "factura-incasat";
+      totalIncasat += f.totalC;
+    } else if (nrCash === total) {
+      badgeHtml = '<span class="badge-factura-cash"><i class="bi bi-cash-stack"></i> CASH</span>';
+      cardClass = "factura-cash";
+      totalCash += f.totalC;
+    } else if (nrRestante === 0) {
+      badgeHtml = '<span class="badge-factura-incasat"><i class="bi bi-check-circle-fill"></i> ACHITAT</span>';
+      cardClass = "factura-incasat";
+      totalIncasat += f.totalC;
+    } else {
+      badgeHtml = '<span class="badge-factura-partial"><i class="bi bi-hourglass-split"></i> PARȚIAL ' + nrPlatite + '/' + total + '</span>';
+      cardClass = "factura-partial";
+      totalRestant += f.totalC;
+    }
 
     html += '<div class="pro-card ' + cardClass + '" style="margin-bottom:18px;">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
-        '<span style="font-weight:800;font-size:1.05rem;color:var(--text-main);">' + f.nom + '</span>' +
-        '<div style="display:flex;align-items:center;gap:8px;">' + badgeHtml +
+      '<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">' +
+        '<span style="font-weight:800; font-size:1.05rem; color:var(--text-main);">' + f.nom + '</span>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          badgeHtml +
           '<button onclick="stergeFactura(' + f.id + ')" style="background:none;border:none;color:var(--danger);font-size:1.1rem;cursor:pointer;padding:0 4px;"><i class="bi bi-trash3-fill"></i></button>' +
         '</div>' +
       '</div>';
 
     f.saptamani.forEach(function(w) {
       var ws = weekStats[String(w)] || { h: 0, cash: 0 };
-      var st = statusSaptamani[String(w) + "_" + an] || "RESTANT";
+      var cheie = String(w) + "_" + an;
+      var st = statusSaptamani[cheie] || "RESTANT";
+      
       var dotColor, stLabel;
-      if (st === "Platit") { dotColor = "var(--cash)"; stLabel = '<span style="font-size:0.72rem;font-weight:700;color:var(--cash);background:rgba(16,185,129,0.1);padding:2px 8px;border-radius:8px;">✓ Încasat</span>'; }
-      else if (st === "CASH") { dotColor = "var(--accent)"; stLabel = '<span style="font-size:0.72rem;font-weight:700;color:var(--accent);background:rgba(6,182,212,0.1);padding:2px 8px;border-radius:8px;">⚡ Cash</span>'; }
-      else { dotColor = "var(--danger)"; stLabel = '<span style="font-size:0.72rem;font-weight:700;color:var(--danger);background:rgba(239,68,68,0.1);padding:2px 8px;border-radius:8px;">⏳ Restant</span>'; }
+      if (st === "Platit") {
+        dotColor = "var(--cash)";
+        stLabel = '<span style="font-size:0.72rem;font-weight:700;color:var(--cash);background:rgba(16,185,129,0.1);padding:2px 8px;border-radius:8px;">✓ Încasat</span>';
+      } else if (st === "CASH") {
+        dotColor = "var(--accent)";
+        stLabel = '<span style="font-size:0.72rem;font-weight:700;color:var(--accent);background:rgba(6,182,212,0.1);padding:2px 8px;border-radius:8px;">⚡ Cash</span>';
+      } else {
+        dotColor = "var(--danger)";
+        stLabel = '<span style="font-size:0.72rem;font-weight:700;color:var(--danger);background:rgba(239,68,68,0.1);padding:2px 8px;border-radius:8px;">⏳ Restant</span>';
+      }
+
       html += '<div class="sapt-row">' +
-        '<span style="font-size:0.85rem;color:var(--text-muted);display:flex;align-items:center;"><span class="sapt-status-dot" style="background:' + dotColor + ';"></span><i class="bi bi-calendar3" style="margin-right:5px;"></i>Săptămâna ' + w + '</span>' +
-        '<div style="display:flex;align-items:center;gap:8px;">' + stLabel + '<span style="font-size:0.85rem;font-weight:700;color:var(--text-main);">' + ws.h.toFixed(1) + 'h = ' + ws.cash.toFixed(0) + '€</span></div>' +
+        '<span style="font-size:0.85rem; color:var(--text-muted); display:flex; align-items:center;">' +
+          '<span class="sapt-status-dot" style="background:' + dotColor + ';"></span>' +
+          '<i class="bi bi-calendar3" style="margin-right:5px;"></i>Săptămâna ' + w +
+        '</span>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+          stLabel +
+          '<span style="font-size:0.85rem; font-weight:700; color:var(--text-main);">' + ws.h.toFixed(1) + 'h = ' + ws.cash.toFixed(0) + '€</span>' +
+        '</div>' +
       '</div>';
     });
 
-    html += '<div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;margin-top:8px;border-top:1px solid rgba(0,0,0,0.05);">' +
-      '<span style="font-size:0.8rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Total factură</span>' +
-      '<span style="font-size:1.1rem;font-weight:900;color:var(--primary);">' + f.totalH.toFixed(1) + 'h = ' + f.totalC.toFixed(2) + '€</span>' +
-    '</div></div>';
+    html += '<div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; margin-top:8px; border-top:1px solid rgba(0,0,0,0.05);">' +
+        '<span style="font-size:0.8rem; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Total factură</span>' +
+        '<span style="font-size:1.1rem; font-weight:900; color:var(--primary);">' + f.totalH.toFixed(1) + 'h = ' + f.totalC.toFixed(2) + '€</span>' +
+      '</div>' +
+    '</div>';
   });
 
   container.innerHTML = html;
@@ -949,17 +1327,23 @@ function confirmaPlata(saptamana, an) {
   Swal.fire({
     title: 'Confirmare Încasare',
     text: 'Ai primit banii pentru săptămâna ' + saptamana + '?',
-    icon: 'question', showCancelButton: true,
-    confirmButtonColor: 'var(--cash)', cancelButtonColor: 'var(--text-muted)',
-    confirmButtonText: 'Da, încasat!', cancelButtonText: 'Anulează',
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonColor: 'var(--cash)',
+    cancelButtonColor: 'var(--text-muted)',
+    confirmButtonText: 'Da, încasat!',
+    cancelButtonText: 'Anulează',
+    background: 'rgba(255, 255, 255, 0.95)',
+    backdrop: 'rgba(15, 23, 42, 0.2) blur(4px)',
     showClass: { popup: 'animate__animated animate__fadeInUp' }
   }).then(function(result) {
     if (result.isConfirmed) {
-      apiPost({ action: "marcheazaPlata", saptamana: saptamana, an: an })
-        .then(function() {
-          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#10b981','#2563eb'] });
-          loadData();
-        });
+      google.script.run
+        .withSuccessHandler(function() {
+          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#10b981', '#2563eb'] });
+          loadData(); 
+        })
+        .marcheazaPlata(saptamana, an);
     }
   });
 }
@@ -972,26 +1356,37 @@ function switchTab(tab, el) {
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   document.getElementById('view-' + tab).classList.add('active');
   el.classList.add('active');
+  
   document.getElementById('searchBar').value = '';
   filtreazaDate();
+
   var titluri = { pontaje: 'Jurnal Pontaj', santiere: 'Șantiere Active', stats: 'Statistici', facturi: 'Facturi' };
   document.getElementById('pageTitle').innerText = titluri[tab] || 'Jurnal Pontaj';
+
   if (tab === 'facturi') renderFacturi();
 }
 
 // ============================================================
-// SEARCH
+// FILTRARE SEARCH
 // ============================================================
 function filtreazaDate() {
   var query = document.getElementById('searchBar').value.toLowerCase().trim();
   var activeTab = document.querySelector('.view-section.active').id;
+
   if (activeTab === 'view-pontaje') {
     var container = document.getElementById('lista-bruta');
-    if (query === "") { container.innerHTML = ""; renderedCount = 0; renderNextChunk(); return; }
+    if (query === "") {
+      container.innerHTML = "";
+      renderedCount = 0;
+      renderNextChunk();
+      return;
+    }
     container.innerHTML = "";
     var rezultate = globalData.filter(function(r) {
-      return r[0].toLowerCase().includes(query) || r[1].toLowerCase().includes(query) ||
-             r[4].toLowerCase().includes(query) || r[7].toLowerCase().includes(query);
+      return r[0].toLowerCase().includes(query) ||
+             r[1].toLowerCase().includes(query) ||
+             r[4].toLowerCase().includes(query) ||
+             r[7].toLowerCase().includes(query);
     });
     if (rezultate.length === 0) {
       container.innerHTML = '<div class="text-center mt-5">Nu am găsit nimic...</div>';
@@ -1003,13 +1398,22 @@ function filtreazaDate() {
         card.className = 'pro-card ' + (cash ? 'card-cash' : '');
         card.innerHTML = '<div class="card-title">' + r[0] + ' ' + r[1] + '</div>' +
           '<div class="card-subtitle">' + r[4] + '</div>' +
-          '<div class="info-grid"><div class="info-item"><b>' + r[5] + 'h</b></div><div class="info-item">' + r[7] + '</div></div>';
+          '<div class="info-grid">' +
+            '<div class="info-item"><b>' + r[5] + 'h</b></div>' +
+            '<div class="info-item">' + r[7] + '</div>' +
+          '</div>';
         container.appendChild(card);
       });
     }
   } else if (activeTab === 'view-santiere') {
-    document.querySelectorAll('#lista-santiere .pro-card').forEach(function(card) {
-      card.style.setProperty('display', card.innerText.toLowerCase().includes(query) ? 'block' : 'none', 'important');
+    var cards = document.querySelectorAll('#lista-santiere .pro-card');
+    cards.forEach(function(card) {
+      var text = card.innerText.toLowerCase();
+      if (text.includes(query)) {
+        card.style.setProperty('display', 'block', 'important');
+      } else {
+        card.style.setProperty('display', 'none', 'important');
+      }
     });
   }
 }
@@ -1020,8 +1424,11 @@ function filtreazaDate() {
 function deschideAdaugare() {
   currentEditIdx = null;
   document.getElementById('fMain').reset();
-  document.getElementById('container-adrese').innerHTML =
-    '<div class="input-group mb-2"><input type="text" class="form-control camp-strada" placeholder="Unde ai lucrat?"><button class="btn btn-outline-primary" type="button" onclick="adaugaRandAdresa()"><i class="bi bi-plus-lg"></i></button></div>';
+  document.getElementById('container-adrese').innerHTML = 
+    '<div class="input-group mb-2">' +
+      '<input type="text" class="form-control camp-strada" placeholder="Unde ai lucrat?">' +
+      '<button class="btn btn-outline-primary" type="button" onclick="adaugaRandAdresa()"><i class="bi bi-plus-lg"></i></button>' +
+    '</div>';
   document.getElementById('modalTitle').innerText = "Adaugă Zi";
   modalObj.show();
 }
@@ -1030,25 +1437,37 @@ function pregatesteEdit(idx) {
   var r = globalData.find(function(x) { return x[9] === idx; });
   if (!r) return;
   currentEditIdx = idx;
+  
   var curataOra = function(valoare) {
     if (!valoare) return "";
     var s = String(valoare).trim();
     var match = s.match(/(\d{1,2}):(\d{2})/);
-    return match ? match[1].padStart(2,'0') + ':' + match[2] : "";
+    if (match) return match[1].padStart(2, '0') + ':' + match[2];
+    return "";
   };
+
   document.getElementById('nume').value = r[7];
   document.getElementById('data').value = r[1];
   document.getElementById('intrare').value = curataOra(r[2]);
   document.getElementById('iesire').value = curataOra(r[3]);
+  
   var containerAdrese = document.getElementById('container-adrese');
   containerAdrese.innerHTML = '';
   var adreseSplit = (r[4] || "").split(' + ');
+  
   adreseSplit.forEach(function(adr, index) {
     var adresaCurata = adr.trim();
     if (index === 0) {
-      containerAdrese.innerHTML = '<div class="input-group mb-2"><input type="text" class="form-control camp-strada" value="' + adresaCurata + '" placeholder="Unde ai lucrat?"><button class="btn btn-outline-primary" type="button" onclick="adaugaRandAdresa()"><i class="bi bi-plus-lg"></i></button></div>';
-    } else if (adresaCurata !== "") { adaugaRandAdresa(adresaCurata); }
+      containerAdrese.innerHTML = 
+        '<div class="input-group mb-2">' +
+          '<input type="text" class="form-control camp-strada" value="' + adresaCurata + '" placeholder="Unde ai lucrat?">' +
+          '<button class="btn btn-outline-primary" type="button" onclick="adaugaRandAdresa()"><i class="bi bi-plus-lg"></i></button>' +
+        '</div>';
+    } else if (adresaCurata !== "") {
+      adaugaRandAdresa(adresaCurata);
+    }
   });
+
   document.getElementById('km').value = r[6] || '';
   var val = String(r[8]).toLowerCase().trim();
   document.getElementById('isCash').checked = (val === "true" || val === "adevărat" || val === "adevarat");
@@ -1060,17 +1479,19 @@ function confirmSterge(idx, dS, h, km) {
   Swal.fire({
     title: 'Ștergi înregistrarea?',
     text: 'Data: ' + dS + ' (' + h + 'h). Acțiunea este ireversibilă!',
-    icon: 'warning', showCancelButton: true,
-    confirmButtonColor: 'var(--danger)', confirmButtonText: 'Da, șterge!', cancelButtonText: 'Renunță'
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: 'var(--danger)',
+    confirmButtonText: 'Da, șterge!',
+    cancelButtonText: 'Renunță'
   }).then(function(result) {
     if (result.isConfirmed) {
-      apiPost({
-        action: "stergeRand", idx: idx, data: dS, h: h, km: km,
-        tH: document.getElementById('tH').value, tK: document.getElementById('tK').value
-      }).then(function() {
-        Swal.fire({ title: 'Șters!', icon: 'success', timer: 1000, showConfirmButton: false });
-        loadData();
-      });
+      google.script.run
+        .withSuccessHandler(function() {
+          Swal.fire({ title: 'Șters!', icon: 'success', timer: 1000, showConfirmButton: false });
+          loadData();
+        })
+        .stergeRand(idx, dS, h, km, document.getElementById('tH').value, document.getElementById('tK').value);
     }
   });
 }
@@ -1078,17 +1499,40 @@ function confirmSterge(idx, dS, h, km) {
 function execSalveaza() {
   var b = document.getElementById('btnS');
   var dVal = document.getElementById('data').value;
+
   if (!dVal) {
-    Swal.fire({ icon:'warning', title:'Alege data!', toast:true, position:'top-end', showConfirmButton:false, timer:3000, timerProgressBar:true });
+    Swal.fire({ icon: 'warning', title: 'Alege data!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true });
     return;
   }
   if (b.disabled) return;
-  b.disabled = true; b.innerText = "Se salvează...";
-  var zile = ["Duminică","Luni","Marți","Miercuri","Joi","Vineri","Sâmbătă"];
+  b.disabled = true;
+  b.innerText = "Se salvează...";
 
-  apiPost({
-    action: "adaugaDate",
-    date: {
+  var zile = ["Duminică", "Luni", "Marți", "Miercuri", "Joi", "Vineri", "Sâmbătă"];
+
+  google.script.run
+    .withSuccessHandler(function() {
+      var containerAdrese = document.getElementById('container-adrese');
+      if (containerAdrese) {
+        containerAdrese.innerHTML = 
+          '<div class="input-group mb-2">' +
+            '<input type="text" class="form-control camp-strada" placeholder="Unde ai lucrat?">' +
+            '<button class="btn btn-outline-primary" type="button" onclick="adaugaRandAdresa()"><i class="bi bi-plus-lg"></i></button>' +
+          '</div>';
+      }
+      document.getElementById('fMain').reset();
+      modalObj.hide();
+      loadData();
+      b.disabled = false;
+      b.innerText = "SALVEAZĂ DATELE";
+      Swal.fire({ icon: 'success', title: 'Salvat cu succes!', toast: true, position: 'top-end', showConfirmButton: false, timer: 3000, timerProgressBar: true, background: '#fff', iconColor: 'var(--cash)' });
+    })
+    .withFailureHandler(function(err) {
+      b.disabled = false;
+      b.innerText = "SALVEAZĂ DATELE";
+      Swal.fire({ icon: 'error', title: 'Eroare la salvare', text: err.message, confirmButtonColor: 'var(--danger)' });
+    })
+    .adaugaDate({
       ridx: currentEditIdx,
       isCash: document.getElementById('isCash').checked,
       nume: document.getElementById('nume').value,
@@ -1100,25 +1544,15 @@ function execSalveaza() {
       km: document.getElementById('km').value,
       tarifH: document.getElementById('tH').value,
       tarifKm: document.getElementById('tK').value
-    }
-  }).then(function() {
-    document.getElementById('container-adrese').innerHTML =
-      '<div class="input-group mb-2"><input type="text" class="form-control camp-strada" placeholder="Unde ai lucrat?"><button class="btn btn-outline-primary" type="button" onclick="adaugaRandAdresa()"><i class="bi bi-plus-lg"></i></button></div>';
-    document.getElementById('fMain').reset();
-    modalObj.hide();
-    loadData();
-    b.disabled = false; b.innerText = "SALVEAZĂ DATELE";
-    Swal.fire({ icon:'success', title:'Salvat cu succes!', toast:true, position:'top-end', showConfirmButton:false, timer:3000, timerProgressBar:true, iconColor:'var(--cash)' });
-  }).catch(function(err) {
-    b.disabled = false; b.innerText = "SALVEAZĂ DATELE";
-    Swal.fire({ icon:'error', title:'Eroare la salvare', text: err.message, confirmButtonColor:'var(--danger)' });
-  });
+    });
 }
 
 function obtineStradaDinFormular() {
   var campuri = document.querySelectorAll('.camp-strada');
   var adrese = [];
-  campuri.forEach(function(input) { if (input.value.trim() !== "") adrese.push(input.value.trim()); });
+  campuri.forEach(function(input) {
+    if (input.value.trim() !== "") adrese.push(input.value.trim());
+  });
   return adrese.join(' + ');
 }
 
@@ -1126,7 +1560,9 @@ function adaugaRandAdresa(valoareInitiala) {
   var container = document.getElementById('container-adrese');
   var div = document.createElement('div');
   div.className = 'input-group mb-2 animate__animated animate__fadeIn';
-  div.innerHTML = '<input type="text" class="form-control camp-strada" value="' + (valoareInitiala || '') + '" placeholder="Altă locație..."><button class="btn btn-outline-danger" type="button" onclick="this.closest(\'.input-group\').remove()"><i class="bi bi-trash"></i></button>';
+  div.innerHTML = 
+    '<input type="text" class="form-control camp-strada" value="' + (valoareInitiala || '') + '" placeholder="Altă locație...">' +
+    '<button class="btn btn-outline-danger" type="button" onclick="this.closest(\'.input-group\').remove()"><i class="bi bi-trash"></i></button>';
   container.appendChild(div);
 }
 
@@ -1136,31 +1572,38 @@ function adaugaRandAdresa(valoareInitiala) {
 function genereazaAni() {
   var selector = document.getElementById('anSelector');
   var anulCurent = new Date().getFullYear();
+  var startAn = 2025;
+  var stopAn = anulCurent + 1;
   selector.innerHTML = '';
-  for (var an = 2025; an <= anulCurent + 1; an++) {
+  for (var an = startAn; an <= stopAn; an++) {
     var opt = document.createElement('option');
-    opt.value = an; opt.innerText = an;
+    opt.value = an;
+    opt.innerText = an;
     if (an === anulCurent) opt.selected = true;
     selector.appendChild(opt);
   }
 }
 
 function alegeAnulCuStil() {
-  var anCurent = document.getElementById('anSelector').value;
+  var anSelector = document.getElementById('anSelector');
+  var anCurent = anSelector.value;
   Swal.fire({
     title: 'Selectează Anul',
     html: '<div class="d-grid gap-2 mt-3">' +
-      '<button onclick="setAn(2025)" class="btn btn-outline-primary p-3 fw-bold ' + (anCurent=='2025'?'active':'') + '">Anul 2025</button>' +
-      '<button onclick="setAn(2026)" class="btn btn-outline-primary p-3 fw-bold ' + (anCurent=='2026'?'active':'') + '">Anul 2026</button>' +
-      '<button onclick="setAn(2027)" class="btn btn-outline-primary p-3 fw-bold ' + (anCurent=='2027'?'active':'') + '">Anul 2027</button>' +
+      '<button onclick="setAn(2025)" class="btn btn-outline-primary p-3 fw-bold ' + (anCurent == '2025' ? 'active' : '') + '">Anul 2025</button>' +
+      '<button onclick="setAn(2026)" class="btn btn-outline-primary p-3 fw-bold ' + (anCurent == '2026' ? 'active' : '') + '">Anul 2026</button>' +
+      '<button onclick="setAn(2027)" class="btn btn-outline-primary p-3 fw-bold ' + (anCurent == '2027' ? 'active' : '') + '">Anul 2027</button>' +
     '</div>',
-    showConfirmButton: false, showCancelButton: true, cancelButtonText: 'Închide',
+    showConfirmButton: false,
+    showCancelButton: true,
+    cancelButtonText: 'Închide',
     customClass: { popup: 'rounded-4 shadow-lg', cancelButton: 'btn btn-light mt-2' }
   });
 }
 
 function setAn(an) {
-  document.getElementById('anSelector').value = an;
+  var selector = document.getElementById('anSelector');
+  selector.value = an;
   var titluAn = document.getElementById('anDinTitlu');
   if (titluAn) titluAn.innerText = an;
   Swal.close();
@@ -1168,33 +1611,44 @@ function setAn(an) {
 }
 
 // ============================================================
-// CEAS / LANDING
+// LANDING PAGE / CEAS
 // ============================================================
 function initLandingPage() {
   var clock = document.getElementById('clock-container');
   clock.style.transform = "translateY(-150vh) scale(0.5)";
-  setTimeout(function() { clock.style.transform = "translateY(0) scale(1)"; clock.style.opacity = "1"; }, 100);
+  
+  setTimeout(function() {
+    clock.style.transform = "translateY(0) scale(1)";
+    clock.style.opacity = "1";
+  }, 100); 
+
   var face = document.getElementById('clock-face');
   if (face) {
     for (var i = 1; i <= 12; i++) {
       var digit = document.createElement('div');
       digit.className = 'clock-digit';
       digit.style.transform = 'rotate(' + (i * 30) + 'deg)';
-      digit.innerHTML = '<span style="display:inline-block;transform:rotate(-' + (i * 30) + 'deg)">' + i + '</span>';
+      digit.innerHTML = '<span style="display:inline-block; transform:rotate(-' + (i * 30) + 'deg)">' + i + '</span>';
       face.appendChild(digit);
     }
   }
+
   var displayDate = document.getElementById('display-date');
   if (displayDate) {
-    displayDate.innerText = new Date().toLocaleDateString('ro-RO', { day:'numeric', month:'long', year:'numeric' }).toUpperCase();
+    var acum = new Date();
+    var optiuni = { day: 'numeric', month: 'long', year: 'numeric' };
+    displayDate.innerText = acum.toLocaleDateString('ro-RO', optiuni).toUpperCase();
   }
+
   setInterval(updateMecanismCeas, 1000);
   updateMecanismCeas();
 }
 
 function updateMecanismCeas() {
   var acum = new Date();
-  var h = acum.getHours() % 12, m = acum.getMinutes(), s = acum.getSeconds();
+  var h = acum.getHours() % 12;
+  var m = acum.getMinutes();
+  var s = acum.getSeconds();
   document.getElementById('hr-hand').style.transform = 'translateX(-50%) rotate(' + (h * 30 + m * 0.5) + 'deg)';
   document.getElementById('min-hand').style.transform = 'translateX(-50%) rotate(' + (m * 6) + 'deg)';
   document.getElementById('sec-hand').style.transform = 'translateX(-50%) rotate(' + (s * 6) + 'deg)';
@@ -1202,7 +1656,7 @@ function updateMecanismCeas() {
 
 function intraInAplicatie() {
   document.getElementById('hero-section').classList.add('exit-anim');
-  loadData();
+  if (typeof loadData === "function") loadData();
 }
 
 window.addEventListener('DOMContentLoaded', initLandingPage);
@@ -1216,6 +1670,7 @@ document.addEventListener("visibilitychange", function() {
     if (!sBar || sBar.value === "") loadData();
   }
 });
+
 setInterval(function() {
   var sBar = document.getElementById('searchBar');
   if (!sBar || sBar.value === "") loadData();
