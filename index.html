@@ -228,6 +228,26 @@
 </div>
 
 <script>
+    let isSaving = false; // ✅ LOCK pentru a preveni apeluri paralele
+
+async function autoSaveCloud() {
+    if (isSaving) return; // Dacă deja se salvează, nu face nimic
+    isSaving = true;
+    
+    try {
+        await fetch(scriptURL, { 
+            method: 'POST',
+            mode: 'no-cors',
+            body: JSON.stringify(facturi)
+        });
+        console.log("✅ Salvat în cloud");
+    } catch(e) {
+        console.log("❌ Cloud save failed:", e);
+    } finally {
+        isSaving = false; // Eliberează lockul
+    }
+}
+    
     const scriptURL = "https://script.google.com/macros/s/AKfycbzEW785lu1Wzwyr8v8dehrQBbpQJt-1ahGURPKZtosCFjla7RbRu-6cuctIIo2wmkI9RA/exec";
     const PLATI_FIXE_MODEL = [
         { nume: "Internet", suma: 78, status: false },
