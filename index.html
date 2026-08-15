@@ -326,23 +326,79 @@ async function autoSaveCloud() {
         incarcaDate();
     });
 
-    async function incarcaDate() {
-        const user = localStorage.getItem("userName") || "Gabriel";
-        document.getElementById('welcomeUser').innerText = user + "!";
-        document.getElementById('dynamicLetter').innerText = user[0];
-        try {
-            const r = await fetch(scriptURL + "?t=" + new Date().getTime());
-            const dateCloud = await r.json();
-            facturi = (!dateCloud || dateCloud.length === 0) ? JSON.parse(JSON.stringify(PLATI_FIXE_MODEL)) : dateCloud;
-            render();
-            actualizeazaStatusLandingPage();
-        } catch(e) {
-            const local = localStorage.getItem("facturi_gabriel_final");
-            facturi = local ? JSON.parse(local) : JSON.parse(JSON.stringify(PLATI_FIXE_MODEL));
-            render();
-            actualizeazaStatusLandingPage();
+   async function incarcaDate() {
+
+    const user = localStorage.getItem("userName") || "Gabriel";
+
+    document.getElementById('welcomeUser').innerText = user + "!";
+    document.getElementById('dynamicLetter').innerText = user[0];
+
+    try {
+
+        const r = await fetch(
+            scriptURL + "?t=" + new Date().getTime(),
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!r.ok) {
+            throw new Error("Server HTTP " + r.status);
         }
+
+        const dateCloud = await r.json();
+
+        /*
+         * Dacă serverul răspunde cu un array,
+         * folosim EXACT ce este în Google Sheet.
+         *
+         * Chiar și [] este valid.
+         */
+        if (Array.isArray(dateCloud)) {
+
+            facturi = dateCloud;
+
+            localStorage.setItem(
+                "facturi_gabriel_final",
+                JSON.stringify(facturi)
+            );
+
+        } else {
+
+            throw new Error("Răspuns invalid de la server");
+        }
+
+        render();
+        actualizeazaStatusLandingPage();
+
+    } catch (e) {
+
+        console.error("Eroare încărcare:", e);
+
+        /*
+         * Doar dacă serverul chiar nu poate fi accesat,
+         * folosim copia locală.
+         */
+        const local = localStorage.getItem(
+            "facturi_gabriel_final"
+        );
+
+        if (local) {
+
+            facturi = JSON.parse(local);
+
+        } else {
+
+            facturi = JSON.parse(
+                JSON.stringify(PLATI_FIXE_MODEL)
+            );
+        }
+
+        render();
+        actualizeazaStatusLandingPage();
     }
+}
+
 
     function actualizeazaStatusLandingPage() {
         const statusMsg = document.getElementById('status-message');
