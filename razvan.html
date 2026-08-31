@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Données de Facturation - Bratu Gabriel</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #2ecc71; /* Un verde business pentru succes */
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .header {
+            border-bottom: 3px solid var(--accent-color);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            color: var(--primary-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-row {
+            margin-bottom: 18px;
+        }
+
+        .label {
+            font-size: 0.75rem;
+            color: #95a5a6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .value {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: block;
+        }
+
+        .tva-box {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #dcfce7;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copy-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.95);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 0.85rem;
+            color: #bdc3c7;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="header">
+        <h1>Facturation</h1>
+    </div>
+
+    <div class="info-row">
+        <span class="label">Nom / Entreprise</span>
+        <span class="value">BRATU GABRIEL</span>
+    </div>
+
+    <div class="tva-box">
+        <div>
+            <span class="label">N° TVA / CUI</span>
+            <span class="value" id="tva-code">0640.973.228</span>
+        </div>
+        <button class="copy-btn" onclick="copyTVA()">Copier</button>
+    </div>
+
+    <div class="info-row">
+        <span class="label">Adresse</span>
+        <span class="value">AVENUE ERNEST CAMBIER 159,<br>1030 SCHAERBEEK</span>
+    </div>
+
+    <div class="info-row">
+        <span class="label">E-mail</span>
+        <span class="value">GABRIELBRATU2023@GMAIL.COM</span>
+    </div>
+
+    <div class="info-row">
+        <span class="label">Téléphone</span>
+        <span class="value">0488.300.480</span>
+    </div>
+
+    <footer>
+        Scannez pour les détails de facturation
+    </footer>
+</div>
+
+<script>
+    function copyTVA() {
+        const tva = document.getElementById('tva-code').innerText;
+        navigator.clipboard.writeText(tva).then(() => {
+            const btn = document.querySelector('.copy-btn');
+            btn.innerText = 'Copié !';
+            btn.style.background = '#2ecc71';
+            setTimeout(() => {
+                btn.innerText = 'Copier';
+                btn.style.background = '#2c3e50';
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
