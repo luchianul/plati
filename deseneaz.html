@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proiect electric – Unifilar și plan</title>
+<style>
+:root { --sidebar: 300px; --accent: #2980b9; }
+* { box-sizing: border-box; }
+body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; background: #333; overflow: hidden; }
+#sidebar { width: var(--sidebar); background: #f8f9fa; border-right: 2px solid #000; overflow-y: auto; flex: none; }
+.nav-tabs { display: flex; background: #2c3e50; }
+.tab { flex: 1; padding: 12px 6px; color: #fff; background: none; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
+.tab.active { background: var(--accent); }
+.section-header { background: #d1d4d7; padding: 6px 12px; font-size: 12px; font-weight: bold; border-bottom: 1px solid #aaa; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px; }
+.btn { background: #fff; border: 1px solid #ccc; padding: 4px 2px; font-size: 11px; cursor: pointer; border-radius: 3px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.btn canvas { width: 36px; height: 36px; }
+.btn:hover { background: #e8f4fd; }
+.btn.active { background: #3498db; color: #fff; border-color: #21618c; }
+.btn.danger.active { background: #c0392b; border-color: #7b241c; }
+#main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+#toolbar { min-height: 50px; background: #fff; display: flex; align-items: center; flex-wrap: wrap; padding: 6px 15px; gap: 10px; border-bottom: 1px solid #000; font-size: 13px; }
+#toolbar button { padding: 6px 10px; cursor: pointer; }
+#cab, #app { padding: 4px; }
+#cid { width: 60px; font-weight: bold; border: 2px solid var(--accent); padding: 4px; }
+#st { margin-left: auto; color: var(--accent); font-weight: bold; }
+#canvas-wrap { flex: 1; overflow: auto; padding: 30px; background: #666; }
+#pc { display: none; }
+#c { display: block; flex: none; margin: 0 auto; background-color: #fff; border: 1px solid #000; box-shadow: 0 0 20px rgba(0,0,0,.5); cursor: crosshair; touch-action: none;
+  background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
+#help { padding: 6px 15px; background: #ecf0f1; font-size: 12px; border-top: 1px solid #000; }
+#levels { display: none; background: #ecf0f1; padding: 6px 15px; gap: 6px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #000; font-size: 13px; }
+#levels .lv { padding: 5px 12px; border: 1px solid #999; background: #fff; cursor: pointer; border-radius: 3px; font-weight: bold; }
+#levels .lv.active { background: var(--accent); color: #fff; border-color: #21618c; }
+#levels .lvadd { background: #27ae60; color: #fff; border-color: #1e8449; }
+#cabbar { width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; }
+#cabbar select { padding: 3px; }
+#cabinfo { color: #555; }
+#pa { display: none; }
+@media print {
+  body { display: block; height: auto; background: #fff; overflow: visible; }
+  #sidebar, #toolbar, #help, #levels, #canvas-wrap { display: none !important; }
+  #main { display: block; }
+  #pa { display: block; }
+  .pg { break-after: page; page-break-after: always; }
+  .pg:last-child { break-after: auto; page-break-after: auto; }
+  .pg h3 { font: bold 14px Arial; margin: 0 0 3mm; }
+  .pg canvas { display: block; width: 100%; height: auto; max-height: 172mm; object-fit: contain; margin: 0 auto; }
+  @page { size: landscape; margin: 8mm; }
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div class="nav-tabs">
+    <button class="tab active" id="t1" onclick="switchPage(1)">PAG 1: UNIFILAR</button>
+    <button class="tab" id="t2" onclick="switchPage(2)">PAG 2: PLAN CASĂ</button>
+  </div>
+  <div id="menu"></div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <b>ID circuit:</b> <input type="text" id="cid" value="A">
+    <b>Cablu:</b> <input id="cab" list="cabs" placeholder="ex. EXVB 4x16" size="12">
+    <b>Aparat:</b> <input id="app" list="apps" value="3kA|4P - C 16A|LEGRAND" size="24" title="Rândurile se separă cu |">
+    <datalist id="cabs"><option value="EXVB 4x16"><option value="XGB 5G4"><option value="VOB 3G2,5"><option value="VOB 3G1,5"><option value="XGB 3G2,5"></datalist>
+    <datalist id="apps"><option value="3kA|4P - C 40A|LEGRAND"><option value="3kA|2P - C 16A|LEGRAND"><option value="3kA|2P - C 10A|LEGRAND"><option value="3kA|4P - C 32A|LEGRAND"><option value="4P - 25A"><option value="4P - C 40A|Δ300mA - 10kA|LEGRAND"></datalist>
+    <button onclick="generate()" style="background:#27ae60;color:#fff;font-weight:bold">⚡ Generează unifilar din plan</button>
+    <button onclick="rotate()">↻ Rotește (R)</button>
+    <button onclick="undo()">↶ Anulează (Ctrl+Z)</button>
+    <button onclick="exportPNG()">🖼️ Salvează PNG</button>
+    <button onclick="window.print()" title="Tipărește/salvează PDF cu unifilarul și toate nivelurile planului">🖨️ Export PDF (toate paginile)</button>
+    <button onclick="clearAll()" style="color:red">Reset pagina</button>
+    <span id="st"></span>
+    <div id="cabbar"></div>
+  </div>
+  <div id="levels"></div>
+  <div id="canvas-wrap"><canvas id="c" width="1100" height="900"></canvas></div>
+  <div id="pa"></div>
+  <div id="help"></div>
+</div>
+
+<script>
+const cv = document.getElementById('c'), ct = cv.getContext('2d');
+const G = 10;                                   // pasul de aliniere (px)
+let plans = [{ name:'Parter', items:[] }], lvl = 0;   // planul casei: mai multe niveluri
+const pages = { 1: [] };                        // pagina 1 = unifilar; pagina 2 = nivelul curent din plan
+Object.defineProperty(pages, 2, { get: () => plans[lvl].items, set: v => { plans[lvl].items = v; }, enumerable: false });
+const ALLP = () => plans.flatMap(p => p.items);
+let U = {}, linkFrom = null, resizing = null;
+let currentPage = 1, md = 'u_wire', rot = 0, start = null, mouse = null;
+
+/* ---------- Unelte ---------- */
+// type 'line' = se desenează cu tragere; 'sym' = un clic plasează simbolul
+const TOOLS = {
+  1: [
+    ['INTRARE ȘI PROTECȚIE', [
+      ['u_start','Branșament complet','sym'], ['u_earth','Împământare','sym'], ['u_ground','Priză pământ','sym'], ['u_feed','Branșament','line'],
+      ['u_meter','Contor kWh','sym'], ['u_diff_g','Dif. general','sym'], ['u_bus','Bară cupru','line'], ['u_wire','Cablu','line'] ]],
+    ['CIRCUITE (A, B, C...)', [
+      ['u_mcb','Disjunctor','sym'], ['u_lamp','Plecare bec','sym'], ['u_sock','Plecare priză','sym'], ['u_vov','Plecare motor','sym'] ]],
+    ['TEXT', [ ['text','Text','sym'], ['edit','Editează','edit'], ['erase','Șterge','erase'] ]]
+  ],
+  2: [
+    ['STRUCTURĂ', [
+      ['wall','Perete','line'], ['door','Ușă','sym'], ['window','Fereastră','sym'],
+      ['stair','Scară dreaptă','sym'], ['stair_r','Scară rotundă','sym'], ['resize','Redimensionează','resize'] ]],
+    ['ILUMINAT', [
+      ['lp_x','Lampă','sym'], ['lp_spot','Spot','sym'], ['lp_neon','Neon','sym'], ['fan','Ventilator','sym'] ]],
+    ['PRIZE ȘI COMUTARE', [
+      ['sk_1','Priză','sym'], ['sk_2','Priză dublă','sym'], ['sk_ip','Priză IP44','sym'],
+      ['sw_1','Întrerup.','sym'], ['sw_2','Întrerup. dublu','sym'], ['sw_c','Cap-scară','sym'], ['sw_x','Cruce','sym'] ]],
+    ['CIRCUITE (LEGĂTURI)', [ ['link','Leagă','link'], ['edit','Editează ID','edit'] ]],
+    ['ALTELE', [
+      ['panel','Tablou','sym'], ['jb','Doză','sym'], ['text','Text','sym'], ['erase','Șterge','erase'] ]]
+  ]
+};
+const kindOf = k => { for (const p of [1,2]) for (const s of TOOLS[p]) for (const t of s[1]) if (t[0]===k) return t[2]; };
+const nameOf = k => { for (const p of [1,2]) for (const s of TOOLS[p]) for (const t of s[1]) if (t[0]===k) return t[1]; };
+
+/* ---------- Simboluri (desenate în jurul lui 0,0) ---------- */
+const S = {
+  u_meter: c => { c.strokeRect(-20,-15,40,30); c.fillText('kWh',-12,4); },
+  u_diff_g: c => { brk(c); c.beginPath(); c.arc(8,32,4,0,7); c.stroke(); },
+  u_earth: c => { c.beginPath(); c.moveTo(0,0); c.lineTo(10,0); c.moveTo(0,-10); c.lineTo(0,10); c.moveTo(-5,-7); c.lineTo(-5,7); c.moveTo(-10,-4); c.lineTo(-10,4); c.stroke(); },
+  u_start: c => {},
+  u_ground: c => {                   // priză de pământ: din bară în jos, 2 condensatoare, pământ (0,0 = punctul de pe bară)
+    c.beginPath();
+    c.moveTo(0,0); c.lineTo(0,20); c.moveTo(-14,20); c.lineTo(14,20); c.moveTo(-14,26); c.lineTo(14,26);
+    c.moveTo(0,26); c.lineTo(0,60); c.moveTo(-14,60); c.lineTo(14,60); c.moveTo(-14,66); c.lineTo(14,66);
+    c.moveTo(0,66); c.lineTo(0,100); c.moveTo(-14,100); c.lineTo(14,100); c.moveTo(-9,106); c.lineTo(9,106); c.moveTo(-4,112); c.lineTo(4,112);
+    c.stroke();
+  },
+  u_mcb: c => brk(c),
+  u_lamp: c => { vline(c,0,20); c.beginPath(); c.arc(0,30,10,0,7); c.moveTo(-7,23); c.lineTo(7,37); c.moveTo(7,23); c.lineTo(-7,37); c.stroke(); },
+  u_sock: c => { vline(c,0,22); c.beginPath(); c.arc(0,22,9,Math.PI,0,true); c.stroke(); c.beginPath(); c.moveTo(-9,22); c.lineTo(9,22); c.stroke(); },
+  u_vov:  c => { vline(c,0,20); c.beginPath(); c.arc(0,32,12,0,7); c.stroke(); c.save(); c.scale(1,-1); c.font='bold 13px Arial'; c.fillText('M',-5,-27); c.restore(); },
+  door: c => { c.globalCompositeOperation='destination-out'; c.fillRect(0,-6,40,12); c.globalCompositeOperation='source-over';
+    c.lineWidth=2; c.beginPath(); c.moveTo(0,0); c.lineTo(0,-40); c.stroke(); c.lineWidth=1; c.beginPath(); c.arc(0,0,40,-Math.PI/2,0); c.stroke(); },
+  window: c => { c.globalCompositeOperation='destination-out'; c.fillRect(0,-6,50,12); c.globalCompositeOperation='source-over';
+    c.lineWidth=1.5; c.strokeRect(0,-4,50,8); c.beginPath(); c.moveTo(0,0); c.lineTo(50,0); c.stroke(); },
+  stair: (c, it) => {                // scară dreaptă: pornește din 0,0 spre „sus”, n trepte de 10px
+    const n = (it && it.n) || 8, L = n*10, hh = Math.min(12, L-12);
+    c.fillStyle = '#fff'; c.fillRect(-20,-L,40,L);
+    c.strokeStyle = '#999'; c.lineWidth = 1; c.strokeRect(-20,-L,40,L);
+    c.beginPath(); for (let y = -10; y > -L; y -= 10) { c.moveTo(-20,y); c.lineTo(20,y); } c.stroke();
+    c.fillStyle = '#999';
+    c.beginPath(); c.moveTo(0,-5); c.lineTo(0,-(L-3-hh)); c.stroke();
+    c.beginPath(); c.moveTo(0,-(L-3)); c.lineTo(-6,-(L-3-hh)); c.lineTo(6,-(L-3-hh)); c.closePath(); c.fill();
+    c.beginPath(); c.arc(0,-5,3,0,7); c.fill();
+  },
+  stair_r: (c, it) => {              // scară rotundă centrată pe 0,0, raza r
+    const R = (it && it.r) || 45, r0 = Math.min(8, R/4), ar = R*0.62, a = Math.PI*1.75;
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,R,0,7); c.fill();
+    c.strokeStyle = '#999'; c.lineWidth = 1;
+    c.beginPath(); c.arc(0,0,R,0,7); c.stroke();
+    c.beginPath(); c.arc(0,0,r0,0,7); c.stroke();
+    c.beginPath(); for (let i = 0; i < 16; i++) { const t = i*Math.PI/8; c.moveTo(r0*Math.cos(t),r0*Math.sin(t)); c.lineTo(R*Math.cos(t),R*Math.sin(t)); } c.stroke();
+    c.beginPath(); c.arc(0,0,ar,Math.PI/2,a); c.stroke();
+    c.fillStyle = '#999'; c.beginPath(); c.arc(0,ar,4,0,7); c.fill();
+    c.save(); c.translate(ar*Math.cos(a), ar*Math.sin(a)); c.rotate(a + Math.PI/2); c.beginPath(); c.moveTo(0,-7); c.lineTo(-5,5); c.lineTo(5,5); c.closePath(); c.fill(); c.restore();
+  },
+  u_x: c => { c.beginPath(); c.moveTo(-8,-8); c.lineTo(8,8); c.moveTo(8,-8); c.lineTo(-8,8); c.stroke(); },
+  lp_x:   c => { c.beginPath(); c.arc(0,0,10,0,7); c.moveTo(-7,-7); c.lineTo(7,7); c.moveTo(7,-7); c.lineTo(-7,7); c.stroke(); },
+  lp_spot:c => { c.beginPath(); c.arc(0,0,9,0,7); c.stroke(); c.beginPath(); c.arc(0,0,4,0,7); c.fill(); },
+  lp_neon:c => { c.strokeRect(-25,-5,50,10); c.beginPath(); c.moveTo(-25,-5); c.lineTo(25,5); c.moveTo(25,-5); c.lineTo(-25,5); c.stroke(); },
+  fan:    c => { c.beginPath(); c.arc(0,0,13,0,7); c.stroke(); for (let i=0;i<4;i++){ c.save(); c.rotate(i*Math.PI/2); c.beginPath(); c.ellipse(0,-7,3,6,0,0,7); c.fill(); c.restore(); } },
+  sk_1:   c => { sock(c); },
+  sk_2:   c => { sock(c); c.beginPath(); c.moveTo(-5,-11); c.lineTo(-5,-17); c.moveTo(5,-11); c.lineTo(5,-17); c.stroke(); },
+  sk_ip:  c => { c.beginPath(); c.arc(0,0,10,Math.PI,0); c.closePath(); c.fill(); c.beginPath(); c.moveTo(0,-10); c.lineTo(0,-16); c.stroke(); },
+  sw_1:   c => { sw(c); c.beginPath(); c.moveTo(11,-11); c.lineTo(16,-8); c.stroke(); },
+  sw_2:   c => { sw(c); c.beginPath(); c.moveTo(11,-11); c.lineTo(16,-8); c.moveTo(8,-14); c.lineTo(13,-11); c.stroke(); },
+  sw_c:   c => { sw(c); c.beginPath(); c.moveTo(11,-11); c.lineTo(16,-8); c.moveTo(-11,-11); c.lineTo(-16,-8); c.stroke(); },
+  sw_x:   c => { sw(c); c.beginPath(); c.moveTo(11,-11); c.lineTo(16,-8); c.moveTo(8,-14); c.lineTo(13,-11); c.moveTo(-11,-11); c.lineTo(-16,-8); c.moveTo(-8,-14); c.lineTo(-13,-11); c.stroke(); },
+  panel:  c => { c.strokeRect(-14,-10,28,20); c.beginPath(); c.moveTo(-14,-10); c.lineTo(14,10); c.moveTo(14,-10); c.lineTo(-14,10); c.stroke(); },
+  jb:     c => { c.strokeRect(-6,-6,12,12); c.beginPath(); c.arc(0,0,2,0,7); c.fill(); }
+};
+function vline(c,y1,y2){ c.beginPath(); c.moveTo(0,y1); c.lineTo(0,y2); c.stroke(); }
+function brk(c){ vline(c,0,10); c.beginPath(); c.moveTo(0,10); c.lineTo(10,24); c.moveTo(0,24); c.lineTo(0,40); c.stroke(); }
+function sock(c){ c.beginPath(); c.arc(0,0,10,Math.PI,0); c.closePath(); c.stroke(); c.beginPath(); c.moveTo(0,-10); c.lineTo(0,-16); c.stroke(); }
+function sw(c){ c.beginPath(); c.arc(0,0,5,0,7); c.fill(); c.beginPath(); c.moveTo(0,0); c.lineTo(11,-11); c.stroke(); }
+
+/* ---------- Desenare ---------- */
+function style(c, lw=2){ c.strokeStyle = '#000'; c.fillStyle = '#000'; c.lineWidth = lw; c.lineCap = 'round'; c.lineJoin = 'round'; c.font = 'bold 12px Arial'; }
+
+const STAIRS = ['stair','stair_r'];
+const FLIP = ['u_mcb','u_diff_g','u_lamp','u_sock','u_vov'];   // pleacă în sus din bară
+const IDSYM = ['lp_x','lp_spot','lp_neon','fan','sk_1','sk_2','sk_ip','sw_1','sw_2','sw_c','sw_x'];
+function lineText(c, it) {
+  const mx = (it.x1+it.x2)/2, my = (it.y1+it.y2)/2;
+  c.save(); c.font = '11px Arial'; c.textAlign = 'center'; c.translate(mx, my);
+  if (Math.abs(it.x2-it.x1) >= Math.abs(it.y2-it.y1)) c.fillText(it.txt, 0, -6);
+  else { c.rotate(Math.PI/2); c.fillText(it.txt, 0, it.side === 'l' ? 15 : -6); }
+  c.restore();
+}
+function symText(c, it) {
+  const L = it.txt.split('|'); c.save(); style(c, 1); c.font = 'bold 11px Arial';
+  const horiz = Math.abs(Math.sin(it.a)) > .5;
+  if (horiz || it.k === 'u_meter') {
+    c.textAlign = 'center';
+    const cx = it.k === 'u_meter' ? it.x : it.x + 20*Math.sign(Math.sin(it.a)), y0 = it.y + (it.k === 'u_meter' ? 30 : 24);
+    L.forEach((l,i) => fillLine(c, l, cx, y0 + i*12, i, L.length));
+  } else {
+    const y0 = it.y + (Math.cos(it.a) < 0 ? 40 : 0);
+    c.translate(it.x, y0); c.rotate(-Math.PI/2);
+    L.forEach((l,i) => fillLine(c, l, 4, 14 + i*12, i, L.length));
+  }
+  c.restore();
+}
+function idLabel(c, it) {          // litera circuitului: în partea dinspre cameră, ca să știi a cui e fiecare priză
+  const ux = Math.sin(it.a), uy = -Math.cos(it.a), d = WALLMOUNT[it.k] ? 27 : 24;
+  c.save(); style(c, 1); c.font = 'bold 13px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const x = it.x + ux*d, y = it.y + uy*d;
+  c.strokeStyle = '#fff'; c.lineWidth = 3; c.strokeText(it.id, x, y); c.fillText(it.id, x, y);
+  c.restore();
+}
+function groundText(c, it) {        // „??Ω” și data măsurătorii, sub simbolul de pământ
+  const L = it.txt.split('|'), co = Math.cos(it.a), si = Math.sin(it.a);
+  c.save(); style(c, 1); c.textAlign = 'left';
+  L.forEach((l, i) => { const lx = -54, ly = 138 + i*18; c.font = (i ? 'italic ' : '') + 'bold 13px Arial'; c.fillText(l, it.x + lx*co - ly*si, it.y + lx*si + ly*co); });
+  c.restore();
+}
+function fillLine(c, l, x, y, i, n) { c.font = (i >= 2 && i === n-1 ? 'italic ' : '') + 'bold 11px Arial'; c.fillText(l, x, y); }
+
+function drawItem(c, it) {
+  style(c);
+  if (it.t === 'link') {
+    const a = U[it.from], b = it.to ? U[it.to] : it.pt; if (!a || !b) return;
+    c.save(); c.strokeStyle = '#c0392b'; c.lineWidth = 1.2; c.setLineDash([6,4]);
+    c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); c.restore(); return;
+  }
+  if (it.t === 'group') { it.items.forEach(i => drawItem(c, i)); return; }
+  if (it.t === 'line') {
+    const thick = it.k === 'wall' ? 7 : it.k === 'u_bus' ? 5 : 2;
+    c.lineWidth = thick; c.lineCap = it.k === 'wall' ? 'square' : 'butt';
+    c.beginPath(); c.moveTo(it.x1,it.y1); c.lineTo(it.x2,it.y2); c.stroke();
+    if (it.k === 'u_feed') {
+      const a = Math.atan2(it.y2-it.y1, it.x2-it.x1);
+      c.beginPath(); c.moveTo(it.x2,it.y2); c.lineTo(it.x2-12*Math.cos(a-.4), it.y2-12*Math.sin(a-.4)); c.lineTo(it.x2-12*Math.cos(a+.4), it.y2-12*Math.sin(a+.4)); c.closePath(); c.fill();
+    }
+    if (it.txt) { style(c, 1); lineText(c, it); }
+  } else if (it.t === 'text') {
+    c.font = 'bold ' + (it.sz || 14) + 'px Arial'; c.fillText(it.txt, it.x, it.y);
+  } else if (it.t === 'sym') {
+    c.save(); c.translate(it.x, it.y); c.rotate(it.a); if (FLIP.includes(it.k)) c.scale(1,-1); style(c); S[it.k](c, it); c.restore();
+    if (it.txt) { if (it.k === 'u_ground') groundText(c, it); else symText(c, it); }
+    if (it.id) {
+      style(c);
+      if (IDSYM.includes(it.k)) idLabel(c, it);
+      else if (it.k === 'u_mcb') { c.font = 'bold 16px Arial'; c.fillText(it.id, it.x-22, it.y-6); }
+    }
+  }
+}
+
+function redraw(ghost) {
+  if (currentPage === 1) { let m = 0; pages[1].forEach(i => { m = Math.max(m, i.x || 0, i.x1 || 0, i.x2 || 0); }); const w = Math.max(1100, m + 90); if (cv.width !== w) cv.width = w; }
+  else if (cv.width !== 1100) cv.width = 1100;
+  ct.clearRect(0,0,cv.width,cv.height);
+  U = {}; pages[currentPage].forEach(i => { if (i.uid) U[i.uid] = i; });
+  const isSt = it => it.t === 'sym' && STAIRS.includes(it.k);   // scările se desenează primele, sub restul
+  pages[currentPage].filter(isSt).forEach(it => drawItem(ct, it));
+  pages[currentPage].filter(it => !isSt(it)).forEach(it => drawItem(ct, it));
+  if (linkFrom && U[linkFrom]) { ct.strokeStyle = '#c0392b'; ct.lineWidth = 2; ct.beginPath(); ct.arc(U[linkFrom].x, U[linkFrom].y, 18, 0, 7); ct.stroke(); }
+  if (ghost) { ct.globalAlpha = .45; drawItem(ct, ghost); ct.globalAlpha = 1; }
+}
+
+/* ---------- Interfață ---------- */
+function buildMenu() {
+  const m = document.getElementById('menu'); m.innerHTML = '';
+  TOOLS[currentPage].forEach(([title, list]) => {
+    const h = document.createElement('div'); h.className = 'section-header'; h.textContent = title; m.appendChild(h);
+    const g = document.createElement('div'); g.className = 'grid'; m.appendChild(g);
+    list.forEach(([k, label, kind]) => {
+      const b = document.createElement('button'); b.className = 'btn' + (kind==='erase' ? ' danger' : ''); b.dataset.k = k;
+      const pv = document.createElement('canvas'); pv.width = pv.height = 72; b.appendChild(pv);
+      b.appendChild(document.createTextNode(label));
+      b.onclick = () => setMode(k); g.appendChild(b);
+      preview(pv, k, kind);
+    });
+  });
+}
+function preview(pv, k, kind) {
+  const c = pv.getContext('2d'); c.scale(2,2); style(c, 2); c.font = 'bold 9px Arial';
+  if (kind === 'line') { c.lineWidth = k==='wall'?6:k==='u_bus'?4:2; c.beginPath(); c.moveTo(4,18); c.lineTo(32,18); c.stroke(); }
+  else if (kind === 'erase') { c.font='22px Arial'; c.fillText('🗑',8,26); }
+  else if (kind === 'link') { c.beginPath(); c.arc(8,12,4,0,7); c.stroke(); c.beginPath(); c.arc(28,24,4,0,7); c.stroke(); c.setLineDash([3,2]); c.beginPath(); c.moveTo(11,14); c.lineTo(25,22); c.stroke(); c.setLineDash([]); }
+  else if (kind === 'resize') { c.font='22px Arial'; c.fillText('⤢',8,26); }
+  else if (kind === 'edit') { c.font='22px Arial'; c.fillText('✎',9,26); }
+  else if (k === 'u_start') { c.beginPath(); c.moveTo(3,18); c.lineTo(10,18); c.moveTo(3,12); c.lineTo(3,24); c.moveTo(0,14); c.lineTo(0,22); c.moveTo(12,18); c.lineTo(14,18); c.stroke(); c.strokeRect(14,13,8,10); c.beginPath(); c.moveTo(22,18); c.lineTo(34,18); c.stroke(); }
+  else if (k === 'text') { c.font='bold 22px Arial'; c.fillText('Aa',5,26); }
+  else { c.translate(18,12); const sc = {u_meter:.6,u_diff_g:.6,u_mcb:.6,u_lamp:.55,u_sock:.55,u_vov:.55,lp_neon:.6,door:.5,window:.55,stair:.3,stair_r:.25,u_ground:.26}[k] || 1; c.scale(sc,sc); if (k === 'stair') c.translate(0,45); if (k === 'stair_r') c.translate(0,24); if (k === 'u_ground') c.translate(0,-20);
+    if (FLIP.includes(k)) { c.translate(0,6); c.scale(1,-1); c.translate(0,-3); } S[k](c); }
+}
+
+function setMode(m) {
+  md = m; start = null; linkFrom = null; redraw();
+  document.querySelectorAll('.btn').forEach(b => b.classList.toggle('active', b.dataset.k === m));
+  document.getElementById('st').textContent = 'Mod: ' + nameOf(m) + (kindOf(m)==='sym' && m!=='text' && !WALLMOUNT[m] ? '  (rotire: ' + rot*90 + '°)' : '');
+  const k = kindOf(m);
+  document.getElementById('help').textContent =
+    k === 'line' ? 'Trage cu mouse-ul de la un punct la altul. Liniile sunt drepte și aliniate la grilă; ține Alt apăsat pentru linie oblică.' :
+    m === 'u_start' ? 'Click pe locul unde începe lanțul: împământare, cablu, disjunctor, contor kWh, cablu, diferențial și bara de cupru. Apoi poți șterge sau edita orice piesă.' :
+    k === 'link' ? 'Click pe un simbol, apoi pe altul (ex. întrerupător → lampă, priză → priză): devin același circuit și același rând pe unifilar. Fără legături, regula e: întrerupătoarele plasate înaintea becurilor le comandă. Când ai terminat, apasă ⚡ Generează unifilar.' :
+    k === 'resize' ? 'Trage de o scară existentă: la scara dreaptă se adaugă/scot trepte (minim 2), la cea rotundă se schimbă raza.' :
+    STAIRS.includes(m) ? 'Apasă și trage: lungimea (sau raza) se stabilește din trasul mouse-ului, iar la scara dreaptă direcția e cea în care tragi. Un simplu click pune scara de mărime standard. Mai târziu o poți modifica cu „Redimensionează”.' :
+    m === 'u_ground' ? 'Click pe bara de cupru: coboară priza de pământ (2 condensatoare + simbol pământ). Textul „??Ω” și data se editează cu ✎ Editează.' :
+    k === 'edit' ? 'Click pe un cablu, aparat sau text ca să-i schimbi textul.' :
+    (m === 'u_mcb' || m === 'u_diff_g') ? 'Click ca să plasezi aparatul (urcă din bară). Scrie datele în câmpul „Aparat” (rânduri separate cu |). ID-ul e litera circuitului.' :
+    k === 'erase' ? 'Click pe un element ca să-l ștergi.' :
+    m === 'text' ? 'Click unde vrei textul.' :
+    'Click ca să plasezi simbolul. Apasă R ca să-l rotești. Ușile, ferestrele, prizele și întrerupătoarele se aliniază singure pe cel mai apropiat perete, pe partea unde ții cursorul.';
+}
+function switchPage(p) {
+  currentPage = p; start = null; rot = 0;
+  document.getElementById('t1').classList.toggle('active', p===1);
+  document.getElementById('t2').classList.toggle('active', p===2);
+  buildMenu(); buildLevels(); setMode(p === 1 ? 'u_wire' : 'wall'); redraw(); save();
+}
+/* ---------- Niveluri (parter, etaj, mansardă...) ---------- */
+function buildLevels() {
+  const L = document.getElementById('levels'); L.style.display = currentPage === 2 ? 'flex' : 'none'; L.innerHTML = '';
+  const t = document.createElement('b'); t.textContent = 'Nivel:'; L.appendChild(t);
+  const mk = (txt, cls, fn, title) => { const b = document.createElement('button'); b.className = cls; b.textContent = txt; b.onclick = fn; if (title) b.title = title; L.appendChild(b); };
+  plans.forEach((p, i) => mk(p.name, 'lv' + (i === lvl ? ' active' : ''), () => setLevel(i)));
+  mk('+ Adaugă nivel', 'lv lvadd', addLevel, 'Adaugă etaj, mansardă, subsol etc.');
+  mk('✎ Redenumește', 'lv', renameLevel);
+  mk('🗑 Șterge nivelul', 'lv', delLevel);
+}
+function setLevel(i) { lvl = i; linkFrom = null; start = null; buildLevels(); setMode(md); redraw(); save(); }
+function addLevel() { const n = prompt('Numele nivelului nou:', 'Etaj ' + plans.length); if (!n || !n.trim()) return; plans.push({ name:n.trim(), items:[] }); setLevel(plans.length - 1); }
+function renameLevel() { const n = prompt('Numele nivelului:', plans[lvl].name); if (n && n.trim()) { plans[lvl].name = n.trim(); buildLevels(); save(); } }
+function delLevel() {
+  if (plans.length < 2) { alert('Trebuie să rămână cel puțin un nivel.'); return; }
+  if (!confirm('Ștergi nivelul „' + plans[lvl].name + '” cu tot ce conține?')) return;
+  plans.splice(lvl, 1); setLevel(Math.max(0, lvl - 1));
+}
+/* ---------- Bara de cablu: tip + secțiune + clasă la foc ---------- */
+const CAB_TYPES = [['','(scrie manual)'],['CYY-F','CYY-F – Cu, PVC/PVC, instalații fixe'],['N2XH','N2XH – Cu, fără halogeni (HFFR), rezistent la foc'],['NYY-J','NYY-J – Cu, PVC, îngropat/exterior'],
+  ['H07V-K','H07V-K – Cu flexibil, fir în tub'],['H05VV-F','H05VV-F – Cu flexibil (MYYM)'],['CYABY-F','CYABY-F – Cu armat, îngropat'],['ACYABY','ACYABY – Al armat, branșament'],
+  ['VOB','VOB'],['XGB','XGB'],['EXVB','EXVB']];
+const CAB_CORES = ['1x','2x','3x','3G','4x','4G','5x','5G'];
+const CAB_SEC = { '1,5':['19,5','C10'], '2,5':['27','C16'], '4':['36','C25'], '6':['46','C32'], '10':['63','C40–C50'], '16':['85','C63'], '25':['112','C80'], '35':['138','C100'], '50':['168','C125'], '70':['213','C160'], '95':['258','C200'] };
+const CAB_CPR = [['','fără clasă'],['Eca','Eca'],['Dca-s2,d2,a3','Dca-s2,d2,a3'],['Cca-s3,d1,a3','Cca-s3,d1,a3'],['Cca-s1b,d1,a1','Cca-s1b,d1,a1 (căi de evacuare)'],['Cca-s1,d0,a1','Cca-s1,d0,a1'],['B2ca-s1a,d1,a1','B2ca-s1a,d1,a1 (foarte sever)']];
+function buildCabBar() {
+  const B = document.getElementById('cabbar');
+  const sel = (id, opts, def) => '<select id="' + id + '">' + opts.map(o => { const v = Array.isArray(o) ? o[0] : o, t = Array.isArray(o) ? o[1] : o; return '<option value="' + v + '"' + (v === def ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select>';
+  B.innerHTML = '<b>Compune cablu:</b> ' + sel('ctype', CAB_TYPES, '') + ' ' + sel('ccore', CAB_CORES, '3G') + ' ' + sel('csec', Object.keys(CAB_SEC).map(k => [k, k + ' mm²']), '2,5') + ' ' + sel('ccpr', CAB_CPR, '') + ' <span id="cabinfo"></span>';
+  ['ctype','ccore','csec','ccpr'].forEach(id => document.getElementById(id).onchange = composeCable);
+  composeCable(true);
+}
+function composeCable(noFill) {
+  const t = ctype.value, k = ccore.value, s = csec.value, c = ccpr.value, d = CAB_SEC[s];
+  document.getElementById('cabinfo').textContent = 'Iz ≈ ' + d[0] + ' A (met. C, PVC, 2 conductoare încărcate) • protecție uzuală ' + d[1] + ' • orientativ, verifică NP I7 / SR HD 60364';
+  if (t && noFill !== true) document.getElementById('cab').value = t + ' ' + k + s + (c ? ' ' + c : '');
+}
+function rotate() { rot = (rot + 1) % 4; setMode(md); if (mouse) redraw(ghostAt(mouse)); }
+/* ---------- Generare automată a unifilarului din plan ---------- */
+const CAT = { lp_x:'l', lp_spot:'l', lp_neon:'l', fan:'f', sk_1:'s', sk_2:'s', sk_ip:'s', sw_1:'w', sw_2:'w', sw_c:'w', sw_x:'w' };
+const EL = { lp_x:'u_x', lp_neon:'u_x' };   // lampa apare ca X pe unifilar
+// Împarte aparatele unui circuit în rânduri: întrerupătoare + becurile comandate de ele stau pe același rând
+function buildRows(dev, edges) {
+  const inC = new Set(dev.map(d => d.uid)), seen = new Set(), groups = [];
+  const nb = d => (edges[d.uid] || []).filter(u => inC.has(u));
+  dev.forEach((d, i) => {                       // 1) legăturile făcute de tine au prioritate
+    if (seen.has(d.uid) || !nb(d).length) return;
+    const comp = [], q = [d]; seen.add(d.uid);
+    while (q.length) { const x = q.shift(); comp.push(x); nb(x).forEach(u => { if (!seen.has(u)) { seen.add(u); q.push(dev.find(e => e.uid === u)); } }); }
+    groups.push({ first:i, m:comp });
+  });
+  let cur = null;                                // 2) restul, după ordinea plasării: întrerupătoare apoi becuri = același rând
+  dev.forEach((d, i) => {
+    if (seen.has(d.uid)) return; const c = CAT[d.k];
+    if (c === 's') { groups.push({ first:i, m:[d] }); cur = null; }
+    else if (c === 'w') { if (cur && cur.lamp) cur = null; if (!cur) { cur = { first:i, m:[], lamp:false }; groups.push(cur); } cur.m.push(d); }
+    else if (cur) { cur.m.push(d); cur.lamp = true; }
+    else groups.push({ first:i, m:[d] });
+  });
+  groups.sort((p, r) => p.first - r.first);
+  return groups.map(g => g.m.slice().sort((p, r) => (CAT[r.k] === 'w') - (CAT[p.k] === 'w')));   // întrerupătoarele primele
+}
+function generate() {
+  const grp = {}, edges = {};
+  ALLP().forEach(i => { if (i.t === 'sym' && CAT[i.k]) { const id = (i.id || '?').trim() || '?'; const g = grp[id] = grp[id] || { l:0, f:0, w:0, s:0, dev:[] }; g[CAT[i.k]]++; g.dev.push(i); } });
+  ALLP().forEach(l => { if (l.t === 'link') { (edges[l.from] = edges[l.from] || []).push(l.to); (edges[l.to] = edges[l.to] || []).push(l.from); } });
+  const ids = Object.keys(grp).sort();
+  if (!ids.length) { alert('Pune întâi prize, lămpi sau întrerupătoare în planul casei (pagina 2, oricare nivel).'); return; }
+  if (pages[1].length && !pages[1].some(i => i.gk) && !confirm('Pagina 1 conține un desen făcut manual. Unifilarul generat se adaugă peste el. Continui?')) return;
+  const H = Math.PI/2, B = 690, x0 = 110, y0 = B - 110, X = j => 20 + j*30;
+  const items = presetItems(40, B + 40), bus = items.find(i => i.k === 'u_bus'), sum = [];
+  items.forEach((it, i) => { it.gk = 'pre' + i; });
+  let cx = x0;
+  ids.forEach(id => {
+    const g = grp[id], sock = g.s > 0 && g.s >= g.l + g.f, rows = buildRows(g.dev, edges);
+    const ext = Math.max(60, ...rows.map(r => X(r.length - 1) + 16));
+    const sp = Math.max(18, Math.min(30, (y0 - 60) / Math.max(rows.length - 1, 1)));
+    items.push({ t:'sym', k:'u_mcb', x:cx, y:B, a:0, id, gk:id+'|mcb', txt:'3kA|' + (sock ? '2P - C 16A' : '2P - C 10A') + '|LEGRAND' });
+    items.push({ t:'line', k:'u_wire', x1:cx, y1:B-40, x2:cx, y2:y0, txt: sock ? 'VOB 3G2,5' : 'VOB 3G1,5', side:'l', gk:id+'|w' });
+    if (rows.length > 1) items.push({ t:'line', k:'u_wire', x1:cx, y1:y0, x2:cx, y2:y0 - (rows.length-1)*sp, gk:id+'|w2' });
+    rows.forEach((r, i) => {
+      const y = y0 - i*sp, lastIsSock = CAT[r[r.length-1].k] === 's';
+      items.push({ t:'line', k:'u_wire', x1:cx, y1:y, x2:cx + X(r.length-1) + (lastIsSock ? 0 : 10), y2:y, gk:id+'|r'+i });
+      r.forEach((d, j) => items.push({ t:'sym', k:EL[d.k] || d.k, x:cx + X(j), y, a: CAT[d.k] === 's' ? H : 0, gk:id+'|r'+i+'s'+j }));
+      items.push({ t:'text', x: cx - (i > 8 ? 22 : 14), y: y + 4, txt: String(i+1), sz:11, gk:id+'|n'+i });
+    });
+    const L = [];
+    if (g.s) L.push(g.s + (g.s === 1 ? ' priză' : ' prize'));
+    if (g.l) L.push(g.l + (g.l === 1 ? ' bec' : ' becuri'));
+    if (g.f) L.push(g.f + ' ventilat.');
+    if (g.w) L.push(g.w + ' într.');
+    sum.push(id + ': ' + L.join(', ') + ' pe ' + rows.length + (rows.length === 1 ? ' rând' : ' rânduri'));
+    cx += ext + 50;
+  });
+  bus.x2 = Math.max(bus.x2, cx - 20);
+  const gr = items.find(i => i.k === 'u_ground'); if (gr) gr.x = bus.x2 - 20;
+  const oldBy = {}; pages[1].forEach(o => { if (o.gk) oldBy[o.gk] = o; });
+  const del = new Set(pages.del || []);
+  const fresh = items.filter(it => !del.has(it.gk));                       // piesele șterse de tine rămân șterse
+  fresh.forEach(it => { const o = oldBy[it.gk]; if (o && o.edited) { it.txt = o.txt; if (o.id !== undefined) it.id = o.id; it.edited = true; } });   // textele editate rămân
+  const manual = pages[1].filter(o => !o.gk);                              // tot ce ai adăugat tu rămâne
+  pages[1] = fresh.concat(manual); save(); switchPage(1);
+  document.getElementById('help').textContent = 'Unifilar generat din plan – ' + sum.join('  |  ') + '. Modificările tale manuale au fost păstrate. Întrerupătorul și becurile lui stau pe același rând (regula: întrerupătoare, apoi becuri, în ordinea plasării sau după legăturile tale).';
+}
+function undo() { const it = pages[currentPage].pop(); if (it && currentPage === 1 && it.gk) (pages.del = pages.del || []).push(it.gk); redraw(); save(); }
+function clearAll() { if (confirm(currentPage === 2 ? 'Ștergi nivelul curent (' + plans[lvl].name + ')?' : 'Ștergi pagina curentă?')) { pages[currentPage] = []; if (currentPage === 1) pages.del = []; redraw(); save(); } }
+function exportPNG() {
+  const t = document.createElement('canvas'); t.width = cv.width; t.height = cv.height;
+  const c = t.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0,0,t.width,t.height); c.drawImage(cv,0,0);
+  const a = document.createElement('a'); a.download = (currentPage===1 ? 'unifilar' : 'plan-' + plans[lvl].name) + '.png'; a.href = t.toDataURL(); a.click();
+}
+
+/* ---------- Mouse (coordonate corecte chiar dacă pagina e scalată) ---------- */
+function pos(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: Math.round((e.clientX - r.left) * cv.width / r.width / G) * G,
+           y: Math.round((e.clientY - r.top)  * cv.height / r.height / G) * G };
+}
+function lineLabel() { return (md === 'u_wire' || md === 'u_feed') ? document.getElementById('cab').value.trim() : ''; }
+function endPoint(p, e) { // blochează pe orizontală/verticală, cu excepția Alt
+  if (e.altKey) return p;
+  return Math.abs(p.x - start.x) >= Math.abs(p.y - start.y) ? { x: p.x, y: start.y } : { x: start.x, y: p.y };
+}
+// Lanțul de început: împământare → cablu → disjunctor → contor → cablu → diferențial → bară
+const today = () => { const d = new Date(), z = n => String(n).padStart(2,'0'); return z(d.getDate()) + '.' + z(d.getMonth()+1) + '.' + d.getFullYear(); };
+function presetItems(x, y) {
+  const H = Math.PI/2, w = (x1,x2,txt) => ({ t:'line', k:'u_wire', x1, y1:y, x2, y2:y, txt });
+  return [
+    { t:'sym', k:'u_earth', x, y, a:0 },
+    w(x+10, x+110, 'EXVB 4x16'),
+    { t:'sym', k:'u_mcb', x:x+110, y, a:H, txt:'4P - 25A' },
+    w(x+150, x+220),
+    { t:'sym', k:'u_meter', x:x+240, y, a:0, txt:'NR. xxxxxxxxxx' },
+    w(x+260, x+360, 'EXVB 4x16'),
+    { t:'sym', k:'u_diff_g', x:x+360, y, a:H, txt:'4P - C 40A|Δ300mA - 10kA|LEGRAND' },
+    w(x+400, x+420),
+    { t:'line', k:'u_wire', x1:x+420, y1:y, x2:x+420, y2:y-40 },
+    { t:'line', k:'u_bus', x1:x, y1:y-40, x2:x+720, y2:y-40 },
+    { t:'sym', k:'u_ground', x:x+700, y:y-40, a:0, txt:'??Ω|' + today() }
+  ];
+}
+// Simbolurile care se montează pe perete: [jumătate din lățime, distanța față de axa peretelui]
+const WALLMOUNT = { door:[20,0], window:[25,0], sk_1:[0,5], sk_2:[0,5], sk_ip:[0,5], sw_1:[0,11], sw_2:[0,11], sw_c:[0,11], sw_x:[0,11] };
+function ghostAt(p) {
+  if (md === 'u_start') return { t:'group', items: presetItems(p.x, p.y) };
+  const it = { t:'sym', k:md, x:p.x, y:p.y, a:rot*Math.PI/2, id:document.getElementById('cid').value };
+  if (md === 'u_mcb' || md === 'u_diff_g') it.txt = document.getElementById('app').value;
+  if (md === 'u_meter') it.txt = 'NR. xxxxxxxxxx';
+  if (md === 'u_ground') it.txt = '??Ω|' + today();
+  if (md === 'stair') it.n = 8;
+  if (md === 'stair_r') it.r = 45;
+  const wm = WALLMOUNT[md];
+  if (wm && currentPage === 2) {
+    let best = null, bd = 30;
+    pages[2].forEach(w => {
+      if (w.t !== 'line' || w.k !== 'wall') return;
+      const dx = w.x2-w.x1, dy = w.y2-w.y1, l2 = dx*dx+dy*dy; if (!l2) return;
+      const t = Math.max(0, Math.min(1, ((p.x-w.x1)*dx+(p.y-w.y1)*dy)/l2));
+      const qx = w.x1+t*dx, qy = w.y1+t*dy, d = Math.hypot(p.x-qx, p.y-qy);
+      if (d < bd) { bd = d; best = { qx, qy, dx, dy, l:Math.sqrt(l2) }; }
+    });
+    if (best) {
+      let nx = -best.dy/best.l, ny = best.dx/best.l;            // normala peretelui
+      if ((p.x-best.qx)*nx + (p.y-best.qy)*ny < 0) { nx = -nx; ny = -ny; } // spre partea unde e cursorul
+      it.a = Math.atan2(nx, -ny);                               // „sus” al simbolului arată spre cameră
+      const ux = Math.cos(it.a), uy = Math.sin(it.a);           // direcția de-a lungul peretelui
+      it.x = best.qx + nx*wm[1] - ux*wm[0];
+      it.y = best.qy + ny*wm[1] - uy*wm[0];
+    }
+  }
+  return it;
+}
+function distSeg(p, a, b) {
+  const dx=b.x-a.x, dy=b.y-a.y, l=dx*dx+dy*dy; let t = l ? ((p.x-a.x)*dx+(p.y-a.y)*dy)/l : 0; t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p.x-(a.x+t*dx), p.y-(a.y+t*dy));
+}
+function stairHit(it, p, pad) {
+  const dx = p.x-it.x, dy = p.y-it.y;
+  if (it.k === 'stair_r') return Math.hypot(dx,dy) < (it.r || 45) + pad;
+  const lx = dx*Math.cos(it.a) + dy*Math.sin(it.a), ly = -dx*Math.sin(it.a) + dy*Math.cos(it.a), L = (it.n || 8)*10;
+  return Math.abs(lx) < 20 + pad && ly > -L - pad && ly < pad;
+}
+function resizeStair(p) {
+  const r = resizing, it = r.it;
+  if (r.drag && p.x === it.x && p.y === it.y) return;          // fără mișcare = mărime standard
+  if (it.k === 'stair_r') it.r = Math.max(20, Math.min(150, Math.round(Math.hypot(p.x-it.x, p.y-it.y)/5)*5));
+  else {
+    const dx = p.x-it.x, dy = p.y-it.y;
+    if (r.drag) it.a = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? Math.PI/2 : -Math.PI/2) : (dy < 0 ? 0 : Math.PI);
+    const ly = -dx*Math.sin(it.a) + dy*Math.cos(it.a);
+    it.n = Math.max(2, Math.min(60, Math.round(-ly/10)));        // minim 2 trepte, +1 treaptă la fiecare 10px
+  }
+  redraw();
+}
+const newUid = () => Math.random().toString(36).slice(2, 10);
+function hitSym(p) {
+  let best = null, bd = 24;
+  pages[currentPage].forEach(it => { if (it.t === 'sym' && it.uid && IDSYM.includes(it.k)) { const d = Math.hypot(p.x-it.x, p.y-it.y); if (d < bd) { bd = d; best = it; } } });
+  return best;
+}
+function setComponentId(uid, id) {          // toate simbolurile legate între ele primesc același circuit
+  const L = pages[2].filter(i => i.t === 'link'), seen = new Set([uid]), q = [uid];
+  while (q.length) {
+    const u = q.pop(); const it = pages[2].find(i => i.uid === u); if (it) it.id = id;
+    L.forEach(l => { const o = l.from === u ? l.to : l.to === u ? l.from : null; if (o && !seen.has(o)) { seen.add(o); q.push(o); } });
+  }
+}
+function hit(p) {
+  const L = pages[currentPage];
+  for (let i = L.length-1; i >= 0; i--) {
+    const it = L[i];
+    if (it.t === 'link') { const a = U[it.from], b = U[it.to]; if (a && b && distSeg(p, a, b) < 6) return i; }
+    if (it.t === 'line' && distSeg(p, {x:it.x1,y:it.y1}, {x:it.x2,y:it.y2}) < 8) return i;
+    if (it.t === 'sym' && it.k === 'u_ground' && distSeg(p, it, { x: it.x - Math.sin(it.a)*112, y: it.y + Math.cos(it.a)*112 }) < 16) return i;
+    if (it.t === 'sym' && !STAIRS.includes(it.k) && Math.hypot(p.x-it.x, p.y-it.y) < 22) return i;
+    if (it.t === 'text' && p.x > it.x-4 && p.x < it.x + it.txt.length*8 && Math.abs(p.y-it.y+5) < 10) return i;
+  }
+  for (let i = L.length-1; i >= 0; i--) if (L[i].t === 'sym' && STAIRS.includes(L[i].k) && stairHit(L[i], p, 4)) return i;
+  return -1;
+}
+
+cv.addEventListener('pointerdown', e => {
+  const p = pos(e), k = kindOf(md);
+  if (k === 'line') { start = p; cv.setPointerCapture(e.pointerId); }
+  else if (md === 'u_start') { pages[currentPage].push(...presetItems(p.x, p.y)); redraw(); save(); }
+  else if (k === 'edit') {
+    const i = hit(p); if (i < 0) return; const it = pages[currentPage][i];
+    if (it.t === 'link') return;
+    if (currentPage === 2 && it.t === 'sym') { const v = prompt('ID circuit:', it.id || ''); if (v !== null) { if (it.uid) setComponentId(it.uid, v); else it.id = v; } redraw(); save(); return; }
+    if (it.t === 'sym' || it.t === 'line') { const v = prompt(it.t === 'line' ? 'Text cablu:' : 'Text aparat (rânduri separate cu |):', it.txt || ''); if (v !== null) it.txt = v; }
+    else { const v = prompt('Text:', it.txt); if (v !== null) it.txt = v; }
+    if (it.k === 'u_mcb') { const v = prompt('ID circuit:', it.id || ''); if (v !== null) it.id = v; }
+    it.edited = true;
+    redraw(); save();
+  }
+  else if (k === 'link') {
+    const t = hitSym(p);
+    if (!linkFrom) { if (t) { linkFrom = t.uid; redraw(); } }
+    else { if (t && t.uid !== linkFrom) { pages[2].push({ t:'link', from:linkFrom, to:t.uid }); setComponentId(linkFrom, U[linkFrom].id); } linkFrom = null; redraw(); save(); }
+  }
+  else if (k === 'resize') {
+    let f = null; pages[currentPage].forEach(it => { if (it.t === 'sym' && STAIRS.includes(it.k) && stairHit(it, p, 10)) f = it; });
+    if (f) { resizing = { it:f, drag:false }; cv.setPointerCapture(e.pointerId); }
+  }
+  else if (STAIRS.includes(md)) {
+    const it = ghostAt(p); it.uid = newUid(); pages[currentPage].push(it);
+    resizing = { it, drag:true }; cv.setPointerCapture(e.pointerId); redraw();
+  }
+  else if (k === 'erase') { const i = hit(p); if (i >= 0) { const g = pages[currentPage][i].gk; if (currentPage === 1 && g) (pages.del = pages.del || []).push(g); pages[currentPage].splice(i,1); redraw(); save(); } }
+  else if (md === 'text') { const t = prompt('Text:'); if (t) { pages[currentPage].push({t:'text', x:p.x, y:p.y, txt:t}); redraw(); save(); } }
+  else { const it = ghostAt(p); it.uid = newUid(); pages[currentPage].push(it); redraw(); save(); }
+});
+cv.addEventListener('pointermove', e => {
+  const p = pos(e); mouse = p;
+  if (resizing) { resizeStair(p); return; }
+  if (start) {
+    const q = endPoint(p, e);
+    redraw({ t:'line', k:md, x1:start.x, y1:start.y, x2:q.x, y2:q.y, txt:lineLabel() });
+  } else if (linkFrom) redraw({ t:'link', from:linkFrom, pt:p });
+  else if (kindOf(md) === 'sym' && md !== 'text') redraw(ghostAt(p));
+});
+cv.addEventListener('pointerup', e => {
+  if (resizing) { resizing = null; redraw(); save(); return; }
+  if (!start) return;
+  const q = endPoint(pos(e), e);
+  if (q.x !== start.x || q.y !== start.y) pages[currentPage].push({ t:'line', k:md, x1:start.x, y1:start.y, x2:q.x, y2:q.y, txt:lineLabel() });
+  start = null; redraw(); save();
+});
+cv.addEventListener('pointerleave', () => { mouse = null; if (!start) redraw(); });
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'r' || e.key === 'R') rotate();
+  if (e.key === 'Escape') { start = null; linkFrom = null; redraw(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+});
+
+/* ---------- Tipărire / PDF: unifilar + toate nivelurile planului, fiecare pe câte o pagină ---------- */
+function capture() {                       // decupează desenul curent de pe canvas
+  linkFrom = null; redraw();
+  const W = cv.width, H = cv.height, d = ct.getImageData(0,0,W,H).data;
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (d[(y*W+x)*4+3] > 0) { if (x<x0) x0=x; if (x>x1) x1=x; if (y<y0) y0=y; if (y>y1) y1=y; }
+  if (x1 < 0) return null;
+  const m = 20; x0 = Math.max(0,x0-m); y0 = Math.max(0,y0-m); x1 = Math.min(W,x1+m); y1 = Math.min(H,y1+m);
+  const pc = document.createElement('canvas'); pc.width = x1-x0; pc.height = y1-y0;
+  const c = pc.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0,0,pc.width,pc.height);
+  c.drawImage(cv, x0, y0, pc.width, pc.height, 0, 0, pc.width, pc.height);
+  pc.style.maxWidth = Math.round(pc.width * 1.25) + 'px';
+  return pc;
+}
+function buildPrint() {
+  const pa = document.getElementById('pa'); pa.innerHTML = '';
+  const sp = currentPage, sl = lvl, sk = linkFrom, jobs = [];
+  if (pages[1].length) jobs.push({ title:'Schemă monofilară (unifilar)', page:1, l:sl });
+  plans.forEach((p, i) => { if (p.items.length) jobs.push({ title:'Plan casă – ' + p.name, page:2, l:i }); });
+  jobs.forEach(j => {
+    currentPage = j.page; lvl = j.l;
+    const c = capture(); if (!c) return;
+    const d = document.createElement('div'); d.className = 'pg';
+    const h = document.createElement('h3'); h.textContent = j.title; d.appendChild(h); d.appendChild(c); pa.appendChild(d);
+  });
+  currentPage = sp; lvl = sl; linkFrom = sk; redraw();
+}
+window.addEventListener('beforeprint', buildPrint);
+window.addEventListener('afterprint', () => { document.getElementById('pa').innerHTML = ''; });
+
+/* ---------- Salvare automată în browser ---------- */
+function save() { try { localStorage.setItem('proiect_electric', JSON.stringify({ 1:pages[1], del:pages.del || [], plans, lvl })); } catch (_) {} }
+function load() {
+  try {
+    const d = JSON.parse(localStorage.getItem('proiect_electric')); if (!d || !d[1]) return;
+    pages[1] = d[1]; pages.del = d.del || [];
+    if (d.plans && d.plans.length) { plans = d.plans; lvl = Math.min(d.lvl || 0, plans.length - 1); }
+    else if (d[2]) plans = [{ name:'Parter', items:d[2] }];
+    const all = [pages[1]].concat(plans.map(p => p.items));
+    all.forEach(L => L.forEach(it => { if (it.t === 'sym' && !it.uid) it.uid = newUid(); if (it.t === 'sym' && it.a === undefined) it.a = (it.r||0)*Math.PI/2; }));
+  } catch (_) {}
+}
+
+load(); buildMenu(); buildLevels(); buildCabBar(); setMode('u_wire'); redraw();
+</script>
+</body>
+</html>
