@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Proiect electric – Unifilar și plan</title>
+<style>
+:root { --sidebar: 300px; --accent: #2980b9; }
+* { box-sizing: border-box; }
+body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; display: flex; height: 100vh; height: 100dvh; background: #333; overflow: hidden; }
+#sidebar { width: var(--sidebar); background: #f8f9fa; border-right: 2px solid #000; overflow-y: auto; flex: none; -webkit-overflow-scrolling: touch; }
+.nav-tabs { display: flex; background: #2c3e50; }
+.tab { flex: 1; padding: 12px 6px; color: #fff; background: none; border: none; cursor: pointer; font-weight: bold; font-size: 12px; }
+.tab.active { background: var(--accent); }
+.section-header { background: #d1d4d7; padding: 6px 12px; font-size: 12px; font-weight: bold; border-bottom: 1px solid #aaa; }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 8px; }
+.btn { background: #fff; border: 1px solid #ccc; padding: 4px 2px; font-size: 11px; cursor: pointer; border-radius: 3px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.btn canvas { width: 36px; height: 36px; }
+.btn:hover { background: #e8f4fd; }
+.btn.active { background: #3498db; color: #fff; border-color: #21618c; }
+.btn.danger.active { background: #c0392b; border-color: #7b241c; }
+#main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+#toolbar { background: #fff; display: flex; flex-direction: column; gap: 6px; padding: 6px 12px; border-bottom: 1px solid #000; font-size: 13px; }
+#tbmain, #tbmore { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; width: 100%; }
+#tbmore { padding-top: 6px; border-top: 1px solid #ddd; }
+#toolbar.compact #tbmore { display: none; }
+#tbshow { display: none; position: fixed; top: 6px; right: 10px; z-index: 60; padding: 8px 14px; border-radius: 18px; border: 1px solid #555; background: rgba(255,255,255,.95); box-shadow: 0 2px 6px rgba(0,0,0,.4); font-weight: bold; cursor: pointer; }
+body.tbhid #tbshow { display: block; }
+body.tbhid #help { display: none; }
+body.p2 .p1only { display: none !important; }
+#toolbar button { padding: 6px 10px; cursor: pointer; }
+#cab, #app { padding: 4px; }
+#cid { width: 60px; font-weight: bold; border: 2px solid var(--accent); padding: 4px; }
+#st { margin-left: auto; color: var(--accent); font-weight: bold; }
+#canvas-wrap { flex: 1; overflow: auto; padding: 30px; background: #666; -webkit-overflow-scrolling: touch; }
+#pc { display: none; }
+#c { display: block; flex: none; margin: 0 auto; background-color: #fff; border: 1px solid #000; box-shadow: 0 0 20px rgba(0,0,0,.5); cursor: crosshair; touch-action: none;
+  background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
+#c { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+#c.pan { touch-action: auto; cursor: grab; }
+@media (pointer: coarse) {
+  #toolbar button, #toolbar input, #toolbar select { min-height: 40px; font-size: 14px; }
+  .btn { padding: 10px 2px; font-size: 12px; }
+  .tab { padding: 16px 6px; font-size: 13px; }
+  :root { --sidebar: 250px; }
+  input, select, textarea { font-size: 16px; }
+  #fab { display: flex; }
+  #canvas-wrap { padding: 8px; }
+  #toolbar { padding: 4px 8px; }
+}
+@media (max-width: 1000px) { #fab { display: flex; } :root { --sidebar: 230px; } }
+#fab { position: fixed; right: 10px; bottom: 46px; display: none; flex-direction: column; gap: 6px; z-index: 50; }
+#fab button { width: 48px; height: 48px; font-size: 20px; border-radius: 50%; border: 1px solid #555; background: rgba(255,255,255,.92); box-shadow: 0 2px 6px rgba(0,0,0,.4); cursor: pointer; }
+#home { position: fixed; inset: 0; background: #f1f2f4; z-index: 80; display: none; flex-direction: column; font-family: 'Segoe UI', Arial, sans-serif; }
+#htop { background: #fff; padding: 10px 20px; display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #ddd; }
+#htop .htab { border-bottom: 3px solid #5b4fcf; padding: 6px 4px; font-size: 14px; }
+#htop button { padding: 7px 12px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; }
+#htop .vb.on { background: #dfe3e8; }
+#hwrap { flex: 1; overflow: auto; }
+#hgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; padding: 20px; max-width: 1100px; margin: 0 auto; }
+.pcard { background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,.18); padding: 14px 10px 12px; cursor: pointer; position: relative; text-align: center; }
+.pcard:hover { box-shadow: 0 3px 10px rgba(0,0,0,.25); }
+.pcard .th { height: 110px; display: flex; align-items: center; justify-content: center; }
+.pcard .th img { max-width: 100%; max-height: 110px; border: 1px solid #eee; }
+.pcard .nm { font-weight: 600; margin-top: 8px; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pcard .dt { font-size: 11px; color: #888; margin-top: 2px; }
+.pcard .dots { position: absolute; top: 8px; right: 8px; width: 30px; height: 30px; border-radius: 50%; background: #1e73d8; color: #fff; border: none; font-size: 16px; cursor: pointer; }
+.pcard .big { font-size: 72px; line-height: 110px; font-weight: bold; }
+#hgrid.list { grid-template-columns: 1fr; }
+#hgrid.list .pcard { display: flex; align-items: center; text-align: left; gap: 14px; padding: 8px 52px 8px 12px; }
+#hgrid.list .th { height: 54px; width: 90px; flex: none; }
+#hgrid.list .th img { max-height: 54px; }
+#hgrid.list .big { font-size: 40px; line-height: 54px; }
+#hgrid.list .nm { margin-top: 0; }
+#cmenu { position: fixed; z-index: 90; background: #fff; border-radius: 6px; box-shadow: 0 4px 16px rgba(0,0,0,.3); min-width: 160px; padding: 4px 0; font: 14px 'Segoe UI', Arial, sans-serif; }
+#cmenu div { padding: 10px 16px; cursor: pointer; }
+#cmenu div:hover { background: #eef4fb; }
+#help { padding: 6px 15px; background: #ecf0f1; font-size: 12px; border-top: 1px solid #000; }
+#levels { display: none; background: #ecf0f1; padding: 6px 15px; gap: 6px; align-items: center; flex-wrap: wrap; border-bottom: 1px solid #000; font-size: 13px; }
+#levels .lv { padding: 5px 12px; border: 1px solid #999; background: #fff; cursor: pointer; border-radius: 3px; font-weight: bold; }
+#levels .lv.active { background: var(--accent); color: #fff; border-color: #21618c; }
+#levels .lvadd { background: #27ae60; color: #fff; border-color: #1e8449; }
+#cabbar { width: 100%; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 12px; }
+#cabbar select { padding: 3px; }
+#cabinfo { color: #555; }
+#pa { display: none; }
+#ov{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:99}
+.dlg{background:#fff;border-radius:8px;padding:18px 20px;min-width:300px;width:min(520px,94vw);max-width:94vw;max-height:92vh;max-height:92dvh;overflow:auto;box-shadow:0 8px 30px rgba(0,0,0,.4);font-size:14px}
+.dlg h4{margin:0 0 12px;font-size:15px}
+.dlg label{display:block;margin:8px 0}
+.dlg input[type=text],.dlg input:not([type]),.dlg select{padding:6px;max-width:100%}
+.dlg .qty{display:flex;gap:6px;margin-top:6px}
+.dlg .qty button{width:42px;font-size:22px;cursor:pointer}
+.dlg .qty input{width:80px;font-size:22px;text-align:center;font-weight:bold}
+.dlg .dbtn{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.dlg .dbtn button{padding:9px 18px;cursor:pointer;font-size:15px}
+.dlg .dok{background:#27ae60;color:#fff;border:1px solid #1e8449;font-weight:bold}
+.dlg small{color:#666;display:block;margin-top:8px}
+.dlg .chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px}
+.dlg .chip{min-width:44px;height:40px;font-size:17px;font-weight:bold;border:1px solid #888;background:#f4f6f8;border-radius:6px;cursor:pointer}
+.dlg .chip.on{background:#2980b9;color:#fff;border-color:#1b5e8a}
+.dlg .row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.dlg .full{width:100%;margin-top:4px}
+/* ---- Mod tabletă / ecran mic ---- */
+#chip { display: none; }
+body.small #sidebar { position: fixed; left: 0; top: 0; bottom: 0; z-index: 70; width: 230px; box-shadow: 4px 0 14px rgba(0,0,0,.45); }
+body.small #help { display: none; }
+body.small #chip { display: block; position: fixed; left: 10px; bottom: 10px; z-index: 50; background: rgba(44,62,80,.92); color: #fff; padding: 7px 12px; border-radius: 16px; font-size: 13px; font-weight: bold; max-width: 60vw; pointer-events: none; }
+body.small #fab { display: flex; flex-wrap: wrap; max-height: calc(100dvh - 70px); justify-content: flex-end; align-content: flex-end; bottom: 10px; }
+body.small #fab button { width: 46px; height: 46px; }
+body.small #canvas-wrap { padding: 4px; }
+@media print { #chip { display: none !important; } }
+@media print {
+  body { display: block; height: auto; background: #fff; overflow: visible; }
+  #sidebar, #toolbar, #help, #levels, #canvas-wrap, #fab, #home, #tbshow { display: none !important; }
+  #main { display: block; }
+  #pa { display: block; }
+  .pg { break-after: page; page-break-after: always; }
+  .pg:last-child { break-after: auto; page-break-after: auto; }
+  .pg h3 { font: bold 14px Arial; margin: 0 0 3mm; }
+  .pg canvas, .pg img { display: block; width: 100%; height: auto; max-height: 172mm; object-fit: contain; margin: 0 auto; }
+  @page { size: landscape; margin: 8mm; }
+}
+
+/* ================= Stil iOS (doar pe PC) ================= */
+@media screen {
+body.pc { font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif; background: #f2f2f7; color: #1c1c1e; -webkit-font-smoothing: antialiased; }
+body.pc * { scrollbar-width: thin; scrollbar-color: rgba(60,60,67,.3) transparent; }
+
+/* meniul din stânga */
+body.pc #sidebar { background: #f2f2f7; border-right: 1px solid rgba(60,60,67,.14); }
+body.pc #menu { padding-bottom: 20px; }
+body.pc .nav-tabs { background: rgba(118,118,128,.12); margin: 12px 12px 4px; padding: 2px; border-radius: 9px; gap: 2px; }
+body.pc .tab { color: #1c1c1e; border-radius: 7px; padding: 7px 4px; font-size: 12px; font-weight: 600; transition: background .15s; }
+body.pc .tab.active { background: #fff; color: #1c1c1e; box-shadow: 0 1px 3px rgba(0,0,0,.18), 0 0 1px rgba(0,0,0,.1); }
+body.pc .section-header { background: transparent; border: none; color: #6d6d72; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .4px; padding: 16px 18px 6px; }
+body.pc .grid { background: #fff; margin: 0 12px; padding: 6px; gap: 4px; border-radius: 12px; }
+body.pc .btn { background: transparent; border: none; border-radius: 9px; color: #3a3a3c; font-size: 11px; padding: 6px 2px; transition: background .12s; }
+body.pc .btn:hover { background: rgba(120,120,128,.1); }
+body.pc .btn.active { background: rgba(0,122,255,.14); color: #007aff; }
+body.pc .btn.danger.active { background: rgba(255,59,48,.14); color: #ff3b30; }
+
+/* bara de sus */
+body.pc #toolbar { background: rgba(255,255,255,.82); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(60,60,67,.14); padding: 8px 14px; gap: 8px; }
+body.pc #tbmore { border-top: 1px solid rgba(60,60,67,.1); }
+body.pc #toolbar b { font-weight: 600; color: #3a3a3c; }
+body.pc #toolbar button { background: rgba(120,120,128,.12); border: none; border-radius: 9px; color: #007aff; font-weight: 500; padding: 7px 12px; transition: background .12s, transform .08s; }
+body.pc #toolbar button:hover { background: rgba(120,120,128,.2); }
+body.pc #toolbar button:active { transform: scale(.97); }
+body.pc #toolbar button[onclick="generate()"] { background: #34c759 !important; color: #fff !important; font-weight: 600; }
+body.pc #toolbar button[onclick="showHome()"] { background: #007aff !important; color: #fff !important; font-weight: 600; }
+body.pc #toolbar button[onclick="clearAll()"] { color: #ff3b30 !important; }
+body.pc #toolbar input:not([type=checkbox]), body.pc #toolbar select { background: rgba(120,120,128,.12); border: none; border-radius: 8px; padding: 6px 10px; color: #1c1c1e; }
+body.pc #toolbar input:focus, body.pc #toolbar select:focus { outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0,122,255,.3); }
+body.pc #cid { width: 56px; text-align: center; font-weight: 700; color: #007aff; border: none; }
+body.pc #st { color: #007aff; background: rgba(0,122,255,.1); padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+body.pc #st:empty { display: none; }
+body.pc #cabinfo { color: #8e8e93; }
+
+/* zona de desen */
+body.pc #canvas-wrap { background: #e5e5ea; padding: 28px; }
+body.pc #c { border: none; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,.08), 0 12px 40px rgba(0,0,0,.12);
+  background-image: linear-gradient(#f0f0f5 1px, transparent 1px), linear-gradient(90deg, #f0f0f5 1px, transparent 1px); }
+body.pc #levels { background: rgba(255,255,255,.82); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(60,60,67,.14); padding: 8px 14px; gap: 8px; }
+body.pc #levels .lv { background: rgba(120,120,128,.12); border: none; border-radius: 999px; color: #007aff; font-weight: 600; padding: 6px 14px; }
+body.pc #levels .lvadd { background: rgba(52,199,89,.15); color: #248a3d; }
+body.pc #levels .lv.active { background: #007aff; color: #fff; }
+body.pc #help { background: rgba(255,255,255,.82); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-top: 1px solid rgba(60,60,67,.14); color: #6d6d72; padding: 8px 16px; }
+
+/* ferestre */
+body.pc #ov { background: rgba(0,0,0,.3); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+body.pc .dlg { border-radius: 18px; padding: 22px 22px 18px; box-shadow: 0 20px 60px rgba(0,0,0,.3); }
+body.pc .dlg h4 { font-size: 17px; font-weight: 600; text-align: center; margin-bottom: 14px; }
+body.pc .dlg input:not([type=checkbox]):not([type=file]), body.pc .dlg select, body.pc .dlg textarea { background: rgba(120,120,128,.12); border: none; border-radius: 9px; padding: 8px 10px; }
+body.pc .dlg input:focus, body.pc .dlg select:focus, body.pc .dlg textarea:focus { outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(0,122,255,.3); }
+body.pc .dlg .dbtn button { border: none; border-radius: 10px; background: rgba(120,120,128,.12); color: #007aff; font-weight: 500; }
+body.pc .dlg .dbtn .dok { background: #007aff; color: #fff; font-weight: 600; }
+body.pc .dlg .chip { border: none; background: rgba(120,120,128,.12); border-radius: 10px; color: #1c1c1e; }
+body.pc .dlg .chip.on { background: #007aff; color: #fff; }
+body.pc .dlg .qty button { border: none; border-radius: 10px; background: rgba(120,120,128,.12); color: #007aff; }
+body.pc .dlg small { color: #8e8e93; }
+
+/* galeria de proiecte */
+body.pc #home { background: #f2f2f7; font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui, sans-serif; }
+body.pc #htop { background: rgba(255,255,255,.82); -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(60,60,67,.14); }
+body.pc #htop .htab { border-bottom-color: #007aff; font-weight: 600; }
+body.pc #htop button { border: none; background: rgba(120,120,128,.12); color: #007aff; border-radius: 9px; }
+body.pc #htop .vb.on { background: #007aff; color: #fff; }
+body.pc .pcard { border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.06); transition: transform .15s, box-shadow .15s; }
+body.pc .pcard:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(0,0,0,.14); }
+body.pc .pcard .dots { background: rgba(120,120,128,.16); color: #007aff; }
+body.pc #cmenu { border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.2); }
+}
+/* ===== INTERFAȚĂ iOS PRO – suprascrie aspectul de mai sus ===== */
+
+@media screen {
+
+/* ---------- Variabile de design ---------- */
+:root {
+  --ios-blue: #007aff;
+  --ios-blue-soft: rgba(0,122,255,.12);
+  --ios-green: #34c759;
+  --ios-red: #ff3b30;
+  --ios-bg: #f2f2f7;
+  --ios-card: #ffffff;
+  --ios-fill: rgba(120,120,128,.12);
+  --ios-fill-2: rgba(120,120,128,.2);
+  --ios-sep: rgba(60,60,67,.16);
+  --ios-label: #1c1c1e;
+  --ios-label-2: #6d6d72;
+  --ios-glass: rgba(249,249,251,.78);
+  --ios-font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --ios-ease: cubic-bezier(.2,.8,.2,1);
+  --accent: var(--ios-blue);
+}
+
+html body {
+  font-family: var(--ios-font);
+  background: var(--ios-bg);
+  color: var(--ios-label);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  letter-spacing: -.005em;
+}
+html body * { scrollbar-width: thin; scrollbar-color: rgba(60,60,67,.28) transparent; }
+html body ::-webkit-scrollbar { width: 8px; height: 8px; }
+html body ::-webkit-scrollbar-thumb { background: rgba(60,60,67,.25); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
+
+/* ---------- Meniul din stânga (sidebar) ---------- */
+html body #sidebar {
+  background: var(--ios-bg);
+  border-right: 1px solid var(--ios-sep);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+html body.small #sidebar {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(28px);
+  backdrop-filter: saturate(180%) blur(28px);
+  box-shadow: 8px 0 40px rgba(0,0,0,.22);
+  border-right: 1px solid var(--ios-sep);
+  border-radius: 0 20px 20px 0;
+}
+html body #menu { padding-bottom: 28px; }
+
+/* Tab-urile = segmented control iOS */
+html body .nav-tabs {
+  position: sticky; top: 0; z-index: 5;
+  background: var(--ios-fill);
+  margin: 12px 12px 6px; padding: 2px; gap: 2px;
+  border-radius: 10px;
+}
+html body .tab {
+  background: transparent; color: var(--ios-label);
+  border-radius: 8px; padding: 8px 4px;
+  font: 600 12px var(--ios-font); letter-spacing: -.01em;
+  transition: background .25s var(--ios-ease), box-shadow .25s var(--ios-ease), transform .12s;
+}
+html body .tab:active { transform: scale(.97); }
+html body .tab.active {
+  background: #fff; color: var(--ios-label);
+  box-shadow: 0 3px 8px rgba(0,0,0,.12), 0 1px 1px rgba(0,0,0,.08);
+}
+
+/* Titluri de secțiune */
+html body .section-header {
+  background: transparent; border: none;
+  color: var(--ios-label-2);
+  font: 600 11.5px var(--ios-font);
+  text-transform: uppercase; letter-spacing: .6px;
+  padding: 18px 20px 7px;
+}
+
+/* Cartonașele cu unelte = grupuri inset iOS */
+html body .grid {
+  background: var(--ios-card);
+  margin: 0 12px; padding: 8px; gap: 6px;
+  border-radius: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 0 0 .5px rgba(60,60,67,.08);
+}
+html body .btn {
+  background: transparent; border: none; border-radius: 12px;
+  color: #3a3a3c; font: 500 10.5px var(--ios-font);
+  padding: 8px 2px 6px; gap: 3px; line-height: 1.15;
+  text-align: center;
+  transition: background .18s var(--ios-ease), transform .12s var(--ios-ease), box-shadow .2s;
+}
+html body .btn canvas { width: 38px; height: 38px; transition: transform .2s var(--ios-ease); }
+html body .btn:hover { background: var(--ios-fill); }
+html body .btn:hover canvas { transform: scale(1.06); }
+html body .btn:active { transform: scale(.93); background: var(--ios-fill-2); }
+html body .btn.active {
+  background: var(--ios-blue-soft); color: var(--ios-blue);
+  box-shadow: inset 0 0 0 1.5px rgba(0,122,255,.55);
+  font-weight: 600;
+}
+html body .btn.danger.active {
+  background: rgba(255,59,48,.12); color: var(--ios-red);
+  box-shadow: inset 0 0 0 1.5px rgba(255,59,48,.55);
+}
+
+/* ---------- Bara de sus (toolbar) ---------- */
+html body #toolbar {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(28px);
+  backdrop-filter: saturate(180%) blur(28px);
+  border-bottom: 1px solid var(--ios-sep);
+  padding: 8px 14px; gap: 8px;
+  font: 500 13px var(--ios-font);
+  position: relative; z-index: 20;
+}
+html body #tbmore { border-top: 1px solid var(--ios-sep); padding-top: 8px; }
+html body #toolbar b { font-weight: 600; color: var(--ios-label-2); font-size: 12px; }
+html body #pcur { color: var(--ios-label); font-size: 14px; font-weight: 700; letter-spacing: -.02em; }
+
+/* Butoane de bară = pastile „tinted” iOS */
+html body #toolbar button {
+  font: 600 13px var(--ios-font);
+  background: var(--ios-fill); color: var(--ios-blue);
+  border: none; border-radius: 11px;
+  padding: 7px 13px; min-height: 34px;
+  transition: background .15s, transform .1s var(--ios-ease), box-shadow .2s;
+}
+html body #toolbar button:hover { background: var(--ios-fill-2); }
+html body #toolbar button:active { transform: scale(.95); background: var(--ios-fill-2); }
+
+/* Butoane principale (au stil inline, de aceea !important) */
+html body #toolbar button[onclick="showHome()"] {
+  background: linear-gradient(180deg,#2f8bff,#007aff) !important; color: #fff !important;
+  box-shadow: 0 2px 8px rgba(0,122,255,.38);
+}
+html body #toolbar button[onclick="generate()"] {
+  background: linear-gradient(180deg,#3fd763,#2fb94f) !important; color: #fff !important;
+  box-shadow: 0 2px 8px rgba(52,199,89,.38);
+}
+html body #toolbar button[onclick="clearAll()"] { color: var(--ios-red) !important; background: rgba(255,59,48,.1); }
+html body #bpan[style*="241"], html body #bpan[style*="f1c40f"] { background: #ffcc00 !important; color: #1c1c1e; }
+
+/* Butoanele cu simbol scurt (↶ ↻ － ＋ ⤢ ▲) = pătrate rotunjite */
+html body #toolbar button[onclick="undo()"], html body #toolbar button[onclick="rotate()"],
+html body #toolbar button[onclick^="zoom"], html body #toolbar button[onclick="toggleBar()"] {
+  min-width: 36px; padding: 7px 10px; font-size: 16px; font-weight: 500;
+}
+
+/* Câmpuri */
+html body #toolbar input:not([type=checkbox]), html body #toolbar select {
+  background: var(--ios-fill); border: none; border-radius: 10px;
+  padding: 7px 11px; min-height: 34px; color: var(--ios-label);
+  font: 500 13px var(--ios-font);
+  transition: background .15s, box-shadow .15s;
+}
+html body #toolbar input:focus, html body #toolbar select:focus {
+  outline: none; background: #fff; box-shadow: 0 0 0 3.5px rgba(0,122,255,.3);
+}
+html body #toolbar input[type=checkbox], html body .dlg input[type=checkbox] { accent-color: var(--ios-blue); width: 18px; height: 18px; vertical-align: -4px; }
+html body #cid { width: 56px; text-align: center; font-weight: 800; color: var(--ios-blue); border: none; font-size: 15px; }
+html body #cloud { color: var(--ios-green) !important; font-size: 11.5px; font-weight: 600; }
+html body #st {
+  color: var(--ios-blue); background: var(--ios-blue-soft);
+  padding: 5px 13px; border-radius: 999px;
+  font: 600 12px var(--ios-font);
+}
+html body #st:empty { display: none; }
+html body #cabbar { color: var(--ios-label-2); }
+html body #cabinfo { color: #8e8e93; }
+
+/* Buton „Bara” când bara e ascunsă */
+html body #tbshow {
+  background: var(--ios-glass); color: var(--ios-blue);
+  -webkit-backdrop-filter: blur(20px); backdrop-filter: blur(20px);
+  border: .5px solid var(--ios-sep); border-radius: 999px;
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  font: 700 13px var(--ios-font); padding: 9px 16px;
+}
+
+/* ---------- Niveluri (Parter / Etaj ...) ---------- */
+html body #levels {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(28px); backdrop-filter: saturate(180%) blur(28px);
+  border-bottom: 1px solid var(--ios-sep);
+  padding: 8px 14px; gap: 8px; font: 600 12px var(--ios-font);
+}
+html body #levels .lv {
+  background: var(--ios-fill); color: var(--ios-blue);
+  border: none; border-radius: 999px; padding: 6px 15px;
+  font: 600 13px var(--ios-font);
+  transition: background .15s, transform .1s;
+}
+html body #levels .lv:active { transform: scale(.95); }
+html body #levels .lv.active { background: var(--ios-blue); color: #fff; box-shadow: 0 2px 8px rgba(0,122,255,.35); }
+html body #levels .lvadd { background: rgba(52,199,89,.16); color: #1f8a3a; }
+
+/* ---------- Zona de desen ---------- */
+html body #canvas-wrap { background: #e4e4ea; padding: 26px; }
+html body #c {
+  border: none; border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08), 0 14px 44px rgba(0,0,0,.16);
+  background-image: linear-gradient(#efeff4 1px, transparent 1px), linear-gradient(90deg, #efeff4 1px, transparent 1px);
+}
+
+/* Bara de ajutor jos */
+html body #help {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(28px); backdrop-filter: saturate(180%) blur(28px);
+  border-top: 1px solid var(--ios-sep);
+  color: var(--ios-label-2); font: 500 12px var(--ios-font);
+  padding: 9px 18px calc(9px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Butoane plutitoare (tabletă) ---------- */
+html body #fab button {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(20px); backdrop-filter: saturate(180%) blur(20px);
+  border: .5px solid var(--ios-sep); color: var(--ios-label);
+  box-shadow: 0 4px 14px rgba(0,0,0,.2), 0 1px 2px rgba(0,0,0,.1);
+  transition: transform .12s var(--ios-ease), background .15s;
+}
+html body #fab button:active { transform: scale(.9); }
+html body #fab { padding-bottom: env(safe-area-inset-bottom); }
+html body #chip {
+  background: rgba(28,28,30,.82);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  color: #fff; font: 600 13px var(--ios-font);
+  border-radius: 999px; padding: 8px 15px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.3);
+}
+
+/* ---------- Ferestre (dialoguri) = sheet iOS ---------- */
+html body #ov {
+  background: rgba(0,0,0,.32);
+  -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+  animation: iosFade .2s ease-out;
+}
+html body .dlg {
+  background: rgba(255,255,255,.96);
+  border-radius: 20px; padding: 24px 22px 18px;
+  box-shadow: 0 24px 70px rgba(0,0,0,.35), 0 0 0 .5px rgba(0,0,0,.08);
+  font: 400 14px var(--ios-font);
+  animation: iosPop .28s var(--ios-ease);
+}
+html body .dlg h4 { font: 700 17px var(--ios-font); text-align: center; margin: 0 0 16px; letter-spacing: -.02em; }
+html body .dlg label { color: var(--ios-label); font-weight: 500; }
+html body .dlg input:not([type=checkbox]):not([type=file]), html body .dlg select, html body .dlg textarea {
+  background: var(--ios-fill); border: none; border-radius: 10px;
+  padding: 9px 12px; color: var(--ios-label);
+  transition: background .15s, box-shadow .15s;
+}
+html body .dlg input:focus, html body .dlg select:focus, html body .dlg textarea:focus {
+  outline: none; background: #fff; box-shadow: 0 0 0 3.5px rgba(0,122,255,.3);
+}
+html body .dlg .dbtn { gap: 10px; margin-top: 20px; }
+html body .dlg .dbtn button {
+  flex: 1; border: none; border-radius: 12px; padding: 12px 18px;
+  background: var(--ios-fill); color: var(--ios-blue);
+  font: 600 15px var(--ios-font);
+  transition: transform .1s, background .15s;
+}
+html body .dlg .dbtn button:active { transform: scale(.96); }
+html body .dlg .dbtn .dok { background: var(--ios-blue); color: #fff; box-shadow: 0 3px 10px rgba(0,122,255,.38); }
+html body .dlg .chip { border: none; background: var(--ios-fill); border-radius: 12px; color: var(--ios-label); transition: transform .1s, background .15s; }
+html body .dlg .chip:active { transform: scale(.92); }
+html body .dlg .chip.on { background: var(--ios-blue); color: #fff; box-shadow: 0 2px 8px rgba(0,122,255,.38); }
+html body .dlg .qty button { border: none; border-radius: 12px; background: var(--ios-fill); color: var(--ios-blue); }
+html body .dlg small { color: #8e8e93; line-height: 1.4; }
+@keyframes iosPop { from { opacity: 0; transform: scale(.94) translateY(8px); } to { opacity: 1; transform: none; } }
+@keyframes iosFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* ---------- Galeria de proiecte ---------- */
+html body #home { background: var(--ios-bg); font-family: var(--ios-font); }
+html body #htop {
+  background: var(--ios-glass);
+  -webkit-backdrop-filter: saturate(180%) blur(28px); backdrop-filter: saturate(180%) blur(28px);
+  border-bottom: 1px solid var(--ios-sep);
+  padding: 12px 22px calc(12px); padding-top: calc(12px + env(safe-area-inset-top));
+}
+html body #htop .hlogo { font-size: 17px; font-weight: 800; letter-spacing: -.02em; }
+html body #htop .htab { border-bottom: none; background: var(--ios-blue-soft); color: var(--ios-blue); border-radius: 999px; padding: 5px 14px; font-weight: 600; font-size: 13px; }
+html body #htop button {
+  border: none; background: var(--ios-fill); color: var(--ios-blue);
+  border-radius: 10px; padding: 8px 14px; font: 600 13px var(--ios-font);
+  transition: transform .1s, background .15s;
+}
+html body #htop button:active { transform: scale(.95); }
+html body #htop .vb.on { background: var(--ios-blue); color: #fff; }
+html body #hgrid { gap: 18px; padding: 26px 22px; }
+html body .pcard {
+  border-radius: 20px; background: var(--ios-card);
+  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 6px 20px rgba(0,0,0,.07);
+  transition: transform .22s var(--ios-ease), box-shadow .22s var(--ios-ease);
+}
+html body .pcard:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,.16); }
+html body .pcard:active { transform: scale(.97); }
+html body .pcard .th img { border-radius: 10px; border: .5px solid var(--ios-sep); }
+html body .pcard .nm { font-weight: 700; letter-spacing: -.01em; }
+html body .pcard .dt { color: #8e8e93; }
+html body .pcard .big { color: var(--ios-blue); font-weight: 300; }
+html body .pcard .dots { background: var(--ios-fill); color: var(--ios-blue); }
+html body #cmenu {
+  background: rgba(255,255,255,.92);
+  -webkit-backdrop-filter: saturate(180%) blur(24px); backdrop-filter: saturate(180%) blur(24px);
+  border-radius: 14px; padding: 6px;
+  box-shadow: 0 14px 40px rgba(0,0,0,.28), 0 0 0 .5px rgba(0,0,0,.08);
+  font: 500 14px var(--ios-font);
+  animation: iosPop .18s var(--ios-ease);
+}
+html body #cmenu div { border-radius: 9px; padding: 10px 14px; }
+html body #cmenu div:hover { background: var(--ios-blue); color: #fff; }
+html body #cmenu div:last-child { color: var(--ios-red); }
+html body #cmenu div:last-child:hover { background: var(--ios-red); color: #fff; }
+
+/* ---------- Atingere (tabletă / telefon) ---------- */
+@media (pointer: coarse) {
+  html body #toolbar button, html body #toolbar input:not([type=checkbox]), html body #toolbar select { min-height: 42px; border-radius: 12px; }
+  html body .btn { padding: 10px 2px 8px; }
+  html body .tab { padding: 13px 4px; font-size: 13px; }
+  html body #fab button { width: 50px; height: 50px; }
+  html body .dlg .dbtn button { padding: 14px 18px; }
+}
+
+}
+body.small * { -webkit-backdrop-filter: none !important; backdrop-filter: none !important; }
+</style>
+</head>
+<body>
+
+<div id="home">
+  <div id="htop"><b class="hlogo">⚡ Proiect electric</b><span class="htab">Proiecte</span><span id="hcloud"></span><span style="flex:1"></span>
+    <button id="bgrid" class="vb on" onclick="setView(false)" title="Cartonașe">▦</button><button id="blist" class="vb" onclick="setView(true)" title="Listă">☰</button>
+    <button id="hback" onclick="hideHome()">↩ Înapoi la desen</button></div>
+  <div id="hwrap"><div id="hgrid"></div></div>
+</div>
+<div id="sidebar">
+  <div class="nav-tabs">
+    <button class="tab active" id="t1" onclick="switchPage(1)">PAG 1: UNIFILAR</button>
+    <button class="tab" id="t2" onclick="switchPage(2)">PAG 2: PLAN CASĂ</button>
+  </div>
+  <div id="menu"></div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <div id="tbmain">
+      <button onclick="showHome()" style="background:#2c3e50;color:#fff;font-weight:bold" title="Toate proiectele">🏠 Proiecte</button>
+      <b id="pcur" style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b>
+      <span id="cloud" style="color:#27ae60;font-size:12px"></span>
+      <span class="p1only"><b>ID:</b> <input type="text" id="cid" value="A"></span>
+      <button onclick="generate()" style="background:#27ae60;color:#fff;font-weight:bold" title="Generează unifilar din plan">⚡ Generează</button>
+      <button onclick="undo()" title="Anulează (Ctrl+Z)">↶</button>
+      <button onclick="rotate()" title="Rotește (R)">↻</button>
+<button onclick="zoomBy(0.8)" title="Micșorează">－</button><button onclick="zoomBy(1.25)" title="Mărește">＋</button><button onclick="zoomFit()" title="Încadrează pagina">⤢</button>
+      <button id="bpan" onclick="togglePan()" title="Când e pornit, atingi și tragi ca să muți pagina / ciupești ca să mărești (nu desenezi)">✋ Deplasare: OFF</button>
+      <button id="bmore" onclick="toggleMore()">▾ Mai multe</button>
+      <button onclick="toggleBar()" title="Ascunde bara de sus">▲</button>
+      <span id="st"></span>
+    </div>
+    <div id="tbmore">
+      <span class="p1only"><b>Cablu:</b> <input id="cab" list="cabs" placeholder="ex. EXVB 4x16" size="12"></span>
+      <span class="p1only"><b>Aparat:</b> <input id="app" list="apps" value="3kA|4P - C 16A|LEGRAND" size="24" title="Rândurile se separă cu | sau +"></span>
+      <datalist id="cabs"><option value="EXVB 4x16"><option value="XGB 5G4"><option value="VOB 3G2,5"><option value="VOB 3G1,5"><option value="XGB 3G2,5"></datalist>
+      <datalist id="apps"></datalist>
+      <span class="p1only"><b>Pozare:</b> <select id="cplace" onchange="setPlace(this.value)" title="Cum e pozat cablul: se aplică cablurilor noi și celor generate"></select></span>
+      <button onclick="cfgStart()" title="Alege ce conține lanțul de intrare: contor, separator, diferențial 300mA...">⚙ Branșament</button>
+      <button onclick="toggleMenu()" title="Ascunde/arată meniul din stânga (loc mai mult pe tabletă)">☰ Meniu</button>
+      <label title="Linie oblică (pe calculator: ține Alt apăsat)"><input type="checkbox" id="obl"> Oblic</label>
+      <button onclick="exportPNG()">🖼️ PNG</button>
+      <button onclick="editCartus()" title="Datele din chenarul de la tipărire: adresă, instalator">📋 Cartuș</button>
+      <button onclick="printNow()" title="Tipărește/salvează PDF cu unifilarul și toate nivelurile planului">🖨️ PDF</button>
+      <button onclick="clearAll()" style="color:red">Reset pagina</button>
+      <div id="cabbar" class="p1only"></div>
+    </div>
+  </div>
+  <button id="tbshow" onclick="toggleBar()" title="Arată bara de sus">▼ Bara</button>
+  <div id="levels"></div>
+  <div id="canvas-wrap"><canvas id="c" width="1100" height="900"></canvas></div>
+  <div id="pa"></div>
+  <div id="chip"></div><div id="fab"><button onclick="showHome()" title="Proiecte">🏠</button><button onclick="zoomBy(1.25)" title="Mărește">＋</button><button onclick="zoomBy(0.8)" title="Micșorează">－</button><button onclick="zoomFit()" title="Încadrează pagina">⤢</button><button onclick="undo()" title="Anulează">↶</button><button onclick="rotate()" title="Rotește">↻</button><button onclick="quickLink()" title="Leagă / setează circuitul">🔗</button><button onclick="generate()" title="Generează unifilar">⚡</button><button onclick="setMode('nav')" title="Navigare">☝</button><button id="fsticky" onclick="toggleSticky()" title="Păstrează unealta activă">🔒</button><button id="fpan" onclick="togglePan()" title="Deplasare">✋</button><button onclick="toggleMenu()" title="Meniu stânga">☰</button><button onclick="toggleBar()" title="Bara de sus">⚙</button></div>
+  <div id="help"></div>
+</div>
+
+<script>
+/* Legătura cu Google (Apps Script + Sheet) când pagina rulează pe GitHub Pages.
+   Imită google.script.run, deci restul aplicației merge neschimbat. */
+(function () {
+  if (window.google && google.script && google.script.run) return;   // rulează chiar în Apps Script -> nu e nevoie
+  var URL = "https://script.google.com/macros/library/d/1m8NwcNWZl--SQIJN2wf5c58k9xhrV6pYFZ403xHNrbJBS3usH7C9pJVN/1";
+  function make(ok, err) {
+    return new Proxy({}, { get: function (_, fn) {
+      if (fn === 'withSuccessHandler') return function (f) { return make(f, err); };
+      if (fn === 'withFailureHandler') return function (f) { return make(ok, f); };
+      return function () {
+        var args = Array.prototype.slice.call(arguments);
+        fetch(URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: args }) })
+          .then(function (r) { return r.json(); })
+          .then(function (j) { if (j.error) throw new Error(j.error); if (ok) ok(j.result); })
+          .catch(function (e) { if (err) err(e); else console.error(e); });
+      };
+    } });
+  }
+  window.google = { script: { run: make(null, null) } };
+})();
+</script>
+<script>
+const cv = document.getElementById('c'), ct = cv.getContext('2d');
+const G = 10;                                   // pasul de aliniere (px)
+let plans = [{ name:'Parter', items:[] }], lvl = 0;   // planul casei: mai multe niveluri
+const pages = { 1: [] };                        // pagina 1 = unifilar; pagina 2 = nivelul curent din plan
+Object.defineProperty(pages, 2, { get: () => plans[lvl].items, set: v => { plans[lvl].items = v; }, enumerable: false });
+const ALLP = () => plans.flatMap(p => p.items);
+let U = {}, linkFrom = null, resizing = null;
+let circCfg = {};                                // per circuit: { A:{cab:'VOB 3G2,5', pl:'incastrat', app:'3kA|2P - C 16A|LEGRAND'} }
+let cabPlace = '';                               // pozarea cablului (pagina 1): '', subteran, aerian, incastrat, perete
+const PLACE = [['','Nedeterminat'],['subteran','Subteran'],['aerian','Aerian'],['incastrat','Încastrat în perete'],['perete','Pe perete']];
+const PLN = { subteran:'subteran', aerian:'aerian', incastrat:'încastrat în perete', perete:'pe perete' };
+let TB = [], noRec = false, drag = null, hoverRec = null;     // casete de text (pentru „Mută text”)
+let startOpts = { brk:true, meter:true, sect:false, diff:true };   // ce conține lanțul de intrare
+let currentPage = 1, md = 'u_wire', rot = 0, start = null, mouse = null;
+const isCoarse = () => { try { return matchMedia('(pointer: coarse)').matches; } catch (_) { return false; } };
+
+/* ---------- Unelte ---------- */
+// type 'line' = se desenează cu tragere; 'sym' = un clic plasează simbolul
+const TOOLS = {
+  1: [
+    ['NAVIGARE', [ ['nav','☝ Navigare','nav'] ]],
+    ['INTRARE ȘI PROTECȚIE', [
+      ['u_start','Branșament complet','sym'], ['u_earth','Împământare','sym'], ['u_ground','Priză pământ','sym'], ['u_feed','Branșament','line'],
+      ['u_meter','Contor kWh','sym'], ['u_sect','Separator','sym'], ['u_diff_g','Dif. general','sym'], ['u_bus','Bară cupru','line'], ['u_wire','Cablu','line'] ]],
+    ['CIRCUITE (A, B, C...)', [
+      ['u_mcb','Disjunctor','sym'], ['u_lamp','Plecare bec','sym'], ['u_sock','Plecare priză','sym'], ['u_vov','Plecare motor','sym'] ]],
+    ['PE RÂND (simboluri unifilar)', [
+      ['u_x','Bec (X)','sym'], ['e_sock','Priză','sym'], ['e_sw','Întrerup.','sym'], ['e_sw2','Într. dublu','sym'], ['e_swvv','Vai-vien','sym'], ['e_swx','Cruce','sym'] ]],
+    ['TEXT', [ ['text','Text','sym'], ['move','Mută text','move'], ['edit','Editează','edit'], ['erase','Șterge','erase'] ]]
+  ],
+  2: [
+    ['NAVIGARE', [ ['nav','☝ Navigare','nav'] ]],
+    ['STRUCTURĂ', [
+      ['wall','Perete','line'], ['door','Ușă','sym'], ['window','Fereastră','sym'],
+      ['stair','Scară dreaptă','sym'], ['stair_r','Scară rotundă','sym'], ['resize','Redimensionează','resize'] ]],
+    ['ILUMINAT', [
+      ['lp_x','Lampă','sym'], ['lp_spot','Spot','sym'], ['lp_neon','Neon','sym'], ['fan','Ventilator','sym'] ]],
+    ['PRIZE ȘI COMUTARE', [
+      ['sk_1','Priză','sym'], ['sk_2','Priză dublă','sym'], ['sk_ip','Priză IP44','sym'], ['sk_3','Priză trifazată','sym'],
+      ['sw_1','Întrerup.','sym'], ['sw_2','Întrerup. dublu','sym'], ['sw_b','Bipolar','sym'], ['sw_c','Vai-vien','sym'], ['sw_x','Cruce','sym'] ]],
+    ['CIRCUITE (LEGĂTURI)', [ ['link','Leagă / Circuit','link'], ['edit','Editează','edit'] ]],
+    ['ALTELE', [
+      ['panel','Tablou','sym'], ['jb','Doză','sym'], ['motor','Motor','sym'], ['text','Text','sym'], ['move','Mută text','move'], ['erase','Șterge','erase'] ]]
+  ]
+};
+const kindOf = k => { for (const p of [1,2]) for (const s of TOOLS[p]) for (const t of s[1]) if (t[0]===k) return t[2]; };
+const nameOf = k => { for (const p of [1,2]) for (const s of TOOLS[p]) for (const t of s[1]) if (t[0]===k) return t[1]; };
+
+/* ---------- Simboluri (desenate în jurul lui 0,0) ---------- */
+const S = {
+  u_meter: c => { c.strokeRect(-20,-15,40,30); c.fillText('kWh',-12,4); },
+  u_diff_g: c => brk(c),
+  u_earth: c => { c.beginPath(); c.moveTo(0,0); c.lineTo(10,0); c.moveTo(0,-10); c.lineTo(0,10); c.moveTo(-5,-7); c.lineTo(-5,7); c.moveTo(-10,-4); c.lineTo(-10,4); c.stroke(); },
+  u_start: c => {},
+  u_ground: c => {                   // priză de pământ: din bară în jos, 2 condensatoare, pământ (0,0 = punctul de pe bară)
+    c.beginPath();
+    c.moveTo(0,0); c.lineTo(0,20); c.moveTo(-14,20); c.lineTo(14,20); c.moveTo(-14,26); c.lineTo(14,26);
+    c.moveTo(0,26); c.lineTo(0,60); c.moveTo(-14,60); c.lineTo(14,60); c.moveTo(-14,66); c.lineTo(14,66);
+    c.moveTo(0,66); c.lineTo(0,100); c.moveTo(-14,100); c.lineTo(14,100); c.moveTo(-9,106); c.lineTo(9,106); c.moveTo(-4,112); c.lineTo(4,112);
+    c.stroke();
+  },
+  u_mcb: (c, it) => brk(c, it && it.L),
+  u_sect: c => { vline(c,0,10); c.beginPath(); c.moveTo(0,10); c.lineTo(10,24); c.moveTo(-6,24); c.lineTo(6,24); c.moveTo(0,24); c.lineTo(0,40); c.stroke(); },   // separator (sectioner)
+  // simboluri pe rând de unifilar: se desenează pe linia orizontală, originea = punctul de pe linie
+    e_sock:   (c, it) => { const n = (it && it.n) || 1; c.beginPath(); for (let i = 0; i < n; i++) c.arc(10 + 9*i, 0, 10, Math.PI/2, Math.PI*1.5); c.stroke(); },
+    e_sockm:  (c, it) => { const n = (it && it.n) || 1; c.beginPath(); c.moveTo(0, 0); c.lineTo(10 + 12*(n-1), 0); c.stroke();
+      for (let i = 0; i < n; i++) { c.beginPath(); c.arc(10 + 12*i, 0, 10, Math.PI/2, Math.PI*1.5); c.stroke(); } },   // tijă comună + n arcuri
+  e_sockh:  c => { c.beginPath(); c.arc(10,0,10,Math.PI/2,Math.PI*1.5); c.stroke(); c.save(); c.font = 'bold 10px Arial'; c.textAlign = 'center'; c.fillText('h',4,-13); c.restore(); },   // semietanșă
+  e_sock3:  (c, it) => { const n = (it && it.n) || 1; c.beginPath(); for (let i = 0; i < n; i++) c.arc(10 + 9*i, 0, 10, Math.PI/2, Math.PI*1.5); c.stroke();
+                         c.beginPath(); [-8,-4,0].forEach(x => { c.moveTo(x-2.5,3.5); c.lineTo(x+2.5,-3.5); }); c.stroke(); },
+  e_sw:     c => { eswBase(c); eflag(c,11,-11,1); },
+  e_sw2:    c => { eswBase(c); eflag(c,11,-11,1); eflag(c,8,-14,1); },
+  e_swvv:   c => { eswBase(c); eflag(c,11,-11,1); eflag(c,11,-11,-1); },
+  e_swx:    c => { eswBase(c); eflag(c,11,-11,1); eflag(c,11,-11,-1); eflag(c,6,-6,1); eflag(c,6,-6,-1); },
+  u_lamp: c => { vline(c,0,20); c.beginPath(); c.arc(0,30,10,0,7); c.moveTo(-7,23); c.lineTo(7,37); c.moveTo(7,23); c.lineTo(-7,37); c.stroke(); },
+  u_sock: c => { vline(c,0,22); c.beginPath(); c.arc(0,22,9,Math.PI,0,true); c.stroke(); c.beginPath(); c.moveTo(-9,22); c.lineTo(9,22); c.stroke(); },
+  u_vov:  c => { vline(c,0,20); c.beginPath(); c.arc(0,32,12,0,7); c.stroke(); c.save(); c.scale(1,-1); c.font='bold 13px Arial'; c.fillText('M',-5,-27); c.restore(); },
+  door: (c, it) => { if (it && it.fx) { c.translate(40,0); c.scale(-1,1); } if (it && it.fy) c.scale(1,-1);
+    c.globalCompositeOperation='destination-out'; c.fillRect(0,-6,40,12); c.globalCompositeOperation='source-over';
+    c.lineWidth=2; c.beginPath(); c.moveTo(0,0); c.lineTo(0,-40); c.stroke(); c.lineWidth=1; c.beginPath(); c.arc(0,0,40,-Math.PI/2,0); c.stroke(); },
+  window: c => { c.globalCompositeOperation='destination-out'; c.fillRect(0,-6,50,12); c.globalCompositeOperation='source-over';
+    c.lineWidth=1.5; c.strokeRect(0,-4,50,8); c.beginPath(); c.moveTo(0,0); c.lineTo(50,0); c.stroke(); },
+  stair: (c, it) => {                // scară dreaptă: pornește din 0,0 spre „sus”, n trepte de 10px
+    const n = (it && it.n) || 8, L = n*10, hh = Math.min(12, L-12);
+    c.fillStyle = '#fff'; c.fillRect(-20,-L,40,L);
+    c.strokeStyle = '#999'; c.lineWidth = 1; c.strokeRect(-20,-L,40,L);
+    c.beginPath(); for (let y = -10; y > -L; y -= 10) { c.moveTo(-20,y); c.lineTo(20,y); } c.stroke();
+    c.fillStyle = '#999';
+    c.beginPath(); c.moveTo(0,-5); c.lineTo(0,-(L-3-hh)); c.stroke();
+    c.beginPath(); c.moveTo(0,-(L-3)); c.lineTo(-6,-(L-3-hh)); c.lineTo(6,-(L-3-hh)); c.closePath(); c.fill();
+    c.beginPath(); c.arc(0,-5,3,0,7); c.fill();
+  },
+  stair_r: (c, it) => {              // scară rotundă centrată pe 0,0, raza r
+    const R = (it && it.r) || 45, r0 = Math.min(8, R/4), ar = R*0.62, a = Math.PI*1.75;
+    c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,R,0,7); c.fill();
+    c.strokeStyle = '#999'; c.lineWidth = 1;
+    c.beginPath(); c.arc(0,0,R,0,7); c.stroke();
+    c.beginPath(); c.arc(0,0,r0,0,7); c.stroke();
+    c.beginPath(); for (let i = 0; i < 16; i++) { const t = i*Math.PI/8; c.moveTo(r0*Math.cos(t),r0*Math.sin(t)); c.lineTo(R*Math.cos(t),R*Math.sin(t)); } c.stroke();
+    c.beginPath(); c.arc(0,0,ar,Math.PI/2,a); c.stroke();
+    c.fillStyle = '#999'; c.beginPath(); c.arc(0,ar,4,0,7); c.fill();
+    c.save(); c.translate(ar*Math.cos(a), ar*Math.sin(a)); c.rotate(a + Math.PI/2); c.beginPath(); c.moveTo(0,-7); c.lineTo(-5,5); c.lineTo(5,5); c.closePath(); c.fill(); c.restore();
+  },
+  u_x: c => { c.beginPath(); c.moveTo(-8,-8); c.lineTo(8,8); c.moveTo(8,-8); c.lineTo(-8,8); c.stroke(); },
+  lp_x:   c => { c.beginPath(); c.arc(0,0,10,0,7); c.moveTo(-7,-7); c.lineTo(7,7); c.moveTo(7,-7); c.lineTo(-7,7); c.stroke(); },
+  lp_spot:c => { c.beginPath(); c.arc(0,0,9,0,7); c.stroke(); c.beginPath(); c.arc(0,0,4,0,7); c.fill(); },
+  lp_neon:c => { c.strokeRect(-25,-5,50,10); c.beginPath(); c.moveTo(-25,-5); c.lineTo(25,5); c.moveTo(25,-5); c.lineTo(-25,5); c.stroke(); },
+  fan:    c => { c.beginPath(); c.arc(0,0,13,0,7); c.stroke(); for (let i=0;i<4;i++){ c.save(); c.rotate(i*Math.PI/2); c.beginPath(); c.ellipse(0,-7,3,6,0,0,7); c.fill(); c.restore(); } },
+  sk_1:   c => { sockBody(c, 0, 14); },
+  sk_2:   (c, it) => { sockBody(c, 0, 14);
+                      c.save(); c.font = 'bold 11px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.translate(17,-12); c.rotate(-((it && it.a) || 0)); c.fillText('2',0,0); c.restore(); },
+  sk_ip:  (c, it) => { sockBody(c, 0, 14);
+                      c.save(); c.font = 'bold 11px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.translate(15,-12); c.rotate(-((it && it.a) || 0)); c.fillText('h',0,0); c.restore(); },
+    sk_3:   c => { sockBody(c, 0, 19); c.beginPath(); [14,10,6].forEach(y => { c.moveTo(-3.5,y+2.5); c.lineTo(3.5,y-2.5); }); c.stroke(); },   // trifazată 3/N/PE
+  sw_1:   c => { sw(c); c.beginPath(); c.moveTo(11,-11); c.lineTo(16,-8); c.stroke(); },
+  sw_2:   c => { sw(c); c.beginPath(); c.moveTo(11,-11); c.lineTo(16,-8); c.moveTo(8,-14); c.lineTo(13,-11); c.stroke(); },
+  sw_c:   c => { swRing(c); swArm(c,1,1); swArm(c,-1,-1); },                                   // vai-vien (cap-scară)
+  sw_x:   c => { swRing(c); swArm(c,1,1); swArm(c,-1,1); swArm(c,1,-1); swArm(c,-1,-1); },    // cruce
+  sw_b:   c => { swRing(c); c.beginPath(); c.moveTo(3.5,-3.5); c.lineTo(14,-14); [8,11,14].forEach(t => { c.moveTo(t,-t); c.lineTo(t+4.5,-t+4.5); }); c.stroke(); },   // bipolar
+  motor:  c => { c.fillStyle = '#fff'; c.fillRect(-14,-10,28,20); c.fillStyle = '#000'; c.strokeRect(-14,-10,28,20);
+                 c.save(); c.font = 'bold 16px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('M',0,1); c.restore(); },
+  panel:  c => { c.strokeRect(-14,-10,28,20); c.beginPath(); c.moveTo(-14,-10); c.lineTo(14,10); c.moveTo(14,-10); c.lineTo(-14,10); c.stroke(); },
+  jb:     c => { c.strokeRect(-6,-6,12,12); c.beginPath(); c.arc(0,0,2,0,7); c.fill(); }
+};
+function eswBase(c){ c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,3.5,0,7); c.fill(); c.stroke(); c.fillStyle = '#000'; c.beginPath(); c.moveTo(2.5,-2.5); c.lineTo(11,-11); c.stroke(); }
+function eflag(c,x,y,d){ c.beginPath(); c.moveTo(x,y); c.lineTo(x + 5*d, y + 3*d); c.stroke(); }
+function vline(c,y1,y2){ c.beginPath(); c.moveTo(0,y1); c.lineTo(0,y2); c.stroke(); }
+function brk(c, L){ const e = (L || 40) - 40; vline(c,0,10+e); c.beginPath(); c.moveTo(0,10+e); c.lineTo(10,24+e); c.moveTo(0,24+e); c.lineTo(0,40+e); c.stroke(); }
+function sock(c){ sockBody(c, 0, 14); }
+function sockBody(c, fill, st){            // priză: tija pornește din perete, arcul „∪” e spre cameră (ca pe unifilar)
+  const b = st + 1;                         // b = poziția peretelui
+  c.beginPath(); c.moveTo(0,b-2); c.lineTo(0,b-16); c.stroke();      // tija, din perete până la vârful arcului
+  c.beginPath(); c.arc(0,b-26,10,0,Math.PI); c.stroke(); if (fill) c.fill();   // arcul se deschide spre cameră
+}
+function swRing(c){ c.fillStyle = '#fff'; c.beginPath(); c.arc(0,0,5,0,7); c.fill(); c.stroke(); c.fillStyle = '#000'; }
+function swArm(c,sx,sy){ c.beginPath(); c.moveTo(3.5*sx,-3.5*sy); c.lineTo(9*sx,-9*sy); c.lineTo(15*sx,-9*sy); c.stroke(); }
+function sw(c){ c.beginPath(); c.arc(0,0,5,0,7); c.fill(); c.beginPath(); c.moveTo(0,0); c.lineTo(11,-11); c.stroke(); }
+
+/* ---------- Desenare ---------- */
+function style(c, lw=2){ c.strokeStyle = '#000'; c.fillStyle = '#000'; c.lineWidth = lw; c.lineCap = 'round'; c.lineJoin = 'round'; c.font = 'bold 12px Arial'; }
+
+const STAIRS = ['stair','stair_r'];
+const FLIP = ['u_mcb','u_diff_g','u_sect','u_lamp','u_sock','u_vov'];
+const QTY = ['sk_1','sk_2','sk_ip','sk_3'];
+const INS = ['u_mcb','u_diff_g','u_sect','u_meter'];   // aparate care se inserează pe un cablu orizontal și împing restul lanțului
+const insUndo = [];
+function findChainWire(p) {
+  const L = pages[1];
+  for (let i = L.length-1; i >= 0; i--) { const w = L[i];
+    if (w.t === 'line' && w.k === 'u_wire' && w.y1 === w.y2 && Math.abs(p.y - w.y1) <= 10 && p.x >= Math.min(w.x1,w.x2) && p.x <= Math.max(w.x1,w.x2)) return w; }
+  return null;
+}
+function insertOnWire(it, p) {              // it = aparatul (deja poziționat pe cablu); returnează true dacă s-a inserat
+  const w = findChainWire(p); if (!w) return false;
+  const L = pages[1], wy = w.y1, lo = Math.min(w.x1,w.x2), hi = Math.max(w.x1,w.x2);
+  const px = it.k === 'u_meter' ? it.x - 20 : it.x, len = 40, d = len + Math.max(0, 60 - (hi - px));
+  insUndo.push({ snap: JSON.stringify(L), uid: it.uid });
+  L.forEach(o => {
+    if (o === w) return;
+    if (o.t === 'line') {
+      if (o.k === 'u_bus' && Math.abs(o.y1 - (wy-40)) < 2) { if (Math.max(o.x1,o.x2) > px) { if (o.x2 >= o.x1) o.x2 += d; else o.x1 += d; } }
+      else if (Math.max(o.y1,o.y2) >= wy-1 && Math.min(o.x1,o.x2) >= px) { o.x1 += d; o.x2 += d; }
+    } else if (o.t === 'sym' || o.t === 'text') {
+      if (o.k === 'u_ground' && Math.abs(o.y - (wy-40)) < 2) { if (o.x > px) o.x += d; }
+      else if (o.y >= wy-1 && o.x >= px) o.x += d;
+    }
+  });
+  const leftLen = px - lo, rest = { t:'line', k:'u_wire', x1:px+len, y1:wy, x2:hi+d, y2:wy, txt: leftLen > 0 ? '' : (w.txt || ''), pl: w.pl };
+  if (leftLen > 0) { w.x1 = lo; w.x2 = px; } else L.splice(L.indexOf(w), 1);
+  L.push(it); if (hi + d > px + len) L.push(rest);
+  return true;
+}   // simbolurile pentru care se întreabă „câte bucăți”   // pleacă în sus din bară
+const IDSYM = ['lp_x','lp_spot','lp_neon','fan','motor','sk_1','sk_2','sk_ip','sk_3','sw_1','sw_2','sw_b','sw_c','sw_x'];
+function ftx(c, tag, it, t, x, y) {      // fillText care își notează caseta (pentru „Mută text”)
+  if (!noRec && t) {
+    const m = c.getTransform(), w = c.measureText(t).width, h = parseInt((c.font.match(/(\d+)px/) || [0,12])[1]);
+    const x0 = c.textAlign === 'center' ? x - w/2 : c.textAlign === 'right' ? x - w : x, y0 = c.textBaseline === 'middle' ? y - h/2 : y - h*0.8;
+    const P = [[x0,y0],[x0+w,y0],[x0,y0+h],[x0+w,y0+h]].map(([a,b]) => [m.a*a + m.c*b + m.e, m.b*a + m.d*b + m.f]);
+    TB.push({ it, tag, x0:Math.min(...P.map(q => q[0])), x1:Math.max(...P.map(q => q[0])), y0:Math.min(...P.map(q => q[1])), y1:Math.max(...P.map(q => q[1])) });
+  }
+  c.fillText(t, x, y);
+}
+const offOf = (it, tag) => (it.off && it.off[tag]) || null;
+function plSymbol(c, it) {            // simbol de pozare pe cablu (ca în Trikker): subteran / aerian / încastrat (E) / pe perete (Ǝ)
+  const dx = it.x2 - it.x1, dy = it.y2 - it.y1, L = Math.hypot(dx, dy); if (!it.pl || L < 50) return;
+  c.save(); style(c, 1.5);
+  if (Math.abs(dx) >= Math.abs(dy)) { c.translate(Math.min(it.x1, it.x2), it.y1); c.rotate(Math.PI/2); }   // cablul orizontal: simbolurile apar deasupra
+  else c.translate(it.x1, Math.max(it.y1, it.y2));                                                          // cablul vertical: în stânga
+  const E = (y, mir) => { const sp = mir ? -4 : -14, ar = mir ? -14 : -5; c.beginPath(); c.moveTo(sp, y-8); c.lineTo(sp, y+8); [-8,0,8].forEach(k => { c.moveTo(sp, y+k); c.lineTo(ar, y+k); }); c.stroke(); };
+  if (it.pl === 'incastrat') { E(-15, false); E(-(L-15), false); }
+  else if (it.pl === 'perete') { E(-15, true); E(-(L-15), true); }
+  else if (it.pl === 'subteran') { c.beginPath(); [-8,-13,-18].forEach(x => { c.moveTo(x,-12); c.lineTo(x,-26); }); c.moveTo(-25,-27); c.lineTo(-22,-11); c.stroke(); }
+  else if (it.pl === 'aerian') { c.fillStyle = '#fff'; c.beginPath(); c.arc(0, -(L-17), 5, 0, 7); c.fill(); c.stroke(); }
+  c.restore();
+}
+function lineText(c, it) {
+  const mx = (it.x1+it.x2)/2, my = (it.y1+it.y2)/2;
+  c.save(); const o = offOf(it, 'txt'); if (o) c.translate(o[0], o[1]);
+  c.font = '11px Arial'; c.textAlign = 'center'; c.translate(mx, my);
+  const pl = '';
+  if (Math.abs(it.x2-it.x1) >= Math.abs(it.y2-it.y1)) {
+    ftx(c, 'txt', it, it.txt, 0, -6);
+    if (pl) { c.font = 'italic 10px Arial'; ftx(c, 'txt', it, pl, 0, 14); }
+  } else {
+    c.rotate(Math.PI/2); const sl = it.side === 'l';
+    if (pl) { c.font = 'italic 10px Arial'; ftx(c, 'txt', it, pl, 0, sl ? 15 : -6); }          // pozarea lipită de linie
+    c.font = '11px Arial'; ftx(c, 'txt', it, it.txt, 0, sl ? (pl ? 27 : 15) : (pl ? -18 : -6));  // apoi cablul
+  }
+  c.restore();
+}
+function symText(c, it) {
+  const L = it.txt.split('|'); c.save(); const o = offOf(it, 'txt'); if (o) c.translate(o[0], o[1]); style(c, 1); c.font = 'bold 11px Arial';
+  const horiz = Math.abs(Math.sin(it.a)) > .5;
+  if (horiz || it.k === 'u_meter') {
+    c.textAlign = 'center';
+    const cx = it.k === 'u_meter' ? it.x : it.x + 20*Math.sign(Math.sin(it.a)), y0 = it.y + (it.k === 'u_meter' ? 30 : 24);
+    L.forEach((l,i) => fillLine(c, l, cx, y0 + i*12, i, L.length, it));
+  } else {
+    const y0 = it.y + (Math.cos(it.a) < 0 ? 40 : 0);
+    c.translate(it.x, y0); c.rotate(-Math.PI/2);
+    L.forEach((l,i) => fillLine(c, l, 4 + (it.to || 0), 14 + (it.tp || 0) + i*12, i, L.length, it));
+  }
+  c.restore();
+}
+function idLabel(c, it) {          // litera circuitului: în partea dinspre cameră, ca să știi a cui e fiecare priză
+    const ux = Math.sin(it.a), uy = -Math.cos(it.a), d = QTY.includes(it.k) ? 38 : (WALLMOUNT[it.k] ? 27 : 24);
+  c.save(); const o = offOf(it, 'id'); if (o) c.translate(o[0], o[1]); style(c, 1); c.font = 'bold 13px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  const x = it.x + ux*d, y = it.y + uy*d;
+  c.strokeStyle = '#fff'; c.lineWidth = 3; c.strokeText(it.id, x, y); ftx(c, 'id', it, it.id, x, y);
+  c.restore();
+}
+function qtyLabel(c, it) {         // „x3” lângă simbol
+  c.save(); const o = offOf(it, 'q'); if (o) c.translate(o[0], o[1]); style(c, 1); c.font = 'bold 13px Arial'; c.textAlign = 'center'; c.textBaseline = 'middle';
+  let x, y;
+  if (it.k.startsWith('e_')) { x = it.x + 28; y = it.y; }
+  else if (currentPage === 1) { x = it.x + (EP[it.k] ? EP[it.k][1] : 14) + 12; y = it.y; }
+  else { x = it.x + Math.cos(it.a)*20 + Math.sin(it.a)*14; y = it.y + Math.sin(it.a)*20 - Math.cos(it.a)*14; }
+  c.strokeStyle = '#fff'; c.lineWidth = 3; c.strokeText('x' + it.q, x, y); ftx(c, 'q', it, 'x' + it.q, x, y);
+  c.restore();
+}
+function groundText(c, it) {        // „??Ω” și data măsurătorii, sub simbolul de pământ
+  const L = it.txt.split('|'), co = Math.cos(it.a), si = Math.sin(it.a);
+  c.save(); const o = offOf(it, 'txt'); if (o) c.translate(o[0], o[1]); style(c, 1); c.textAlign = 'left';
+  L.forEach((l, i) => { const lx = -54, ly = 138 + i*18; c.font = (i ? 'italic ' : '') + 'bold 13px Arial'; ftx(c, 'txt', it, l, it.x + lx*co - ly*si, it.y + lx*si + ly*co); });
+  c.restore();
+}
+function fillLine(c, l, x, y, i, n, it) {
+  c.font = (i >= 2 && i === n-1 ? 'italic ' : '') + 'bold 11px Arial';
+  const m = i === 0 && /^(\d+(?:[.,]\d+)?)\s*kA$/i.exec(l);
+  if (m) l = String(Math.round(parseFloat(m[1].replace(',', '.')) * 1000));   // 3kA -> 3000
+  if (i === 0 && /^\d{3,6}$/.test(l)) {                                          // primul rând = doar număr -> îl încadrăm
+    const w = c.measureText(l).width, x0 = c.textAlign === 'center' ? x - w/2 : x;
+    c.save(); c.lineWidth = 1; c.strokeRect(x0 - 2, y - 10, w + 4, 13); c.restore();
+  }
+  ftx(c, 'txt', it, l, x, y);
+}
+
+function drawItem(c, it) {
+  style(c);
+  if (it.t === 'link') {
+    const a = U[it.from], b = it.to ? U[it.to] : it.pt; if (!a || !b) return;
+    c.save(); c.strokeStyle = '#c0392b'; c.lineWidth = 1.2; c.setLineDash([6,4]);
+    c.beginPath(); c.moveTo(a.x,a.y); c.lineTo(b.x,b.y); c.stroke(); c.restore(); return;
+  }
+  if (it.t === 'group') { it.items.forEach(i => drawItem(c, i)); return; }
+  if (it.t === 'line') {
+    const thick = it.k === 'wall' ? 7 : it.k === 'u_bus' ? 5 : 2;
+    c.lineWidth = thick; c.lineCap = it.k === 'wall' ? 'square' : 'butt';
+    c.beginPath(); c.moveTo(it.x1,it.y1); c.lineTo(it.x2,it.y2); c.stroke();
+    if (it.k === 'u_feed') {
+      const a = Math.atan2(it.y2-it.y1, it.x2-it.x1);
+      c.beginPath(); c.moveTo(it.x2,it.y2); c.lineTo(it.x2-12*Math.cos(a-.4), it.y2-12*Math.sin(a-.4)); c.lineTo(it.x2-12*Math.cos(a+.4), it.y2-12*Math.sin(a+.4)); c.closePath(); c.fill();
+    }
+    if (it.pl) plSymbol(c, it);
+    if (it.txt || it.pl) { style(c, 1); lineText(c, it); }
+  } else if (it.t === 'text') {
+    c.font = (it.nb ? '' : 'bold ') + (it.sz || 14) + 'px Arial'; ftx(c, 'free', it, it.txt, it.x, it.y);
+  } else if (it.t === 'sym') {
+    c.save(); c.translate(it.x, it.y); c.rotate(it.a); if (FLIP.includes(it.k)) c.scale(-1, -1); style(c); if (S[it.k]) S[it.k](c, it); c.restore();
+    if (it.txt) { if (it.k === 'u_ground') groundText(c, it); else symText(c, it); }
+    if (it.id) {
+      style(c);
+      if (IDSYM.includes(it.k)) idLabel(c, it);
+      else if (it.k === 'u_mcb') { c.save(); const o = offOf(it, 'id'); if (o) c.translate(o[0], o[1]); c.font = 'bold 16px Arial'; ftx(c, 'id', it, it.id, it.x-22, it.y - (it.L ? 30 : 6)); c.restore(); }
+    }
+if (it.q > 1 && !SOCKU.includes(it.k)) qtyLabel(c, it);
+  }
+}
+
+function boxOf(it, tag) {
+  const r = TB.filter(q => q.it === it && q.tag === tag); if (!r.length) return null;
+  return { x0:Math.min(...r.map(q => q.x0)), x1:Math.max(...r.map(q => q.x1)), y0:Math.min(...r.map(q => q.y0)), y1:Math.max(...r.map(q => q.y1)) };
+}
+function textAt(r) {                       // ultimul text desenat sub cursor
+  for (let i = TB.length-1; i >= 0; i--) { const q = TB[i]; if (r.x >= q.x0-4 && r.x <= q.x1+4 && r.y >= q.y0-4 && r.y <= q.y1+4) return { it:q.it, tag:q.tag }; }
+  return null;
+}
+function rawPos(e) { const r = cv.getBoundingClientRect(); return { x:(e.clientX - r.left) * cv.width / r.width, y:(e.clientY - r.top) * cv.height / r.height }; }
+function redraw(ghost) {
+  if (currentPage === 1) { let m = 0; pages[1].forEach(i => { m = Math.max(m, i.x || 0, i.x1 || 0, i.x2 || 0); }); const w = Math.max(1100, m + 90); if (cv.width !== w) cv.width = w; }
+  else if (cv.width !== 1100) cv.width = 1100;
+  applyZoom();
+  ct.clearRect(0,0,cv.width,cv.height); TB = []; noRec = false;
+  U = {}; pages[currentPage].forEach(i => { if (i.uid) U[i.uid] = i; });
+  const isSt = it => it.t === 'sym' && STAIRS.includes(it.k);   // scările se desenează primele, sub restul
+  pages[currentPage].filter(isSt).forEach(it => drawItem(ct, it));
+  pages[currentPage].filter(it => !isSt(it)).forEach(it => drawItem(ct, it));
+  if (linkFrom && U[linkFrom]) { ct.strokeStyle = '#c0392b'; ct.lineWidth = 2; ct.beginPath(); ct.arc(U[linkFrom].x, U[linkFrom].y, 18, 0, 7); ct.stroke(); }
+  if (hoverRec) { const b = boxOf(hoverRec.it, hoverRec.tag); if (b) { ct.save(); ct.strokeStyle = '#2980b9'; ct.lineWidth = 1; ct.setLineDash([4,3]); ct.strokeRect(b.x0-3, b.y0-3, b.x1-b.x0+6, b.y1-b.y0+6); ct.restore(); } }
+  if (ghost) { noRec = true; ct.globalAlpha = .45; drawItem(ct, ghost); ct.globalAlpha = 1; noRec = false; }
+}
+
+/* ---------- Interfață ---------- */
+function buildMenu() {
+  const m = document.getElementById('menu'); m.innerHTML = '';
+  TOOLS[currentPage].forEach(([title, list]) => {
+    const h = document.createElement('div'); h.className = 'section-header'; h.textContent = title; m.appendChild(h);
+    const g = document.createElement('div'); g.className = 'grid'; m.appendChild(g);
+    list.forEach(([k, label, kind]) => {
+      const b = document.createElement('button'); b.className = 'btn' + (kind==='erase' ? ' danger' : ''); b.dataset.k = k;
+      const pv = document.createElement('canvas'); pv.width = pv.height = 72; b.appendChild(pv);
+      b.appendChild(document.createTextNode(label));
+      b.onclick = () => { setMode(k); if (document.body.classList.contains('small') && k !== 'lib_add' && k !== 'lib_del') hideMenu(); }; g.appendChild(b);
+      preview(pv, k, kind);
+    });
+  });
+}
+function preview(pv, k, kind) {
+  const c = pv.getContext('2d'); c.scale(2,2); style(c, 2); c.font = 'bold 9px Arial';
+  if (kind === 'line') { c.lineWidth = k==='wall'?6:k==='u_bus'?4:2; c.beginPath(); c.moveTo(4,18); c.lineTo(32,18); c.stroke(); }
+  else if (kind === 'erase') { c.font='22px Arial'; c.fillText('🗑',8,26); }
+  else if (kind === 'link') { c.beginPath(); c.arc(8,12,4,0,7); c.stroke(); c.beginPath(); c.arc(28,24,4,0,7); c.stroke(); c.setLineDash([3,2]); c.beginPath(); c.moveTo(11,14); c.lineTo(25,22); c.stroke(); c.setLineDash([]); }
+  else if (kind === 'move') { c.beginPath(); c.moveTo(18,6); c.lineTo(18,30); c.moveTo(6,18); c.lineTo(30,18); c.stroke(); [[18,3,0,-1],[18,33,0,1],[3,18,-1,0],[33,18,1,0]].forEach(([x,y,dx,dy]) => { c.beginPath(); c.moveTo(x,y); c.lineTo(x-dx*6-dy*4, y-dy*6+dx*4); c.lineTo(x-dx*6+dy*4, y-dy*6-dx*4); c.closePath(); c.fill(); }); }
+  else if (kind === 'resize') { c.font='22px Arial'; c.fillText('⤢',8,26); }
+  else if (kind === 'libadd') { c.font='bold 28px Arial'; c.fillText('+',11,27); }
+  else if (kind === 'libdel') { c.font='22px Arial'; c.fillText('🗑',8,26); }
+  else if (k.startsWith('img_')) { const e = lib[k.slice(4)]; if (e) { c.translate(18,18); const sc = Math.min(30/e.w, 30/e.h, 1.5); c.scale(sc,sc); S[k](c); } }
+  else if (kind === 'edit') { c.font='22px Arial'; c.fillText('✎',9,26); }
+  else if (kind === 'nav') { c.font='22px Arial'; c.fillText('☝',8,26); }
+  else if (k === 'u_start') { c.beginPath(); c.moveTo(3,18); c.lineTo(10,18); c.moveTo(3,12); c.lineTo(3,24); c.moveTo(0,14); c.lineTo(0,22); c.moveTo(12,18); c.lineTo(14,18); c.stroke(); c.strokeRect(14,13,8,10); c.beginPath(); c.moveTo(22,18); c.lineTo(34,18); c.stroke(); }
+  else if (k === 'text') { c.font='bold 22px Arial'; c.fillText('Aa',5,26); }
+  else { c.translate(18,12); const sc = {sk_1:.85,sk_2:.7,sk_ip:.85,sk_3:.65,u_sect:.6,u_meter:.6,u_diff_g:.6,u_mcb:.6,u_lamp:.55,u_sock:.55,u_vov:.55,lp_neon:.6,door:.5,window:.55,stair:.3,stair_r:.25,u_ground:.26}[k] || 1; c.scale(sc,sc); if (k.startsWith('e_')) c.translate(-8,8); if (k === 'stair') c.translate(0,45); if (k === 'stair_r') c.translate(0,24); if (k === 'u_ground') c.translate(0,-20);
+    if (FLIP.includes(k)) { c.translate(0,6); c.scale(1,-1); c.translate(0,-3); } S[k](c); }
+}
+
+function setMode(m) {
+  if (m === 'lib_add') { libDlg(); return; }
+  if (m === 'lib_del') { libDelDlg(); return; }
+  md = m; start = null; linkFrom = null; hoverRec = null; drag = null; cv.style.cursor = kindOf(m) === 'move' ? 'move' : 'crosshair'; redraw();
+  document.querySelectorAll('.btn').forEach(b => b.classList.toggle('active', b.dataset.k === m));
+document.getElementById('chip').textContent = nameOf(m) + (rot && kindOf(m)==='sym' && m!=='text' && !WALLMOUNT[m] ? ' ' + rot*90 + '°' : '');
+  document.getElementById('st').textContent = 'Mod: ' + nameOf(m) + (kindOf(m)==='sym' && m!=='text' && !WALLMOUNT[m] ? '  (rotire: ' + rot*90 + '°)' : '');
+  const k = kindOf(m);
+  document.getElementById('help').textContent =
+    m === 'nav' ? 'Navigare: un deget mută pagina, două degete măresc/micșorează. Alege o unealtă din meniu ca să desenezi.' :
+    k === 'line' ? 'Trage cu mouse-ul de la un punct la altul. Liniile sunt drepte și aliniate la grilă; ține Alt apăsat pentru linie oblică.' :
+    m === 'u_start' ? 'Click pe locul unde începe lanțul. Apare o fereastră unde bifezi ce conține: disjunctor, contor kWh, separator (sectioner), diferențial 300 mA. Apoi poți șterge sau edita orice piesă.' :
+    m === 'u_sect' ? 'Click ca să plasezi un separator (sectioner) pe lanțul de intrare, de ex. între contor și diferențial. Datele se scriu în câmpul „Aparat”.' :
+    (m.startsWith('e_') || m === 'u_x') ? 'Click ca să plasezi simbolul pe un rând de circuit (pe linia orizontală). R îl rotește. De obicei le face automat ⚡ Generează unifilar din plan.' :
+    QTY.includes(m) ? 'Click pe perete: apare o fereastră „câte bucăți?”. Dacă pui mai multe, pe plan apare x3 lângă simbol, iar pe unifilar rândul primește același x3. Circuitul îl alegi apoi cu 🔗 Leagă / Circuit.' :
+    k === 'move' ? 'Pune cursorul pe orice text (cablu, date aparat, ID circuit, x3, text liber): apare un chenar albastru. Trage-l unde vrei. Poziția se păstrează și la ⚡ Generează unifilar.' :
+    k === 'link' ? 'Atinge un simbol, apoi altul (ex. întrerupător → lampă, priză → priză): se leagă și se deschide fereastra cu circuitul (A/B/C), cablul, disjunctorul și pozarea. Ca să setezi circuitul unui singur simbol, atinge-l de două ori. Apoi apasă ⚡ Generează unifilar.' :
+    k === 'resize' ? 'Trage de o scară existentă: la scara dreaptă se adaugă/scot trepte (minim 2), la cea rotundă se schimbă raza.' :
+    STAIRS.includes(m) ? 'Apasă și trage: lungimea (sau raza) se stabilește din trasul mouse-ului, iar la scara dreaptă direcția e cea în care tragi. Un simplu click pune scara de mărime standard. Mai târziu o poți modifica cu „Redimensionează”.' :
+    m === 'u_ground' ? 'Click pe bara de cupru: coboară priza de pământ (2 condensatoare + simbol pământ). Textul „??Ω” și data se editează cu ✎ Editează.' :
+    k === 'edit' ? 'Click pe un cablu, aparat sau text ca să-i schimbi textul. Pe plan, click pe un simbol deschide fereastra circuitului.' :
+    (m === 'u_mcb' || m === 'u_diff_g' || m === 'u_sect' || m === 'u_meter') ? 'Click pe un cablu orizontal al lanțului de intrare: aparatul se inserează pe cablu și restul lanțului (bara, priza de pământ) se mută la dreapta. Click în altă parte îl pune liber (urcă din bară). Scrie datele în câmpul „Aparat” (rânduri separate cu | sau +). ID-ul e litera circuitului.' :
+    k === 'erase' ? 'Click pe un element ca să-l ștergi.' :
+    m === 'text' ? 'Click unde vrei textul.' :
+    'Click ca să plasezi simbolul. Apasă R ca să-l rotești. Ușile, ferestrele, prizele și întrerupătoarele se aliniază singure pe cel mai apropiat perete, pe partea unde ții cursorul.';
+}
+function switchPage(p) {
+  currentPage = p; start = null; rot = 0;
+  document.body.classList.toggle('p2', p === 2);
+  document.getElementById('t1').classList.toggle('active', p===1);
+  document.getElementById('t2').classList.toggle('active', p===2);
+  buildMenu(); buildLevels(); setMode('nav'); redraw(); save();
+}
+/* ---------- Niveluri (parter, etaj, mansardă...) ---------- */
+function buildLevels() {
+  const L = document.getElementById('levels'); L.style.display = currentPage === 2 ? 'flex' : 'none'; L.innerHTML = '';
+  const t = document.createElement('b'); t.textContent = 'Nivel:'; L.appendChild(t);
+  const mk = (txt, cls, fn, title) => { const b = document.createElement('button'); b.className = cls; b.textContent = txt; b.onclick = fn; if (title) b.title = title; L.appendChild(b); };
+  plans.forEach((p, i) => mk(p.name, 'lv' + (i === lvl ? ' active' : ''), () => setLevel(i)));
+  mk('+ Adaugă nivel', 'lv lvadd', addLevel, 'Adaugă etaj, mansardă, subsol etc.');
+  mk('✎ Redenumește', 'lv', renameLevel);
+  mk('🗑 Șterge nivelul', 'lv', delLevel);
+}
+function setLevel(i) { lvl = i; linkFrom = null; start = null; buildLevels(); setMode(md); redraw(); save(); }
+function addLevel() { const n = prompt('Numele nivelului nou:', 'Etaj ' + plans.length); if (!n || !n.trim()) return; plans.push({ name:n.trim(), items:[] }); setLevel(plans.length - 1); }
+function renameLevel() { const n = prompt('Numele nivelului:', plans[lvl].name); if (n && n.trim()) { plans[lvl].name = n.trim(); buildLevels(); save(); } }
+function delLevel() {
+  if (plans.length < 2) { alert('Trebuie să rămână cel puțin un nivel.'); return; }
+  if (!confirm('Ștergi nivelul „' + plans[lvl].name + '” cu tot ce conține?')) return;
+  plans.splice(lvl, 1); setLevel(Math.max(0, lvl - 1));
+}
+/* ---------- Bara de cablu: tip + secțiune + clasă la foc ---------- */
+const CAB_TYPES = [['','(scrie manual)'],['CYY-F','CYY-F – Cu, PVC/PVC, instalații fixe'],['N2XH','N2XH – Cu, fără halogeni (HFFR), rezistent la foc'],['NYY-J','NYY-J – Cu, PVC, îngropat/exterior'],
+  ['H07V-K','H07V-K – Cu flexibil, fir în tub'],['H05VV-F','H05VV-F – Cu flexibil (MYYM)'],['CYABY-F','CYABY-F – Cu armat, îngropat'],['ACYABY','ACYABY – Al armat, branșament'],
+  ['VOB','VOB'],['XGB','XGB'],['EXVB','EXVB']];
+const CAB_CORES = ['1x','2x','3x','3G','4x','4G','5x','5G'];
+const CAB_SEC = { '1,5':['19,5','C10'], '2,5':['27','C16'], '4':['36','C25'], '6':['46','C32'], '10':['63','C40–C50'], '16':['85','C63'], '25':['112','C80'], '35':['138','C100'], '50':['168','C125'], '70':['213','C160'], '95':['258','C200'] };
+const CAB_CPR = [['','fără clasă'],['Eca','Eca'],['Dca-s2,d2,a3','Dca-s2,d2,a3'],['Cca-s3,d1,a3','Cca-s3,d1,a3'],['Cca-s1b,d1,a1','Cca-s1b,d1,a1 (căi de evacuare)'],['Cca-s1,d0,a1','Cca-s1,d0,a1'],['B2ca-s1a,d1,a1','B2ca-s1a,d1,a1 (foarte sever)']];
+function buildCabBar() {
+  const B = document.getElementById('cabbar');
+  const sel = (id, opts, def) => '<select id="' + id + '">' + opts.map(o => { const v = Array.isArray(o) ? o[0] : o, t = Array.isArray(o) ? o[1] : o; return '<option value="' + v + '"' + (v === def ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select>';
+  B.innerHTML = '<b>Compune cablu:</b> ' + sel('ctype', CAB_TYPES, '') + ' ' + sel('ccore', CAB_CORES, '3G') + ' ' + sel('csec', Object.keys(CAB_SEC).map(k => [k, k + ' mm²']), '2,5') + ' ' + sel('ccpr', CAB_CPR, '') + ' <b>Pozare:</b> <select id="cplace2" onchange="setPlace(this.value)"></select> <span id="cabinfo"></span>';
+  ['ctype','ccore','csec','ccpr'].forEach(id => document.getElementById(id).onchange = composeCable);
+  composeCable(true); fillPlace();
+}
+function fillPlace() {
+  ['cplace','cplace2'].forEach(id => { const e = document.getElementById(id); if (!e) return; e.innerHTML = PLACE.map(([v,t]) => '<option value="' + v + '"' + (v === cabPlace ? ' selected' : '') + '>' + t + '</option>').join(''); });
+}
+function saveCirc() {}                     // circuitele se setează acum din fereastra „Circuit” (🔗 Leagă)
+function loadCirc() {}
+function setPlace(v) { cabPlace = v; fillPlace(); save(); }
+function composeCable(noFill) {
+  const t = ctype.value, k = ccore.value, s = csec.value, c = ccpr.value, d = CAB_SEC[s];
+  document.getElementById('cabinfo').textContent = 'Iz ≈ ' + d[0] + ' A (met. C, PVC, 2 conductoare încărcate) • protecție uzuală ' + d[1] + ' • orientativ, verifică NP I7 / SR HD 60364';
+  if (t && noFill !== true) { document.getElementById('cab').value = t + ' ' + k + s + (c ? ' ' + c : ''); save(); }
+}
+/* ---------- Ferestre (pop-up) ---------- */
+const escA = v => String(v == null ? '' : v).replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+function dlg(title, html, ok) {
+  const o = document.createElement('div'); o.id = 'ov';
+  o.innerHTML = '<div class="dlg"><h4>' + title + '</h4>' + html + '<div class="dbtn"><button class="dc">Anulează</button><button class="dok">OK</button></div></div>';
+  document.body.appendChild(o);
+  const close = () => o.remove();
+  o.querySelector('.dc').onclick = close;
+  o.querySelector('.dok').onclick = () => { if (ok(o) !== false) close(); };
+  o.addEventListener('keydown', e => { if (e.key === 'Enter' && (e.target.tagName !== 'TEXTAREA' || e.ctrlKey)) o.querySelector('.dok').click(); if (e.key === 'Escape') close(); });
+  o.addEventListener('pointerdown', e => { if (e.target === o) close(); });
+  setTimeout(() => { const f = o.querySelector('input,textarea'); if (f && !o.querySelector('.nofocus')) { f.focus(); if (f.select) f.select(); } }, 0);
+  return o;
+}
+function editLines(txt, cb) {         // text pe mai multe rânduri: Enter = rând nou (se salvează intern cu |)
+  const v = String(txt == null ? '' : txt).split('|').join('\n');
+  dlg('Text aparat', '<label>Scrie fiecare rând pe linie nouă (Enter). Ctrl+Enter = OK.<textarea class="dt" rows="5" style="width:100%;font:14px Arial;margin-top:6px">' + escA(v).replace(/</g,'&lt;') + '</textarea></label>',
+    d => { cb(d.querySelector('.dt').value.split('\n').map(l => l.trim()).join('|').replace(/\|+$/, '')); });
+}
+function askSock(it, done) {          // „câte prize?” + circuitul
+  const o = dlg(nameOf(it.k) + ' – câte bucăți?',
+    '<label>Număr de bucăți în acest punct:<div class="qty"><button type="button" class="qm">−</button><input class="dq" type="number" min="1" max="99" value="' + (it.q || 1) + '"><button type="button" class="qp">+</button></div></label>' +
+    '<small>Circuitul, cablul și disjunctorul le alegi apoi cu 🔗 Leagă / Circuit.</small>',
+    d => { it.q = Math.max(1, Math.min(99, parseInt(d.querySelector('.dq').value) || 1)); if (it.q === 1) delete it.q; done(); });
+  const q = o.querySelector('.dq');
+  o.querySelector('.qm').onclick = () => { q.value = Math.max(1, (parseInt(q.value) || 1) - 1); };
+  o.querySelector('.qp').onclick = () => { q.value = Math.min(99, (parseInt(q.value) || 1) + 1); };
+}
+function dlgStart(cb) {
+  const row = (k, t) => '<label><input type="checkbox" data-k="' + k + '"' + (startOpts[k] ? ' checked' : '') + '> ' + t + '</label>';
+  dlg('Branșament – ce conține lanțul?',
+    row('brk', 'Disjunctor general 4P (înainte de contor)') + row('meter', 'Contor kWh') + row('sect', 'Separator (sectioner) între contor și diferențial') + row('diff', 'Diferențial general 300 mA') +
+    '<small>Ordinea e fixă: disjunctor → contor → separator → diferențial → bară. Textele aparatelor se pot edita cu ✎.</small>',
+    d => { const n = {}; d.querySelectorAll('input[data-k]').forEach(i => n[i.dataset.k] = i.checked); cb(n); });
+}
+function cfgStart() {
+  dlgStart(n => {
+    startOpts = n;
+    pages[1] = pages[1].filter(i => !(i.gk && i.gk.startsWith('pre_')));
+    pages.del = (pages.del || []).filter(g => !g.startsWith('pre_'));
+    if (pages[1].some(i => i.gk)) generate(); else { save(); document.getElementById('help').textContent = 'Setările branșamentului sunt salvate; se aplică la ⚡ Generează unifilar.'; }
+  });
+}
+/* ---------- Fereastra „Circuit”: ID + cablu + disjunctor + pozare (în loc de câmpurile din bara de sus) ---------- */
+function compOf(uid) {                     // toate simbolurile legate de uid (inclusiv el)
+  const L = pages[2].filter(i => i.t === 'link'), seen = new Set([uid]), q = [uid];
+  while (q.length) { const u = q.pop(); L.forEach(l => { const o = l.from === u ? l.to : l.to === u ? l.from : null; if (o && !seen.has(o)) { seen.add(o); q.push(o); } }); }
+  return pages[2].filter(i => i.t === 'sym' && seen.has(i.uid));
+}
+function usedIds() {
+  const s = new Set(Object.keys(circCfg));
+  ALLP().forEach(i => { if (i.t === 'sym' && CAT[i.k] && i.id && i.id.trim()) s.add(i.id.trim()); });
+  return s;
+}
+function circDefaults(comp) {
+  let s = 0, l = 0;
+  comp.forEach(i => { if (CAT[i.k] === 's') s += qtyOf(i); else if (CAT[i.k] === 'l' || CAT[i.k] === 'f') l++; });
+  return s > 0 && s >= l ? { cab:'VOB 3G2,5', app:'3kA|2P - C 16A|LEGRAND' } : { cab:'VOB 3G1,5', app:'3kA|2P - C 10A|LEGRAND' };
+}
+function circDlg(uid) {
+  const it = pages[2].find(i => i.uid === uid); if (!it) return;
+  const comp = compOf(uid), def = circDefaults(comp), used = usedIds(), cur = (it.id || '').trim();
+  let next = 'A'; for (const ch of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') { if (!used.has(ch)) { next = ch; break; } }
+  const ids = [...used].sort(); if (!ids.includes(next)) ids.push(next);
+  const cfgFor = id => { const c = circCfg[id] || {}; return { cab:c.cab || def.cab, app:c.app || def.app, pl:c.pl || '' }; };
+  const first = cur || next, c0 = cfgFor(first);
+  const opt = (arr, d) => arr.map(o => { const v = Array.isArray(o) ? o[0] : o, t = Array.isArray(o) ? o[1] : o; return '<option value="' + escA(v) + '"' + (v === d ? ' selected' : '') + '>' + t.replace(/</g,'&lt;') + '</option>'; }).join('');
+  const html =
+    '<label>Circuit (ID):<div class="chips">' + ids.map(x => '<button type="button" class="chip' + (x === first ? ' on' : '') + '" data-id="' + escA(x) + '">' + escA(x) + '</button>').join('') + '</div>' +
+    '<input class="did" size="6" value="' + escA(first) + '" style="font-size:18px;font-weight:bold"></label>' +
+    '<label>Cablu:<input class="dcab full" list="cabs" value="' + escA(c0.cab) + '" placeholder="ex. VOB 3G2,5"></label>' +
+    '<div class="row"><select class="ct">' + opt(CAB_TYPES, '') + '</select><select class="cc">' + opt(CAB_CORES, '3G') + '</select><select class="cs">' + opt(Object.keys(CAB_SEC).map(k => [k, k + ' mm²']), '2,5') + '</select><select class="cr">' + opt(CAB_CPR, '') + '</select></div>' +
+    '<small>Alege tip + secțiune ca să compui cablul automat (sau scrie-l mai sus).</small>' +
+    '<label>Disjunctor / aparat (rândurile se separă cu |):<input class="dapp full" list="apps" value="' + escA(c0.app) + '"></label>' +
+    '<label>Pozare cablu:<select class="dpl full">' + opt(PLACE, c0.pl) + '</select></label>' +
+    '<small>Se aplică la ' + comp.length + ' simbol' + (comp.length === 1 ? '' : 'uri') + ' legat' + (comp.length === 1 ? '' : 'e') + ' și apoi la ⚡ Generează unifilar.</small>';
+  const o = dlg('Circuit', html + '<span class="nofocus"></span>', d => {
+    const id = d.querySelector('.did').value.trim();
+    if (!id) { alert('Scrie circuitul (ex. A).'); return false; }
+    circCfg[id] = { cab:d.querySelector('.dcab').value.trim(), app:d.querySelector('.dapp').value.trim(), pl:d.querySelector('.dpl').value };
+    setComponentId(uid, id); redraw(); save();
+    document.getElementById('help').textContent = 'Circuit ' + id + ' setat: ' + circCfg[id].cab + ' • ' + circCfg[id].app.replace(/\|/g, ' ') + (circCfg[id].pl ? ' • ' + PLN[circCfg[id].pl] : '') + '. Apasă ⚡ Generează când ai terminat.';
+  });
+  const did = o.querySelector('.did'), q = s => o.querySelector(s);
+  const fill = id => { const c = cfgFor(id); q('.dcab').value = c.cab; q('.dapp').value = c.app; q('.dpl').value = c.pl; };
+  const mark = id => o.querySelectorAll('.chip').forEach(b => b.classList.toggle('on', b.dataset.id === id));
+  o.querySelectorAll('.chip').forEach(b => b.onclick = () => { did.value = b.dataset.id; mark(b.dataset.id); fill(b.dataset.id); });
+  did.addEventListener('input', () => { const id = did.value.trim(); mark(id); if (circCfg[id]) fill(id); });
+  const comp2 = () => { const t = q('.ct').value; if (t) q('.dcab').value = t + ' ' + q('.cc').value + q('.cs').value + (q('.cr').value ? ' ' + q('.cr').value : ''); };
+  ['.ct','.cc','.cs','.cr'].forEach(s => q(s).onchange = comp2);
+  setTimeout(() => { try { document.activeElement.blur(); } catch (_) {} }, 20);   // pe tabletă nu deschide tastatura singur
+}
+function quickLink() { setMode('link'); }
+let zoom = 1;
+function applyZoom() { cv.style.width = Math.round(cv.width * zoom) + 'px'; cv.style.height = Math.round(cv.height * zoom) + 'px'; cv.style.backgroundSize = (20*zoom) + 'px ' + (20*zoom) + 'px'; }
+function setZoom(z) { zoom = Math.max(.3, Math.min(3, z)); applyZoom(); }
+function zoomBy(f) { const w = document.getElementById('canvas-wrap'), cx = (w.scrollLeft + w.clientWidth/2) / zoom, cy = (w.scrollTop + w.clientHeight/2) / zoom; setZoom(zoom * f); w.scrollLeft = cx*zoom - w.clientWidth/2; w.scrollTop = cy*zoom - w.clientHeight/2; }
+function zoomFit() { const w = document.getElementById('canvas-wrap'); setZoom(Math.min((w.clientWidth - 60) / cv.width, (w.clientHeight - 60) / cv.height, 2)); w.scrollLeft = 0; w.scrollTop = 0; }
+
+document.getElementById('canvas-wrap').addEventListener('wheel', e => {
+  if (!e.ctrlKey) return;                    // rotița simplă derulează pagina ca până acum
+  e.preventDefault();
+  const w = e.currentTarget, r = w.getBoundingClientRect();
+  const cx = (w.scrollLeft + e.clientX - r.left) / zoom, cy = (w.scrollTop + e.clientY - r.top) / zoom;
+  setZoom(zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+  w.scrollLeft = cx * zoom - (e.clientX - r.left); w.scrollTop = cy * zoom - (e.clientY - r.top);
+}, { passive: false });
+/* ---------- Bara de sus: compactă / extinsă / ascunsă ---------- */
+function setMore(on, noSave) {
+  document.getElementById('toolbar').classList.toggle('compact', !on);
+  document.getElementById('bmore').textContent = on ? '▴ Mai puține' : '▾ Mai multe';
+  if (!noSave) { try { localStorage.setItem('tb_more', on ? '1' : '0'); } catch (_) {} }
+}
+function toggleMore() { setMore(document.getElementById('toolbar').classList.contains('compact')); }
+function toggleBar() {
+  const hid = document.body.classList.toggle('tbhid');
+  document.getElementById('toolbar').style.display = hid ? 'none' : '';
+}
+let panMode = false, sticky = false;
+function autoNav() { if (isCoarse() && !sticky && !panMode) setMode('nav'); }
+function toggleSticky() { sticky = !sticky; const b = document.getElementById('fsticky'); if (b) b.style.background = sticky ? '#f1c40f' : ''; }
+function togglePan() {
+  panMode = !panMode; cv.classList.toggle('pan', panMode);
+  const f = document.getElementById('fpan'); if (f) f.style.background = panMode ? '#f1c40f' : '';
+  const b = document.getElementById('bpan'); b.textContent = '✋ Deplasare: ' + (panMode ? 'ON' : 'OFF'); b.style.background = panMode ? '#f1c40f' : '';
+  start = null; drag = null; resizing = null; redraw();
+}
+let wasSmall = null;
+function autoMode() {                       // tabletă / ecran mic = atingere SAU fereastră sub 1000 px
+  const small = isCoarse() || innerWidth < 1000;
+  if (small === wasSmall) return;           // nu s-a schimbat nimic
+  wasSmall = small;
+document.body.classList.toggle('small', small); document.body.classList.toggle('pc', !small);
+  const hid = document.body.classList.contains('tbhid');
+  if (small) { document.getElementById('sidebar').style.display = 'none'; if (!hid) toggleBar(); }
+  else { document.getElementById('sidebar').style.display = ''; if (hid) toggleBar(); }
+}
+window.addEventListener('resize', autoMode);
+function hideMenu() { document.getElementById('sidebar').style.display = 'none'; }
+function toggleMenu() { const sb = document.getElementById('sidebar'); sb.style.display = sb.style.display === 'none' ? '' : 'none'; }
+function rotate() { rot = (rot + 1) % 4; setMode(md); if (mouse) redraw(ghostAt(mouse)); }
+/* ---------- Generare automată a unifilarului din plan ---------- */
+const CAT = { lp_x:'l', lp_spot:'l', lp_neon:'l', fan:'f', motor:'m', sk_1:'s', sk_2:'s', sk_ip:'s', sk_3:'s', sw_1:'w', sw_2:'w', sw_b:'w', sw_c:'w', sw_x:'w' };
+const EL = { sk_1:'e_sock', sk_2:'e_sock', sk_ip:'e_sockh', sk_3:'e_sock3' };
+const SOCKU = ['e_sock','e_sock3','e_sockm','e_sockh'];                     // toate simbolurile de priză de pe unifilar
+const elOf = d => { const b = EL[d.k]; return ((b === 'e_sock' || b === 'e_sockh') && arcs(d) > 1) ? 'e_sockm' : (b || d.k); };   // 2+ prize = bară cu arcuri
+const arcs = d => qtyOf(d) * (d.k === 'sk_2' ? 2 : 1);                          // câte arcuri desenăm
+const EP = { lp_x:[10,10], lp_spot:[9,9], lp_neon:[25,25], fan:[13,13], motor:[14,14], sk_1:[14,10], sk_2:[14,18], sk_ip:[14,10], sk_3:[19,10], sw_1:[8,16], sw_2:[8,16], sw_b:[8,19], sw_c:[17,17], sw_x:[17,17], u_x:[10,10], e_sock:[0,24], e_sw:[0,18], e_sw2:[0,18], e_swvv:[0,18], e_swx:[0,18], e_sock3:[0,24], e_sockm:[0,24], e_sockh:[0,24] };   // [decalaj față de cursor, lățime]
+const epw = k => (EP[k] || [14,14])[1];
+const qtyOf = i => CAT[i.k] === 's' ? (i.q || 1) : 1;
+// Împarte aparatele unui circuit în rânduri: întrerupătoare + becurile comandate de ele stau pe același rând
+function buildRows(dev, edges) {
+  const inC = new Set(dev.map(d => d.uid)), seen = new Set(), groups = [];
+  const nb = d => (edges[d.uid] || []).filter(u => inC.has(u));
+  dev.forEach((d, i) => {                       // 1) legăturile făcute de tine au prioritate
+    if (seen.has(d.uid) || !nb(d).length) return;
+    const comp = [], q = [d]; seen.add(d.uid);
+    while (q.length) { const x = q.shift(); comp.push(x); nb(x).forEach(u => { if (!seen.has(u)) { seen.add(u); q.push(dev.find(e => e.uid === u)); } }); }
+    const nonS = comp.filter(x => CAT[x.k] !== 's'), ss = comp.filter(x => CAT[x.k] === 's');
+    if (nonS.length) groups.push({ first:Math.min(...nonS.map(x => dev.indexOf(x))), m:nonS });   // întrerupătoare + becuri = același rând
+    ss.forEach(s => groups.push({ first:dev.indexOf(s), m:[s] }));                                  // fiecare priză = rând separat
+  });
+  let cur = null;                                // 2) restul, după ordinea plasării: întrerupătoare apoi becuri = același rând
+  dev.forEach((d, i) => {
+    if (seen.has(d.uid)) return; const c = CAT[d.k];
+    if (c === 's') { groups.push({ first:i, m:[d] }); cur = null; }
+    else if (c === 'w') { if (cur && cur.lamp) cur = null; if (!cur) { cur = { first:i, m:[], lamp:false }; groups.push(cur); } cur.m.push(d); }
+    else if (cur) { cur.m.push(d); cur.lamp = true; }
+    else groups.push({ first:i, m:[d] });
+  });
+  groups.sort((p, r) => p.first - r.first);
+  return groups.map(g => g.m.slice().sort((p, r) => (CAT[r.k] === 'w') - (CAT[p.k] === 'w')));   // întrerupătoarele primele
+}
+function generate() {
+  const grp = {}, edges = {};
+  ALLP().forEach(i => { if (i.t === 'sym' && CAT[i.k]) { const id = (i.id || '?').trim() || '?'; const g = grp[id] = grp[id] || { l:0, f:0, m:0, w:0, s:0, dev:[] }; g[CAT[i.k]] += qtyOf(i); g.dev.push(i); } });
+  ALLP().forEach(l => { if (l.t === 'link') { (edges[l.from] = edges[l.from] || []).push(l.to); (edges[l.to] = edges[l.to] || []).push(l.from); } });
+  const ids = Object.keys(grp).sort();
+  if (!ids.length) { alert('Pune întâi prize, lămpi sau întrerupătoare în planul casei (pagina 2, oricare nivel).'); return; }
+  if (grp['?'] && !confirm(grp['?'].dev.length + ' simboluri nu au circuit (apar ca „?”). Folosește 🔗 Leagă / Circuit ca să le dai un circuit. Continui oricum?')) return;
+  if (pages[1].length && !pages[1].some(i => i.gk) && !confirm('Pagina 1 conține un desen făcut manual. Unifilarul generat se adaugă peste el. Continui?')) return;
+  const H = Math.PI/2, B = 690, x0 = 110, y0 = B - 170, ML = 70;   // tulpina circuitului (bară → primul rând) = 160; textul disjunctorului începe deasupra simbolului
+  const lay = r => { let c = 16; return r.map(d => { const k = elOf(d), ep = SOCKU.includes(k) ? [14, 10 + 12*(arcs(d)-1)] : (EP[k] || [14,14]), px = c + ep[0]; c = px + ep[1] + 12; return { d, k, px, w:ep[1] }; }); };
+  const items = presetItems(40, B + 40), bus = items.find(i => i.k === 'u_bus'), sum = [];
+  items.forEach(it => { it.gk = 'pre_' + it.pk; delete it.pk; });
+  let cx = x0;
+  ids.forEach(id => {
+    const g = grp[id], sock = g.s > 0 && g.s >= g.l + g.f, rows = buildRows(g.dev, edges), cfg = circCfg[id] || {};
+     const ext = Math.max(60, ...rows.map(r => { const l = lay(r).pop(); return l.px + l.w + 16; }));
+    const sp = Math.max(24, Math.min(32, (y0 - 60) / Math.max(rows.length - 1, 1)));
+items.push({ t:'sym', k:'u_mcb', x:cx, y:B, a:0, L:ML, to:20, tp:26, id, gk:id+'|mcb', txt: cfg.app ? cfg.app.replace(/\s*\+\s*/g, '|') : '3kA|' + (sock ? '2P - C 16A' : '2P - C 10A') + '|LEGRAND' });
+    items.push({ t:'line', k:'u_wire', x1:cx, y1:B-ML, x2:cx, y2:y0, txt: cfg.cab || (sock ? 'VOB 3G2,5' : 'VOB 3G1,5'), pl: cfg.pl || '', side:'r', gk:id+'|w' });
+    if (rows.length > 1) items.push({ t:'line', k:'u_wire', x1:cx, y1:y0, x2:cx, y2:y0 - (rows.length-1)*sp, gk:id+'|w2' });
+    rows.forEach((r, i) => {
+      const y = y0 - i*sp, L = lay(r), last = L[L.length-1], lastIsSock = CAT[last.d.k] === 's';
+      items.push({ t:'line', k:'u_wire', x1:cx, y1:y, x2:cx + last.px + (lastIsSock ? 0 : last.w), y2:y, gk:id+'|r'+i });
+      L.forEach((e, j) => { const s = { t:'sym', k:e.k, x:cx + e.px, y, a:0, gk:id+'|r'+i+'s'+j }; if (SOCKU.includes(e.k)) s.n = arcs(e.d); else if (qtyOf(e.d) > 1) s.q = qtyOf(e.d); items.push(s); });
+      items.push({ t:'text', x: cx - (i > 8 ? 22 : 14), y: y + 4, txt: String(i+1), sz:11, gk:id+'|n'+i });
+    });
+    const L = [];
+    if (g.s) L.push(g.s + (g.s === 1 ? ' priză' : ' prize'));
+    if (g.l) L.push(g.l + (g.l === 1 ? ' bec' : ' becuri'));
+    if (g.f) L.push(g.f + ' ventilat.');
+    if (g.m) L.push(g.m + ' motor');
+    if (g.w) L.push(g.w + ' într.');
+    sum.push(id + ': ' + L.join(', ') + ' pe ' + rows.length + (rows.length === 1 ? ' rând' : ' rânduri'));
+    cx += ext + 50;
+  });
+  bus.x2 = Math.max(bus.x2, cx - 20);
+  const oldBy = {}; pages[1].forEach(o => { if (o.gk) oldBy[o.gk] = o; });
+  const del = new Set(pages.del || []);
+  const fresh = items.filter(it => !del.has(it.gk));                       // piesele șterse de tine rămân șterse
+  fresh.forEach(it => { const o = oldBy[it.gk]; if (!o) return;
+    if (o.edited) { it.txt = o.txt; if (o.id !== undefined) it.id = o.id; it.edited = true; if (o.pl !== undefined) it.pl = o.pl; }
+    if (o.off) it.off = o.off;
+    if (o.mv) { it.x = o.x; it.y = o.y; it.mv = true; } });   // textele editate rămân
+  const manual = pages[1].filter(o => !o.gk);                              // tot ce ai adăugat tu rămâne
+  pages[1] = fresh.concat(manual); save(); switchPage(1);
+  document.getElementById('help').textContent = 'Unifilar generat din plan – ' + sum.join('  |  ') + '. Cablul, disjunctorul și pozarea sunt cele setate în fereastra „Circuit”. Modificările tale manuale au fost păstrate.';
+}
+function undo() {
+  const top = insUndo[insUndo.length-1];
+  if (currentPage === 1 && top && pages[1].some(i => i.uid === top.uid) && pages[1][pages[1].length-1].uid === top.uid || (currentPage === 1 && top && pages[1].length && pages[1][pages[1].length-2] && pages[1][pages[1].length-2].uid === top.uid)) {
+    pages[1] = JSON.parse(top.snap); insUndo.pop(); redraw(); save(); return;
+  }
+  const it = pages[currentPage].pop(); if (it && currentPage === 1 && it.gk) (pages.del = pages.del || []).push(it.gk); redraw(); save(); }
+function clearAll() { if (confirm(currentPage === 2 ? 'Ștergi nivelul curent (' + plans[lvl].name + ')?' : 'Ștergi pagina curentă?')) { pages[currentPage] = []; if (currentPage === 1) pages.del = []; redraw(); save(); } }
+function exportPNG() {
+  const t = document.createElement('canvas'); t.width = cv.width; t.height = cv.height;
+  const c = t.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0,0,t.width,t.height); c.drawImage(cv,0,0);
+  const a = document.createElement('a'); a.download = (currentPage===1 ? 'unifilar' : 'plan-' + plans[lvl].name) + '.png'; a.href = t.toDataURL(); a.click();
+}
+
+/* ---------- Mouse (coordonate corecte chiar dacă pagina e scalată) ---------- */
+function pos(e) {
+  const r = cv.getBoundingClientRect();
+  return { x: Math.round((e.clientX - r.left) * cv.width / r.width / G) * G,
+           y: Math.round((e.clientY - r.top)  * cv.height / r.height / G) * G };
+}
+function lineLabel() { return (md === 'u_wire' || md === 'u_feed') ? document.getElementById('cab').value.trim() : ''; }
+function endPoint(p, e) { // blochează pe orizontală/verticală, cu excepția Alt
+  if (e.altKey || document.getElementById('obl').checked) return p;
+  return Math.abs(p.x - start.x) >= Math.abs(p.y - start.y) ? { x: p.x, y: start.y } : { x: start.x, y: p.y };
+}
+// Lanțul de început: împământare → cablu → disjunctor → contor → cablu → diferențial → bară
+const today = () => { const d = new Date(), z = n => String(n).padStart(2,'0'); return z(d.getDate()) + '.' + z(d.getMonth()+1) + '.' + d.getFullYear(); };
+function presetItems(x, y, o) {
+  o = o || startOpts;
+  const H = Math.PI/2, it = []; let cx = x + 130, n = 0;
+  const add = (pk, obj) => { obj.pk = pk; it.push(obj); };
+  const wire = (len, txt) => { add('w' + (++n), { t:'line', k:'u_wire', x1:cx, y1:y, x2:cx+len, y2:y, txt }); cx += len; };
+  const dev = (pk, k, txt) => { add(pk, { t:'sym', k, x:cx, y, a:H, txt }); cx += 40; };
+  const parts = ['brk','meter','sect','diff'].filter(k => o[k]);
+  let prev = null;
+  parts.forEach((p, idx) => {
+    wire(idx === 0 || prev === 'meter' ? 100 : prev === 'sect' ? 80 : 70, idx === 0 || prev === 'meter' ? 'EXVB 4x16' : '');
+    if (p === 'brk') dev('brk', 'u_mcb', '4P - 25A');
+    else if (p === 'meter') { add('meter', { t:'sym', k:'u_meter', x:cx+20, y, a:0, txt:'NR. xxxxxxxxxx' }); cx += 40; }
+    else if (p === 'sect') dev('sect', 'u_sect', '4P - 40A|Separator');
+    else dev('diff', 'u_diff_g', '4P - C 40A|Δ300mA - 10kA|LEGRAND');
+    prev = p;
+  });
+  wire(20);
+  add('riser', { t:'line', k:'u_wire', x1:cx, y1:y, x2:cx, y2:y-40 });
+  add('bus', { t:'line', k:'u_bus', x1:x, y1:y-40, x2:cx+300, y2:y-40 });
+  add('ground', { t:'sym', k:'u_ground', x:x+60, y:y-40, a:0, txt:'??Ω|' + today() });
+  return it;
+}
+// Simbolurile care se montează pe perete: [jumătate din lățime, distanța față de axa peretelui]
+const WALLMOUNT = { door:[20,0], window:[25,0], sk_1:[0,17], sk_2:[0,17], sk_ip:[0,17], sk_3:[0,22], sw_1:[0,11], sw_2:[0,11], sw_b:[0,14], sw_c:[0,16], sw_x:[0,16] };
+function ghostAt(p) {
+  if (md === 'u_start') return { t:'group', items: presetItems(p.x, p.y) };
+  const it = { t:'sym', k:md, x:p.x, y:p.y, a:rot*Math.PI/2, id: currentPage === 2 ? '' : document.getElementById('cid').value };
+  if (md === 'u_mcb' || md === 'u_diff_g' || md === 'u_sect') it.txt = document.getElementById('app').value.replace(/\s*\+\s*/g, '|');
+  if (md === 'u_meter') it.txt = 'NR. xxxxxxxxxx';
+  if (md === 'u_ground') it.txt = '??Ω|' + today();
+  if (md === 'stair') it.n = 8;
+  if (md === 'stair_r') it.r = 45;
+  if (currentPage === 1 && INS.includes(md)) {
+    const w = findChainWire(p);
+    if (w) { const lo = Math.min(w.x1,w.x2), hi = Math.max(w.x1,w.x2), px = Math.max(lo, Math.min(hi, p.x)); it.y = w.y1; it.id = ''; if (md === 'u_meter') { it.x = px + 20; it.a = 0; } else { it.x = px; it.a = Math.PI/2; } }
+  }
+  const wm = WALLMOUNT[md];
+  if (wm && currentPage === 2) {
+    let best = null, bd = 30;
+    pages[2].forEach(w => {
+      if (w.t !== 'line' || w.k !== 'wall') return;
+      const dx = w.x2-w.x1, dy = w.y2-w.y1, l2 = dx*dx+dy*dy; if (!l2) return;
+      const t = Math.max(0, Math.min(1, ((p.x-w.x1)*dx+(p.y-w.y1)*dy)/l2));
+      const qx = w.x1+t*dx, qy = w.y1+t*dy, d = Math.hypot(p.x-qx, p.y-qy);
+      if (d < bd) { bd = d; best = { qx, qy, dx, dy, l:Math.sqrt(l2) }; }
+    });
+    if (best) {
+      let nx = -best.dy/best.l, ny = best.dx/best.l;            // normala peretelui
+      if ((p.x-best.qx)*nx + (p.y-best.qy)*ny < 0) { nx = -nx; ny = -ny; } // spre partea unde e cursorul
+      it.a = Math.atan2(nx, -ny);                               // „sus” al simbolului arată spre cameră
+      const ux = Math.cos(it.a), uy = Math.sin(it.a);           // direcția de-a lungul peretelui
+      it.x = best.qx + nx*wm[1] - ux*wm[0];
+      it.y = best.qy + ny*wm[1] - uy*wm[0];
+    }
+  }
+  return it;
+}
+function distSeg(p, a, b) {
+  const dx=b.x-a.x, dy=b.y-a.y, l=dx*dx+dy*dy; let t = l ? ((p.x-a.x)*dx+(p.y-a.y)*dy)/l : 0; t = Math.max(0, Math.min(1, t));
+  return Math.hypot(p.x-(a.x+t*dx), p.y-(a.y+t*dy));
+}
+function stairHit(it, p, pad) {
+  const dx = p.x-it.x, dy = p.y-it.y;
+  if (it.k === 'stair_r') return Math.hypot(dx,dy) < (it.r || 45) + pad;
+  const lx = dx*Math.cos(it.a) + dy*Math.sin(it.a), ly = -dx*Math.sin(it.a) + dy*Math.cos(it.a), L = (it.n || 8)*10;
+  return Math.abs(lx) < 20 + pad && ly > -L - pad && ly < pad;
+}
+function resizeStair(p) {
+  const r = resizing, it = r.it;
+  if (r.drag && p.x === it.x && p.y === it.y) return;          // fără mișcare = mărime standard
+  if (it.k === 'stair_r') it.r = Math.max(20, Math.min(150, Math.round(Math.hypot(p.x-it.x, p.y-it.y)/5)*5));
+  else {
+    const dx = p.x-it.x, dy = p.y-it.y;
+    if (r.drag) it.a = Math.abs(dx) >= Math.abs(dy) ? (dx > 0 ? Math.PI/2 : -Math.PI/2) : (dy < 0 ? 0 : Math.PI);
+    const ly = -dx*Math.sin(it.a) + dy*Math.cos(it.a);
+    it.n = Math.max(2, Math.min(60, Math.round(-ly/10)));        // minim 2 trepte, +1 treaptă la fiecare 10px
+  }
+  redraw();
+}
+const newUid = () => Math.random().toString(36).slice(2, 10);
+function hitSym(p) {
+  let best = null, bd = isCoarse() ? 36 : 24;
+  pages[currentPage].forEach(it => { if (it.t === 'sym' && it.uid && IDSYM.includes(it.k)) { const d = Math.hypot(p.x-it.x, p.y-it.y); if (d < bd) { bd = d; best = it; } } });
+  return best;
+}
+function setComponentId(uid, id) {          // toate simbolurile legate între ele primesc același circuit
+  const L = pages[2].filter(i => i.t === 'link'), seen = new Set([uid]), q = [uid];
+  while (q.length) {
+    const u = q.pop(); const it = pages[2].find(i => i.uid === u); if (it) it.id = id;
+    L.forEach(l => { const o = l.from === u ? l.to : l.to === u ? l.from : null; if (o && !seen.has(o)) { seen.add(o); q.push(o); } });
+  }
+}
+function hit(p) {
+  const L = pages[currentPage];
+  for (let i = L.length-1; i >= 0; i--) {
+    const it = L[i];
+    if (it.t === 'link') { const a = U[it.from], b = U[it.to]; if (a && b && distSeg(p, a, b) < 6) return i; }
+    if (it.t === 'line' && distSeg(p, {x:it.x1,y:it.y1}, {x:it.x2,y:it.y2}) < 8) return i;
+    if (it.t === 'sym' && it.k === 'u_ground' && distSeg(p, it, { x: it.x - Math.sin(it.a)*112, y: it.y + Math.cos(it.a)*112 }) < 16) return i;
+    if (it.t === 'sym' && it.k === 'door' && Math.hypot(p.x-(it.x+Math.cos(it.a)*20), p.y-(it.y+Math.sin(it.a)*20)) < 30) return i;
+    if (it.t === 'sym' && !STAIRS.includes(it.k) && Math.hypot(p.x-it.x, p.y-it.y) < 22) return i;
+    if (it.t === 'text' && p.x > it.x-4 && p.x < it.x + it.txt.length*8 && Math.abs(p.y-it.y+5) < 10) return i;
+  }
+  for (let i = L.length-1; i >= 0; i--) if (L[i].t === 'sym' && STAIRS.includes(L[i].k) && stairHit(L[i], p, 4)) return i;
+  return -1;
+}
+
+function onDown(e) {
+  const p = pos(e), k = kindOf(md);
+    if (k === 'nav') return;
+  if (k === 'move') { const r = rawPos(e), h = textAt(r); if (h) { drag = { ...h, sx:r.x, sy:r.y, o: h.tag === 'free' ? [h.it.x, h.it.y] : (offOf(h.it, h.tag) || [0,0]).slice() }; hoverRec = h; cv.setPointerCapture(e.pointerId); } return; }
+  if (k === 'line') { start = p; cv.setPointerCapture(e.pointerId); }
+  else if (md === 'u_start') { const L = pages[currentPage]; dlgStart(n => { startOpts = n; L.push(...presetItems(p.x, p.y, n)); redraw(); save(); }); }
+  else if (k === 'edit') {
+    const i = hit(p); if (i < 0) return; const it = pages[currentPage][i];
+    if (it.t === 'link') return;
+    if (currentPage === 2 && it.t === 'sym' && it.k === 'door') {
+      const seq = [0,1,3,2], cur = (it.fx ? 1 : 0) | (it.fy ? 2 : 0), nx = seq[(seq.indexOf(cur) + 1) % 4];
+      it.fx = !!(nx & 1); it.fy = !!(nx & 2); redraw(); save();
+      document.getElementById('help').textContent = 'Ușă: atinge din nou ca să schimbi balamaua sau sensul de deschidere (4 variante).';
+      return;
+    }
+    if (currentPage === 2 && it.t === 'sym' && QTY.includes(it.k)) { askSock(it, () => { redraw(); save(); if (it.uid) circDlg(it.uid); }); return; }
+    if (currentPage === 2 && it.t === 'sym') {
+      if (it.uid && IDSYM.includes(it.k)) { circDlg(it.uid); return; }
+      const v = prompt('ID circuit:', it.id || ''); if (v !== null) { if (it.uid) setComponentId(it.uid, v); else it.id = v; } redraw(); save(); return;
+    }
+    const rest = () => {
+      if (it.k === 'u_mcb') { const v = prompt('ID circuit:', it.id || ''); if (v !== null) it.id = v; }
+      it.edited = true;
+      redraw(); save();
+      if (it.t === 'line' && (it.k === 'u_wire' || it.k === 'u_feed')) {
+        dlg('Pozare cablu', '<label>Cum e pozat cablul: <select class="dp">' + PLACE.map(([v,t]) => '<option value="' + v + '"' + (v === (it.pl || '') ? ' selected' : '') + '>' + t + '</option>').join('') + '</select></label>',
+          d => { it.pl = d.querySelector('.dp').value; it.edited = true; redraw(); save(); });
+      }
+    };
+    if (it.t === 'sym') editLines(it.txt, v => { it.txt = v; rest(); });
+    else if (it.t === 'line') { const v = prompt('Text cablu:', it.txt || ''); if (v !== null) it.txt = v; rest(); }
+    else { const v = prompt('Text:', it.txt); if (v !== null) it.txt = v; rest(); }
+  }
+  else if (k === 'link') {
+    const t = hitSym(p);
+    if (!linkFrom) { if (t) { linkFrom = t.uid; redraw(); } }
+    else {
+      const from = linkFrom; linkFrom = null;
+      if (t && t.uid !== from) {
+        pages[2].push({ t:'link', from, to:t.uid }); redraw();
+        const a = U[from]; if (a) setComponentId(from, a.id);
+        redraw(); save(); circDlg(from);                    // după legare: fereastra cu circuit / cablu / disjunctor / pozare
+      } else if (t && t.uid === from) { redraw(); circDlg(from); }   // al doilea atingere pe același simbol = setează circuitul lui
+      else redraw();
+    }
+  }
+  else if (k === 'resize') {
+    let f = null; pages[currentPage].forEach(it => { if (it.t === 'sym' && STAIRS.includes(it.k) && stairHit(it, p, 10)) f = it; });
+    if (f) { resizing = { it:f, drag:false }; cv.setPointerCapture(e.pointerId); }
+  }
+  else if (STAIRS.includes(md)) {
+    const it = ghostAt(p); it.uid = newUid(); pages[currentPage].push(it);
+    resizing = { it, drag:true }; cv.setPointerCapture(e.pointerId); redraw();
+  }
+  else if (k === 'erase') { const i = hit(p); if (i >= 0) { const g = pages[currentPage][i].gk; if (currentPage === 1 && g) (pages.del = pages.del || []).push(g); pages[currentPage].splice(i,1); redraw(); save(); } }
+  else if (md === 'text') { const t = prompt('Text:'); if (t) { pages[currentPage].push({t:'text', x:p.x, y:p.y, txt:t}); redraw(); save(); autoNav(); } }
+  else {
+    const it = ghostAt(p); it.uid = newUid(); const L = pages[currentPage];
+    if (currentPage === 2 && QTY.includes(md)) { askSock(it, () => { L.push(it); redraw(); save(); autoNav(); }); return; }
+    if (currentPage === 1 && INS.includes(md) && insertOnWire(it, p)) { redraw(); save(); autoNav(); return; }
+    L.push(it); redraw(); save(); autoNav();
+  }
+}
+/* ---------- Atingere: un deget desenează, două degete mută pagina și măresc/micșorează ---------- */
+const touches = new Map(), down0 = new Map(); let pend = null, gest = null, navLast = null;
+const cp = e => ({ clientX:e.clientX, clientY:e.clientY, pointerId:e.pointerId, altKey:e.altKey, pointerType:e.pointerType });
+function gPts() { return [...touches.values()].slice(0, 2); }
+function startGesture() {
+  start = null; drag = null; resizing = null; redraw();
+  const p = gPts(), w = document.getElementById('canvas-wrap');
+  gest = { d0: Math.hypot(p[0].clientX - p[1].clientX, p[0].clientY - p[1].clientY) || 1, mx0:(p[0].clientX + p[1].clientX)/2, my0:(p[0].clientY + p[1].clientY)/2, z0:zoom, sl0:w.scrollLeft, st0:w.scrollTop };
+}
+function moveGesture() {
+  if (touches.size < 2) return;
+  const p = gPts(), w = document.getElementById('canvas-wrap'), r = w.getBoundingClientRect();
+  const d = Math.hypot(p[0].clientX - p[1].clientX, p[0].clientY - p[1].clientY), mx = (p[0].clientX + p[1].clientX)/2, my = (p[0].clientY + p[1].clientY)/2;
+  const cx = (gest.sl0 + gest.mx0 - r.left) / gest.z0, cy = (gest.st0 + gest.my0 - r.top) / gest.z0;
+  setZoom(gest.z0 * d / gest.d0);
+  w.scrollLeft = cx*zoom - (mx - r.left); w.scrollTop = cy*zoom - (my - r.top);
+}
+cv.addEventListener('pointerdown', e => {
+  if (panMode) return;
+  if (e.pointerType !== 'touch') { onDown(e); return; }
+  touches.set(e.pointerId, cp(e)); down0.set(e.pointerId, cp(e));
+  if (touches.size >= 2) { clearTimeout(pend); pend = null; startGesture(); return; }
+  if (gest) return;
+    if (md === 'nav') { navLast = { x:e.clientX, y:e.clientY }; return; }
+  pend = setTimeout(() => { pend = null; const t = down0.get(e.pointerId); if (t && touches.size === 1 && !gest) onDown(t); }, 110);   // așteptăm să vedem dacă vine al doilea deget
+});
+cv.addEventListener('pointercancel', e => { touches.delete(e.pointerId); down0.delete(e.pointerId); navLast = null; if (!touches.size) { gest = null; clearTimeout(pend); pend = null; start = null; drag = null; resizing = null; redraw(); } });
+cv.addEventListener('pointermove', e => {
+  if (e.pointerType === 'touch') { if (touches.has(e.pointerId)) touches.set(e.pointerId, cp(e)); if (gest) { moveGesture(); return; } }
+    if (md === 'nav' && e.pointerType === 'touch' && navLast && touches.size === 1) {
+    const w = document.getElementById('canvas-wrap');
+    w.scrollLeft -= e.clientX - navLast.x; w.scrollTop -= e.clientY - navLast.y;
+    navLast = { x:e.clientX, y:e.clientY }; return;
+  }
+  const p = pos(e); mouse = p;
+  if (drag) {
+    const r = rawPos(e), dx = Math.round(r.x - drag.sx), dy = Math.round(r.y - drag.sy), it = drag.it;
+    if (drag.tag === 'free') { it.x = drag.o[0] + dx; it.y = drag.o[1] + dy; it.mv = true; }
+    else { it.off = it.off || {}; it.off[drag.tag] = [drag.o[0] + dx, drag.o[1] + dy]; }
+    redraw(); return;
+  }
+  if (kindOf(md) === 'move') { const h = textAt(rawPos(e)); if (!hoverRec !== !h || (h && hoverRec && (h.it !== hoverRec.it || h.tag !== hoverRec.tag))) { hoverRec = h; redraw(); } return; }
+  if (resizing) { resizeStair(p); return; }
+  if (start) {
+    const q = endPoint(p, e);
+    redraw({ t:'line', k:md, x1:start.x, y1:start.y, x2:q.x, y2:q.y, txt:lineLabel() });
+  } else if (linkFrom) redraw({ t:'link', from:linkFrom, pt:p });
+  else if (kindOf(md) === 'sym' && md !== 'text') redraw(ghostAt(p));
+});
+cv.addEventListener('pointerup', e => {
+  if (e.pointerType === 'touch') {
+    if (pend) { clearTimeout(pend); pend = null; const t = down0.get(e.pointerId); if (t && touches.size === 1 && !gest) onDown(t); }
+    touches.delete(e.pointerId); down0.delete(e.pointerId); navLast = null;
+    if (gest) { if (!touches.size) gest = null; return; }
+  }
+  if (drag) { drag = null; redraw(); save(); return; }
+  if (resizing) { resizing = null; redraw(); save(); autoNav(); return; }
+  if (!start) return;
+  const q = endPoint(pos(e), e);
+  if (q.x !== start.x || q.y !== start.y) pages[currentPage].push({ t:'line', k:md, x1:start.x, y1:start.y, x2:q.x, y2:q.y, txt:lineLabel(), ...((md === 'u_wire' || md === 'u_feed') && cabPlace ? { pl:cabPlace } : {}) });
+  start = null; redraw(); save(); autoNav();
+});
+cv.addEventListener('pointerleave', () => { mouse = null; if (!start) redraw(); });
+
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  if (e.key === 'r' || e.key === 'R') rotate();
+  if (e.key === 'Escape') { start = null; linkFrom = null; redraw(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); }
+});
+
+/* ---------- Tipărire / PDF: unifilar + toate nivelurile planului, fiecare pe câte o pagină ---------- */
+function capture(xa, xb) {                       // decupează desenul curent și îl redesenează la rezoluție mare (pentru PDF clar)
+  linkFrom = null; redraw();
+  const W = cv.width, H = cv.height, S = 4, sw = Math.ceil(W/S), sh = Math.ceil(H/S);
+  const sc = document.createElement('canvas'); sc.width = sw; sc.height = sh;
+  const sx = sc.getContext('2d', { willReadFrequently: true }); sx.drawImage(cv, 0, 0, sw, sh);
+  const d = sx.getImageData(0,0,sw,sh).data;
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  const xs = Math.floor((xa || 0)/S), xe = Math.min(Math.ceil((xb || W)/S), sw);
+  for (let y = 0; y < sh; y++) for (let x = xs; x < xe; x++) if (d[(y*sw+x)*4+3] > 0) { if (x*S<x0) x0=x*S; if ((x+1)*S>x1) x1=(x+1)*S; if (y*S<y0) y0=y*S; if ((y+1)*S>y1) y1=(y+1)*S; }
+  if (x1 < 0) return null;
+  const m = 20; x0 = Math.max(xa || 0, x0-m); y0 = Math.max(0,y0-m); x1 = Math.min(xb || W, W, x1+m); y1 = Math.min(H,y1+m);
+// țintă: ~200 dpi pe hârtia A4 landscape (277x156 mm) => ~2200 x 1230 px maxim
+const MAXW = 2200, MAXH = 1250;
+const lw = x1-x0, lh = y1-y0;
+const K = Math.min(MAXW / lw, MAXH / lh, 3);   // fără minim forțat de 1
+  const pc = document.createElement('canvas'); pc.width = Math.round(lw*K); pc.height = Math.round(lh*K);
+  const c = pc.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0,0,pc.width,pc.height);
+  c.save(); c.scale(K,K); c.translate(-x0,-y0); c.beginPath(); c.rect(x0,y0,lw,lh); c.clip();
+  const isSt = it => it.t === 'sym' && STAIRS.includes(it.k), L = pages[currentPage];
+  noRec = true;
+  L.filter(isSt).forEach(it => drawItem(c, it));
+  L.filter(it => !isSt(it)).forEach(it => drawItem(c, it));
+  noRec = false; c.restore();
+  pc.lw = lw; pc.lh = lh;                          // mărimea „logică” (fără multiplicator), folosită la scalare
+  return pc;
+}
+function cartGet() {
+  let g = {}; try { g = JSON.parse(lsGet('cartus') || '{}'); } catch (_) {}
+  return { adr: lsGet('cartus_adr:' + current) || '', inst: g.inst || '', tens: g.tens || '2 x 230V ~ 50Hz', t1: g.t1 || 'Schéma unifilaire', t2: g.t2 || 'Plan de position' };
+}
+function editCartus() {
+  const c = cartGet();
+  dlg('Cartuș (chenarul din colț)',
+    '<label>Adresa instalației (Enter = rând nou):<textarea class="ka" rows="3" style="width:100%">' + escH(c.adr) + '</textarea></label>' +
+    '<label>Instalator (un rând pe linie):<textarea class="ki" rows="6" style="width:100%">' + escH(c.inst) + '</textarea></label>' +
+    '<label>Tensiune / rețea:<input class="kt full" value="' + escA(c.tens) + '"></label>' +
+    '<label>Titlu unifilar:<input class="k1 full" value="' + escA(c.t1) + '"></label>' +
+    '<label>Titlu plan:<input class="k2 full" value="' + escA(c.t2) + '"></label>' +
+    '<small>Adresa se ține separat pentru fiecare proiect; restul e comun tuturor.</small>',
+    d => {
+      lsSet('cartus', JSON.stringify({ inst: d.querySelector('.ki').value, tens: d.querySelector('.kt').value, t1: d.querySelector('.k1').value, t2: d.querySelector('.k2').value }));
+      lsSet('cartus_adr:' + current, d.querySelector('.ka').value);
+    });
+}
+function buildPrint() {
+  const pa = document.getElementById('pa'); pa.innerHTML = '';
+  const sp = currentPage, sl = lvl, sk = linkFrom, jobs = [];
+  if (pages[1].length) {
+    const xs = pages[1].filter(i => i.k === 'u_mcb' && i.gk).map(i => i.x).sort((a, b) => a - b), PER = 10;   // PER = câte circuite pe pagină
+    const np = Math.max(1, Math.ceil(xs.length / PER));
+    for (let j = 0; j < np; j++) jobs.push({ title:'Schemă monofilară (unifilar)' + (np > 1 ? ' – partea ' + (j+1) + '/' + np : ''), page:1, l:sl,
+      xa: j ? xs[j*PER] - 50 : 0, xb: j < np-1 ? xs[(j+1)*PER] - 50 : 0 });
+  }
+  plans.forEach((p, i) => { if (p.items.length) jobs.push({ title:'Plan casă – ' + p.name, page:2, l:i }); });
+  const caps = [];
+  jobs.forEach(j => {
+    currentPage = j.page; lvl = j.l;
+    const c = capture(j.xa, j.xb); if (!c) return;
+    const img = new Image();
+    img.src = c.toDataURL('image/png');
+    img.lw = c.lw; img.lh = c.lh;
+    caps.push({ j, c: img });
+  });
+    const refW = Math.max(1800, ...caps.filter(x => x.j.page === 1).map(x => x.c.lw));   // lățimea de referință = unifilarul
+  const SC = 275 / refW;                                                                    // aceeași scară (mm/px) pe toate paginile
+  const CD = cartGet(), N = caps.length, AW = 277, AH = 156;
+  const s1 = Math.min(...caps.filter(x => x.j.page === 1).map(x => Math.min(AW / x.c.lw, AH / x.c.lh)));   // scara comună a paginilor de unifilar                               // AH = zona liberă pentru desen, deasupra chenarului
+  caps.forEach(({ j, c }, i) => {
+    const s = j.page === 1 ? s1 : Math.min(AW / c.lw, AH / c.lh), w = c.lw * s, h = c.lh * s;   // unifilar = scară comună; plan = maxim posibil
+    Object.assign(c.style, { position:'absolute', display:'block', maxWidth:'none', maxHeight:'none', objectFit:'fill', margin:'0',
+      width:w + 'mm', height:h + 'mm', left:((280 - w) / 2) + 'mm', top:(3 + (AH - h) / 2) + 'mm' });      // centrat pe orizontală și verticală
+    const d = document.createElement('div'); d.className = 'pg';
+    d.style.cssText = 'position:relative;width:281mm;height:192mm;box-sizing:border-box;border:.4mm solid #000;overflow:hidden;background:#fff';
+    const bx = 'box-sizing:border-box;padding:1.5mm 2.5mm;overflow:hidden;font:8pt Arial,sans-serif;white-space:pre-line;';
+    const hd = t => '<b style="font-size:8.5pt">' + escH(t) + '</b>';
+    const title = j.page === 1 ? CD.t1 : CD.t2;
+    const box = document.createElement('div');
+    box.style.cssText = 'position:absolute;right:0;bottom:0;width:190mm;height:31mm;display:flex;border-top:.4mm solid #000;border-left:.4mm solid #000;background:#fff';
+    box.innerHTML =
+      '<div style="' + bx + 'width:78mm;border-right:.4mm solid #000">' + hd('Adresse de l’installation électrique') + '\n' + escH(CD.adr) + '</div>' +
+      '<div style="' + bx + 'width:78mm;border-right:.4mm solid #000">' + hd('Installateur') + '\n' + escH(CD.inst) + '</div>' +
+      '<div style="' + bx + 'width:34mm;padding:0"><div style="padding:1.5mm 2.5mm;border-bottom:.4mm solid #000">' + hd('p. ' + (i + 1) + '/' + N) + '<br>' + hd(title) + '</div>' +
+      '<div style="padding:1.5mm 2.5mm">' + escH(CD.tens) + '</div></div>';
+    d.appendChild(c); d.appendChild(box); pa.appendChild(d);
+  });
+  currentPage = sp; lvl = sl; linkFrom = sk; redraw();
+}
+let printReady = false;
+async function printNow() {
+  buildPrint();
+  const imgs = [...document.querySelectorAll('#pa img')];
+  try { await Promise.all(imgs.map(i => i.decode())); } catch (_) {}
+  printReady = true;
+  window.print();
+}
+window.addEventListener('beforeprint', () => { if (!printReady) buildPrint(); });
+window.addEventListener('afterprint', () => { printReady = false; document.getElementById('pa').innerHTML = ''; });
+
+/* ---------- Salvare automată în browser ---------- */
+const snap = () => JSON.stringify({ 1:pages[1], del:pages.del || [], plans, lvl, so:startOpts, cp:cabPlace, cc:circCfg, lib:usedLib() });
+
+/* ---------- Proiecte multiple (fiecare casă are planul ei) + galeria de proiecte ---------- */
+let current = '', projList = [], cloudD = {};
+const lsKey = n => 'proiect_electric:' + n;
+const lsGet = k => { try { return localStorage.getItem(k); } catch (_) { return null; } };
+const lsSet = (k, v) => { try { localStorage.setItem(k, v); } catch (_) {} };
+const lsDel = k => { try { localStorage.removeItem(k); } catch (_) {} };
+const escH = v => escA(v).replace(/</g, '&lt;');
+function fillProj() { const e = document.getElementById('pcur'); if (e) e.textContent = current; const b = document.getElementById('hback'); if (b) b.style.display = current ? '' : 'none'; }
+function saveList() { lsSet('proiecte_lista', JSON.stringify(projList)); lsSet('proiect_nume', current); fillProj(); }
+function uniqueName(b) { let n = b, i = 2; while (projList.includes(n)) n = b + ' ' + (i++); return n; }
+let thumbT = null;
+function thumbSoon() { clearTimeout(thumbT); const nm = current; thumbT = setTimeout(() => { if (nm === current) makeThumb(); }, 800); }
+function makeThumb() {                      // miniatura proiectului (din ce e acum pe ecran)
+  if (!current) return;
+  try {
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    pages[currentPage].forEach(it => [[it.x,it.y],[it.x1,it.y1],[it.x2,it.y2]].forEach(([x,y]) => { if (typeof x === 'number' && typeof y === 'number') { x0 = Math.min(x0,x); x1 = Math.max(x1,x); y0 = Math.min(y0,y); y1 = Math.max(y1,y); } }));
+    if (x1 < x0) { lsDel('proiect_thumb:' + current); return; }
+    x0 = Math.max(0, x0 - 50); y0 = Math.max(0, y0 - 50); x1 = Math.min(cv.width, x1 + 60); y1 = Math.min(cv.height, y1 + (currentPage === 1 ? 130 : 60));
+    const w = x1 - x0, h = y1 - y0, sc = Math.min(240 / w, 160 / h, 1), t = document.createElement('canvas');
+    t.width = Math.max(1, Math.round(w * sc)); t.height = Math.max(1, Math.round(h * sc));
+    const c = t.getContext('2d'); c.fillStyle = '#fff'; c.fillRect(0, 0, t.width, t.height); c.drawImage(cv, x0, y0, w, h, 0, 0, t.width, t.height);
+    lsSet('proiect_thumb:' + current, t.toDataURL('image/jpeg', .7));
+  } catch (_) {}
+}
+function save() { if (!current) return; lsSet(lsKey(current), snap()); lsSet('proiect_data:' + current, new Date().toISOString()); thumbSoon(); cloudSave(); }
+function resetState() { pages[1] = []; pages.del = []; plans = [{ name:'Parter', items:[] }]; lvl = 0; startOpts = { brk:true, meter:true, sect:false, diff:true }; cabPlace = ''; circCfg = {}; linkFrom = null; start = null; }
+function applyData(d) {
+  if (!d || !d[1]) return;
+  if (d.lib) { Object.keys(d.lib).forEach(id => { if (!lib[id]) { lib[id] = d.lib[id]; regSym(id); } }); libSave(); libTools(); }
+  pages[1] = d[1]; pages.del = d.del || []; if (d.so) startOpts = d.so; if (d.cp !== undefined) cabPlace = d.cp; circCfg = d.cc || {};
+  if (d.plans && d.plans.length) { plans = d.plans; lvl = Math.min(d.lvl || 0, plans.length - 1); }
+  else if (d[2]) plans = [{ name:'Parter', items:d[2] }];
+  const all = [pages[1]].concat(plans.map(p => p.items));
+  all.forEach(L => L.forEach(it => { if (it.t === 'sym' && !it.uid) it.uid = newUid(); if (it.t === 'sym' && it.a === undefined) it.a = (it.r||0)*Math.PI/2; }));
+}
+function showProject() { buildMenu(); buildLevels(); setMode(md); redraw(); fillPlace(); }
+function readLocal(name) { try { applyData(JSON.parse(lsGet(lsKey(name)))); } catch (_) {} }
+function load() {                          // la pornire
+  try { projList = JSON.parse(lsGet('proiecte_lista')) || []; } catch (_) { projList = []; }
+  const old = lsGet('proiect_electric');   // proiectul salvat înainte să existe lista (rămâne ca rezervă)
+  if (old && !projList.length) { projList = ['Proiect 1']; lsSet(lsKey('Proiect 1'), old); }
+  current = lsGet('proiect_nume') || ''; if (!projList.includes(current)) current = projList[0] || '';
+  if (current) readLocal(current);
+  saveList();
+}
+/* --- galeria --- */
+const HOUSE = '<svg width="64" height="64" viewBox="0 0 64 64" fill="none" stroke="#222" stroke-width="5"><path d="M8 56V8h48v48M8 28h20M36 8v22h20M36 56V40"/></svg>';
+function fmtDate(iso) { if (!iso) return ''; try { return new Date(iso).toLocaleString('ro-RO', { day:'2-digit', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' }); } catch (_) { return ''; } }
+function renderHome() {
+  const g = document.getElementById('hgrid'); g.innerHTML = '';
+  const dOf = n => lsGet('proiect_data:' + n) || cloudD[n] || '';
+  projList.slice().sort((a, b) => dOf(b).localeCompare(dOf(a))).forEach(n => {
+    const c = document.createElement('div'); c.className = 'pcard';
+    const th = lsGet('proiect_thumb:' + n);
+    c.innerHTML = '<div class="th">' + (th ? '<img src="' + th + '">' : HOUSE) + '</div><div><div class="nm">' + escH(n) + '</div><div class="dt">' + escH(fmtDate(dOf(n))) + '</div></div><button class="dots">⋯</button>';
+    c.onclick = () => openProject(n);
+    c.querySelector('.dots').onclick = ev => showCMenu(ev, n);
+    g.appendChild(c);
+  });
+  const add = (big, t, sub, fn) => { const c = document.createElement('div'); c.className = 'pcard'; c.innerHTML = '<div class="th big">' + big + '</div><div><div class="nm">' + t + '</div><div class="dt">' + sub + '</div></div>'; c.onclick = fn; g.appendChild(c); };
+  add('＋', 'Proiect nou', 'Creează un proiect nou', newProject);
+  add('⬇', 'Importă proiect', 'Dintr-un fișier .json', importProject);
+}
+function setView(list) { document.getElementById('hgrid').classList.toggle('list', list); document.getElementById('bgrid').classList.toggle('on', !list); document.getElementById('blist').classList.toggle('on', list); }
+function showHome() { if (current) { makeThumb(); save(); cloudFlush(); } renderHome(); fillProj(); document.getElementById('home').style.display = 'flex'; }
+function hideHome() { if (current) document.getElementById('home').style.display = 'none'; }
+function closeCMenu() { const m = document.getElementById('cmenu'); if (m) m.remove(); }
+function showCMenu(ev, name) {
+  ev.stopPropagation(); closeCMenu();
+  const m = document.createElement('div'); m.id = 'cmenu';
+  [['Deschide', () => openProject(name)], ['Redenumește', () => renameProject(name)], ['Copie', () => copyProject(name)], ['Exportă (fișier)', () => exportProject(name)], ['Șterge', () => deleteProject(name)]].forEach(([t, fn]) => {
+    const d = document.createElement('div'); d.textContent = t; d.onclick = e => { e.stopPropagation(); closeCMenu(); fn(); }; m.appendChild(d); });
+  m.style.left = Math.max(4, Math.min(ev.clientX - 20, innerWidth - 180)) + 'px'; m.style.top = Math.min(ev.clientY + 8, innerHeight - 230) + 'px';
+  document.body.appendChild(m);
+}
+document.addEventListener('pointerdown', e => { if (!e.target.closest || !e.target.closest('#cmenu')) closeCMenu(); });
+function openProject(name) { switchProject(name); hideHome(); }
+function switchProject(name) {
+  if (!name || name === current) return;
+  if (current) { makeThumb(); save(); cloudFlush(); }
+  clearTimeout(thumbT);
+  current = name; resetState(); readLocal(name); saveList(); showProject(); thumbSoon();
+  if (GAS) cloudLoad();
+}
+function newProject() {
+  const v = prompt('Numele proiectului nou (de ex. adresa casei):'); if (!v || !v.trim()) return;
+  if (current) { makeThumb(); save(); cloudFlush(); }
+  clearTimeout(thumbT);
+  const nm = uniqueName(v.trim()); projList.push(nm); current = nm; resetState(); saveList(); showProject(); save(); hideHome();
+}
+function copyProject(name) {
+  name = name || current;
+  const v = prompt('Copie sub numele:', name + ' (copie)'); if (!v || !v.trim()) return;
+  if (name === current) { makeThumb(); save(); }
+  const dat = lsGet(lsKey(name)); if (!dat) { alert('Proiectul nu e încă pe acest dispozitiv. Deschide-l o dată, apoi îl poți copia.'); return; }
+  const nm = uniqueName(v.trim());
+  lsSet(lsKey(nm), dat); lsSet('proiect_data:' + nm, new Date().toISOString()); const th = lsGet('proiect_thumb:' + name); if (th) lsSet('proiect_thumb:' + nm, th);
+  projList.push(nm); saveList(); cloudPut(nm, dat); renderHome();
+}
+function renameProject(name) {
+  name = name || current;
+  const v = prompt('Numele nou al proiectului:', name); if (!v || !v.trim() || v.trim() === name) return;
+  const nm = v.trim(); if (projList.includes(nm)) { alert('Există deja un proiect cu acest nume.'); return; }
+  if (name === current) { makeThumb(); clearTimeout(cloudT); cloudPend = null; }
+  const dat = name === current ? snap() : lsGet(lsKey(name));
+  if (dat) lsSet(lsKey(nm), dat);
+  [['proiect_thumb:'], ['proiect_data:']].forEach(([p]) => { const x = lsGet(p + name); if (x) lsSet(p + nm, x); lsDel(p + name); });
+  lsDel(lsKey(name)); projList[projList.indexOf(name)] = nm; if (name === current) current = nm; saveList();
+  if (GAS) google.script.run.withSuccessHandler(() => { if (nm === current) cloudSave(); }).withFailureHandler(e => setCloud('☁ EROARE la redenumire: ' + (e && e.message || e))).renameProject(name, nm);
+  renderHome();
+}
+function deleteProject(name) {
+  name = name || current;
+  if (!confirm('Ștergi proiectul „' + name + '” cu tot ce conține?')) return;
+  lsDel(lsKey(name)); lsDel('proiect_thumb:' + name); lsDel('proiect_data:' + name); projList = projList.filter(n => n !== name);
+  if (name === current) { clearTimeout(cloudT); cloudPend = null; clearTimeout(thumbT); }
+  if (GAS) google.script.run.withFailureHandler(e => setCloud('☁ EROARE la ștergere: ' + (e && e.message || e))).deleteProject(name);
+  if (name === current) { current = ''; resetState(); showProject(); }
+  saveList(); renderHome();
+}
+function exportProject(name) {
+  name = name || current;
+  if (name === current) { makeThumb(); save(); }
+  const dat = lsGet(lsKey(name)); if (!dat) { alert('Proiectul nu e încă pe acest dispozitiv. Deschide-l o dată și apoi îl poți exporta.'); return; }
+  const blob = new Blob([JSON.stringify({ app:'proiect-electric', name, data:JSON.parse(dat) })], { type:'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name.replace(/[\\/:*?"<>|]/g, '_') + '.json'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function importProject() {
+  const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json';
+  i.onchange = () => {
+    const f = i.files[0]; if (!f) return; const r = new FileReader();
+    r.onload = () => {
+      try {
+        const o = JSON.parse(r.result), d = o.data || o; if (!d || !d[1]) throw 0;
+        const nm = uniqueName(o.name || f.name.replace(/\.json$/i, '') || 'Proiect importat'), dat = JSON.stringify(d);
+        lsSet(lsKey(nm), dat); lsSet('proiect_data:' + nm, new Date().toISOString()); projList.push(nm); saveList(); cloudPut(nm, dat); renderHome();
+      } catch (_) { alert('Fișierul nu este un proiect valid.'); }
+    };
+    r.readAsText(f);
+  };
+  i.click();
+}
+
+/* ---------- Salvare în Google (Apps Script + Google Sheet) – se activează doar când pagina rulează din Apps Script ---------- */
+const GAS = typeof google !== 'undefined' && google.script && google.script.run;
+let cloudT = null, cloudPend = null;
+const setCloud = t => { const e = document.getElementById('cloud'); if (e) e.textContent = t; };
+function summaryOf(pl, cc) {               // tabel citibil: un rând per circuit
+  const g = {};
+  pl.forEach(p => p.items.forEach(i => { if (i.t === 'sym' && CAT[i.k]) { const id = (i.id || '?').trim() || '?'; const o = g[id] = g[id] || { l:0, f:0, m:0, w:0, s:0 }; o[CAT[i.k]] += qtyOf(i); } }));
+  return Object.keys(g).sort().map(id => { const c = (cc || {})[id] || {}, o = g[id]; return [id, c.cab || '', PLN[c.pl] || '', o.s, o.l, o.f, o.m, o.w]; });
+}
+const summary = () => summaryOf(plans, circCfg);
+function cloudPut(nm, str) {               // trimite direct un proiect (copie / import)
+  if (!GAS) return;
+  try { const d = JSON.parse(str); google.script.run.withFailureHandler(e => setCloud('☁ EROARE: ' + (e && e.message || e))).saveProject(nm, str, summaryOf(d.plans || [{ items:d[2] || [] }], d.cc)); } catch (_) {}
+}
+function cloudSave() {
+  if (!GAS || !current) return;
+  cloudPend = { nm:current, data:snap(), sm:summary() };   // se reține numele și datele de acum
+  setCloud('☁ se salvează...'); clearTimeout(cloudT); cloudT = setTimeout(cloudFlush, 1500);
+}
+function cloudFlush() {
+  clearTimeout(cloudT); if (!GAS || !cloudPend) return;
+  const p = cloudPend; cloudPend = null;
+  google.script.run.withSuccessHandler(() => setCloud('☁ salvat ' + new Date().toLocaleTimeString()))
+    .withFailureHandler(e => setCloud('☁ EROARE la salvare: ' + (e && e.message || e))).saveProject(p.nm, p.data, p.sm);
+}
+function cloudLoad() {
+  if (!GAS || !current) return;
+  const nm = current; setCloud('☁ se încarcă...');
+  google.script.run.withSuccessHandler(j => {
+    if (nm !== current) return;
+    if (!j) { setCloud('☁ proiect nou: se salvează la prima modificare'); return; }
+    resetState(); applyData(JSON.parse(j)); lsSet(lsKey(nm), snap()); showProject(); thumbSoon(); setCloud('☁ încărcat');
+  }).withFailureHandler(e => setCloud('☁ EROARE la încărcare: ' + (e && e.message || e))).loadProject(nm);
+}
+function cloudList() {
+  if (!GAS) return;
+  google.script.run.withSuccessHandler(l => {
+    (l || []).forEach(x => { const n = typeof x === 'string' ? x : x.n; if (!projList.includes(n)) projList.push(n); if (x && x.d) cloudD[n] = x.d; });
+    saveList(); if (document.getElementById('home').style.display === 'flex') renderHome();
+  }).listProjects();
+}
+
+/* ---------- Biblioteca mea de simboluri (PNG) ---------- */
+let lib = {};          // id -> { n:nume, d:dataURL, w, h, c:rol, wl:lipit de perete, u:id simbol pt. unifilar }
+const IMG = {};
+function regSym(id) {
+  const e = lib[id], k = 'img_' + id, im = new Image();
+  im.onload = () => { redraw(); const pv = document.querySelector('.btn[data-k="' + k + '"] canvas'); if (pv) { pv.width = 72; preview(pv, k, 'sym'); } };
+  im.src = e.d; IMG[k] = im;
+  S[k] = c => { if (im.complete && im.naturalWidth) c.drawImage(im, -e.w/2, -e.h/2, e.w, e.h); };
+  const m = Math.max(e.w, e.h);
+  EP[k] = [Math.round(m/2) + 2, m];
+  if (e.c) { CAT[k] = e.c; if (!IDSYM.includes(k)) IDSYM.push(k); if (e.c === 's' && !QTY.includes(k)) QTY.push(k); }
+  if (e.wl) WALLMOUNT[k] = [0, Math.round(e.h/2) + 2];
+  if (e.u) EL[k] = 'img_' + e.u;
+}
+function libTools() {
+  [1, 2].forEach(p => {
+    TOOLS[p] = TOOLS[p].filter(s => s[0] !== 'BIBLIOTECA MEA');
+    const list = Object.keys(lib).map(id => ['img_' + id, lib[id].n, 'sym']);
+    list.push(['lib_add', '＋ Încarcă PNG', 'libadd']);
+    list.push(['lib_del', '🗑 Șterge PNG', 'libdel']);
+    TOOLS[p].push(['BIBLIOTECA MEA', list]);
+  });
+}
+let libT = null, libReady = !GAS;     // în Apps Script nu trimitem nimic în Drive până nu am citit biblioteca de acolo
+function libSave() {
+  try { localStorage.setItem('proiect_lib', JSON.stringify(lib)); }       // copie rapidă în browser (nu mai e esențială)
+  catch (_) { if (!GAS) alert('Nu mai e loc în browser pentru simboluri. Șterge unele din bibliotecă sau folosește imagini mai mici.'); }
+  if (!GAS || !libReady) return;
+  setCloud('☁ se salvează biblioteca...');
+  clearTimeout(libT);
+  libT = setTimeout(() => {
+    google.script.run
+      .withSuccessHandler(() => setCloud('☁ bibliotecă salvată ' + new Date().toLocaleTimeString()))
+      .withFailureHandler(e => setCloud('☁ EROARE la salvarea bibliotecii: ' + (e && e.message || e)))
+      .saveLibrary(JSON.stringify(lib));
+  }, 800);
+}
+function libLoad() {                   // pornire rapidă din copia din browser
+  try { lib = JSON.parse(localStorage.getItem('proiect_lib')) || {}; } catch (_) { lib = {}; }
+  Object.keys(lib).forEach(regSym); libTools();
+}
+function libCloudLoad() {              // apoi Drive are ultimul cuvânt
+  if (!GAS) return;
+  setCloud('☁ se încarcă biblioteca...');
+  google.script.run.withSuccessHandler(j => {
+    let c = {}; try { c = JSON.parse(j) || {}; } catch (_) {}
+    const hasCloud = Object.keys(c).length > 0;
+    if (hasCloud) { lib = c; Object.keys(lib).forEach(regSym); }          // Drive = sursa de adevăr
+    libReady = true;
+    libTools(); buildMenu(); setMode(kindOf(md) ? md : 'nav'); redraw();
+    if (hasCloud) { try { localStorage.setItem('proiect_lib', JSON.stringify(lib)); } catch (_) {} setCloud('☁ bibliotecă încărcată'); }
+    else if (Object.keys(lib).length) libSave();                          // prima dată: urcă în Drive ce aveai deja în browser
+    else setCloud('☁ bibliotecă goală');
+  }).withFailureHandler(e => setCloud('☁ EROARE la încărcarea bibliotecii: ' + (e && e.message || e))).loadLibrary();
+}
+function usedLib() {                       // doar simbolurile folosite în proiect (ca să nu umfle fișierul)
+  const u = {};
+  [pages[1]].concat(plans.map(p => p.items)).forEach(L => L.forEach(i => { if (i.t === 'sym' && i.k.startsWith('img_') && lib[i.k.slice(4)]) u[i.k.slice(4)] = lib[i.k.slice(4)]; }));
+  return u;
+}
+function libDel(id, after) {
+  const k = 'img_' + id; if (!confirm('Ștergi „' + lib[id].n + '” și toate aparițiile lui din desene?')) return;
+  pages[1] = pages[1].filter(i => i.k !== k); plans.forEach(p => { p.items = p.items.filter(i => i.k !== k); });
+  delete lib[id]; delete S[k]; delete CAT[k]; delete EP[k]; delete WALLMOUNT[k]; delete EL[k];
+  [IDSYM, QTY].forEach(a => { const j = a.indexOf(k); if (j >= 0) a.splice(j, 1); });
+  libSave(); libTools(); buildMenu(); setMode('nav'); redraw(); save(); after();
+}
+function libDelDlg() {
+  const o = dlg('Șterge simbol PNG', '<div class="ll"></div><small>Apasă 🗑 lângă simbolul pe care vrei să-l ștergi. Dispar și toate aparițiile lui din desene.</small><span class="nofocus"></span>', () => true);
+  const renderL = () => {
+    o.querySelector('.ll').innerHTML = Object.keys(lib).map(id => '<div style="display:flex;align-items:center;gap:10px;margin:6px 0"><img src="' + lib[id].d + '" style="height:36px;max-width:70px;object-fit:contain;border:1px solid #ddd;background:#fff"><span style="flex:1">' + escH(lib[id].n) + '</span><button type="button" data-id="' + id + '" style="padding:6px 12px;color:#c0392b;cursor:pointer">🗑 Șterge</button></div>').join('') || '<small>Nu ai niciun simbol încărcat.</small>';
+    o.querySelectorAll('.ll button').forEach(b => b.onclick = () => libDel(b.dataset.id, renderL));
+  };
+  renderL();
+}
+function libDlg() {
+  let img = null;
+  const o = dlg('Biblioteca mea de simboluri',
+    '<label>Fișier PNG (fundal transparent):<input type="file" class="lf" accept="image/*"></label><div class="lp" style="min-height:30px;margin:6px 0"></div>' +
+    '<label>Nume:<input class="ln full" placeholder="ex. Priză Schuko"></label>' +
+    '<label>Rol (pentru Leagă / Generează):<select class="lc full"><option value="">Doar desen (decor)</option><option value="l">Bec / lampă</option><option value="s">Priză</option><option value="w">Întrerupător</option><option value="f">Ventilator</option><option value="m">Motor</option></select></label>' +
+    '<label>Lățime pe desen (px):<input class="lw" type="number" min="10" max="200" value="30"></label>' +
+    '<label><input type="checkbox" class="lwl"> Se lipește de perete (ca prizele și întrerupătoarele)</label>' +
+    '<label>Pe unifilarul generat folosește:<select class="lu full"><option value="">același simbol</option>' + Object.keys(lib).map(id => '<option value="' + id + '">' + escH(lib[id].n) + '</option>').join('') + '</select></label>' +
+    '<small>Desenează simbolul centrat, cu „partea de sus” spre cameră. Pe plan se rotește singur după perete.</small>' +
+    '<h4 style="margin-top:14px">Simboluri existente</h4><div class="ll"></div><span class="nofocus"></span>',
+    d => {
+      if (!img) return true;
+      const w = Math.max(10, Math.min(200, parseInt(d.querySelector('.lw').value) || 30)), id = newUid();
+      lib[id] = { n:d.querySelector('.ln').value.trim() || 'Simbol', d:img.d, w, h:Math.max(4, Math.round(w * img.ar)), c:d.querySelector('.lc').value, wl:d.querySelector('.lwl').checked, u:d.querySelector('.lu').value };
+      regSym(id); libSave(); libTools(); buildMenu(); setMode('img_' + id);
+    });
+  const renderL = () => {
+    o.querySelector('.ll').innerHTML = Object.keys(lib).map(id => '<div style="display:flex;align-items:center;gap:8px;margin:4px 0"><img src="' + lib[id].d + '" style="height:28px;max-width:60px;object-fit:contain;border:1px solid #ddd"><span style="flex:1">' + escH(lib[id].n) + '</span><button type="button" data-id="' + id + '">🗑</button></div>').join('') || '<small>Nimic încă.</small>';
+    o.querySelectorAll('.ll button').forEach(b => b.onclick = () => libDel(b.dataset.id, renderL));
+  };
+  renderL();
+  o.querySelector('.lf').onchange = ev => {
+    const f = ev.target.files[0]; if (!f) return;
+    const r = new FileReader();
+    r.onload = () => {
+      const im = new Image();
+      im.onload = () => {                  // micșorăm la max. 160px ca să încapă mai multe simboluri în browser
+        const s = Math.min(1, 160 / Math.max(im.width, im.height)), t = document.createElement('canvas');
+        t.width = Math.max(1, Math.round(im.width * s)); t.height = Math.max(1, Math.round(im.height * s));
+        t.getContext('2d').drawImage(im, 0, 0, t.width, t.height);
+        img = { d:t.toDataURL('image/png'), ar:im.height / im.width };
+        o.querySelector('.lp').innerHTML = '<img src="' + img.d + '" style="max-height:60px;border:1px solid #ccc;background:#fff">';
+        const n = o.querySelector('.ln'); if (!n.value) n.value = f.name.replace(/\.[^.]+$/, '');
+      };
+      im.src = r.result;
+    };
+    r.readAsDataURL(f);
+  };
+}
+libLoad(); libCloudLoad();
+
+load(); buildMenu(); buildLevels(); buildCabBar(); setMode('nav'); redraw();
+(function () {                             // bara de sus: pe PC extinsă, pe tabletă compactă (alegerea ta se ține minte)
+  let v = null; try { v = localStorage.getItem('tb_more'); } catch (_) {}
+  const touch = matchMedia('(pointer: coarse)').matches || innerWidth < 1000;
+  setMore(v === null ? !touch : v === '1', true);
+  autoMode();
+})();
+document.getElementById('cab').addEventListener('input', () => { save(); });
+if (GAS) { cloudList(); cloudLoad(); }
+renderHome(); document.getElementById('home').style.display = 'flex'; fillProj();     // la pornire se vede galeria de proiecte
+
+/* ---------- Lista „Aparat”: disjunctoare, diferențiale, RCBO, separatoare (LEGRAND) ---------- */
+(function () {
+  const B = 'LEGRAND', L = [];
+  const mcb = (poli, curbe, curenti, ka) => poli.forEach(p => curbe.forEach(c => curenti.forEach(i => L.push(ka + 'kA|' + p + 'P - ' + c + ' ' + i + 'A|' + B))));
+  mcb([2], ['C'], [6,10,13,16,20,25,32,40,50,63], 3);
+  mcb([1], ['C'], [6,10,16,20,25,32], 3);
+  mcb([3], ['C'], [10,16,20,25,32,40,50,63], 3);
+  mcb([4], ['C'], [16,20,25,32,40,50,63], 3);
+  mcb([2], ['B'], [10,16,20,25,32], 3);
+  mcb([3], ['D'], [10,16,25,32,40], 3);
+  [2,4].forEach(p => [25,40,63,80,100].forEach(i => [30,300].forEach(m => L.push(p + 'P - ' + i + 'A|Δ' + m + 'mA - tip A|' + B))));   // diferențiale (RCCB)
+  [4].forEach(p => [25,40,63].forEach(i => L.push(p + 'P - C ' + i + 'A|Δ300mA - 10kA|' + B)));
+  [6,10,16,20,25,32].forEach(i => L.push('2P - C ' + i + 'A|Δ30mA - 6kA|' + B + '|RCBO'));                // disjunctor diferențial combinat
+  [25,40,63,100].forEach(i => L.push('4P - ' + i + 'A|Separator'));
+  L.push('4P - 25A');
+  document.getElementById('apps').innerHTML = L.map(v => '<option value="' + v + '">').join('');
+})();
+</script>
+</body>
+</html>
