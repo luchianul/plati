@@ -581,7 +581,7 @@ body.small * { -webkit-backdrop-filter: none !important; backdrop-filter: none !
    Imită google.script.run, deci restul aplicației merge neschimbat. */
 (function () {
   if (window.google && google.script && google.script.run) return;   // rulează chiar în Apps Script -> nu e nevoie
-  var URL = "https://script.google.com/macros/library/d/1m8NwcNWZl--SQIJN2wf5c58k9xhrV6pYFZ403xHNrbJBS3usH7C9pJVN/1";
+  var URL = "https://script.google.com/macros/s/AKfycbz5HCllvkHcR8WuXFjToVFTYtGmWGBXomabCWeTrt7mT-cd8LWGf7E1Oq3Dsf9onAUsvA/exec";
   function make(ok, err) {
     return new Proxy({}, { get: function (_, fn) {
       if (fn === 'withSuccessHandler') return function (f) { return make(f, err); };
