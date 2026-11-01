@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Proiect electric">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#2c3e50">
 <title>Proiect electric – Unifilar și plan</title>
 <style>
 :root { --sidebar: 300px; --accent: #2980b9; }
@@ -2303,17 +2310,36 @@ function regNat(d) {
 }
 AREI.forEach(regNat);
 (function () {                             // aplicație instalabilă + funcționare fără internet (doar în afara Apps Script)
-  if (GAS || !/^https?:$/.test(location.protocol)) return;
-  const h = document.head, add = (tag, at) => { const e = document.createElement(tag); Object.keys(at).forEach(k => e.setAttribute(k, at[k])); h.appendChild(e); };
-  add('link', { rel:'manifest', href:'manifest.webmanifest' }); add('link', { rel:'apple-touch-icon', href:'icon-192.png' });
-  add('meta', { name:'apple-mobile-web-app-capable', content:'yes' }); add('meta', { name:'mobile-web-app-capable', content:'yes' });
-  add('meta', { name:'apple-mobile-web-app-title', content:'Proiect electric' }); add('meta', { name:'theme-color', content:'#2c3e50' });
+  if (GAS || !/^https?:$/.test(location.protocol)) { document.querySelectorAll('link[rel=manifest],link[rel=apple-touch-icon]').forEach(e => e.remove()); return; }
   if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
   try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (_) {}      // cere să nu fie șterse datele locale
 })();
+let deferredInstall = null;
+const isStandalone = () => { try { return matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches || navigator.standalone === true; } catch (_) { return false; } };
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredInstall = e; });
+window.addEventListener('appinstalled', () => { deferredInstall = null; document.querySelectorAll('.binst').forEach(b => b.style.display = 'none'); });
+function fullscreenToggle() {
+  const d = document, el = d.documentElement;
+  if (d.fullscreenElement || d.webkitFullscreenElement) { (d.exitFullscreen || d.webkitExitFullscreen).call(d); return true; }
+  const f = el.requestFullscreen || el.webkitRequestFullscreen; if (!f) return false;
+  try { const r = f.call(el); if (r && r.catch) r.catch(() => {}); return true; } catch (_) { return false; }
+}
+function installApp() {                    // „Instalează / ecran complet”: instalare dacă browserul permite, altfel instrucțiuni sau ecran complet
+  if (deferredInstall) { deferredInstall.prompt(); deferredInstall.userChoice.finally(() => { deferredInstall = null; }); return; }
+  if (isStandalone()) { alert('Aplicația rulează deja ca aplicație instalată.'); return; }
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (ios) { alert('Pe iPad: în Safari apasă Partajare (pătratul cu săgeată) → „Adaugă pe ecranul principal”, lasă bifat „Deschide ca aplicație web”, apoi deschide aplicația de pe iconiță (nu din Safari).'); return; }
+  if (fullscreenToggle()) return;
+  alert('În Chrome: meniul ⋮ → „Instalează aplicația” (nu „Adaugă pe ecranul principal”). Dacă nu apare, deschide adresa o dată cu internet și reîncarcă pagina.');
+}
+(function () {                             // butonul din galerie și din bara de sus; ascuns când aplicația e deja instalată
+  if (GAS || isStandalone()) return;
+  const mk = txt => { const b = document.createElement('button'); b.className = 'binst'; b.textContent = txt; b.title = 'Instalează aplicația / ecran complet'; b.onclick = installApp; return b; };
+  const top = document.getElementById('htop'), back = document.getElementById('hback'); if (top && back) top.insertBefore(mk('📲 Instalează / ecran complet'), back);
+})();
 buildFab2();
 (function () {                             // etichetă de versiune: ca să vezi dacă rulezi fișierul cel mai nou
-  const v = document.createElement('div'); v.id = 'ver'; v.textContent = 'v 31.10 23:55';
+  const v = document.createElement('div'); v.id = 'ver'; v.textContent = 'v 01.11 10:20';
   v.style.cssText = 'position:fixed;right:8px;bottom:3px;font:10px Arial;color:#888;z-index:5;pointer-events:none';
   document.body.appendChild(v);
   const st = document.createElement('style'); st.textContent = '@media print{#ver{display:none}}'; document.head.appendChild(st);

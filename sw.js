@@ -1,5 +1,5 @@
 // Service worker: aplicația se deschide și fără internet (rețea întâi, cu rezervă din memoria locală)
-const CACHE = 'proiect-electric-v2';
+const CACHE = 'proiect-electric-v3';
 const MAIN = 'trikker.html';
 const FILES = [MAIN, 'manifest.webmanifest', 'icon-192.png', 'icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
