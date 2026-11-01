@@ -7,7 +7,7 @@ self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Pr
 self.addEventListener('fetch', e => {
   const r = e.request;
   if (r.method !== 'GET') return;
-  if (new URL(r.url).origin !== location.origin) return;                       // Google Drive / alte site-uri: direct, fără service worker
+  if (new URL(r.url).origin !== location.origin) return;                       // Google Drive / alte site-uri: direct, fără service worker 
   e.respondWith((async () => {
     const cache = await caches.open(CACHE);
     const net = fetch(r).then(resp => { if (resp.ok) cache.put(r, resp.clone()); return resp; });
