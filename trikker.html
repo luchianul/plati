@@ -579,7 +579,7 @@ body.small * { -webkit-backdrop-filter: none !important; backdrop-filter: none !
   <div id="levels"></div>
   <div id="canvas-wrap"><canvas id="c" width="1100" height="900"></canvas></div>
   <div id="pa"></div>
-  <div id="chip"></div><div id="fab"><button onclick="showHome()" title="Proiecte">🏠</button><button onclick="zoomBy(1.25)" title="Mărește">＋</button><button onclick="zoomBy(0.8)" title="Micșorează">－</button><button onclick="zoomFit()" title="Încadrează pagina">⤢</button><button onclick="undo()" title="Anulează">↶</button><button onclick="rotate()" title="Rotește">↻</button><button onclick="quickLink()" title="Leagă / setează circuitul">🔗</button><button onclick="generate()" title="Generează unifilar">⚡</button><button onclick="setMode('nav')" title="Navigare">☝</button><button id="fsticky" onclick="toggleSticky()" title="Păstrează unealta activă">🔒</button><button id="fpan" onclick="togglePan()" title="Deplasare">✋</button><button onclick="toggleMenu()" title="Meniu stânga">☰</button><button onclick="toggleBar()" title="Bara de sus">⚙</button></div>
+  <div id="chip"></div><div id="fab"><button onclick="showHome()" title="Proiecte">🏠</button><button onclick="zoomBy(1.25)" title="Mărește">＋</button><button onclick="zoomBy(0.8)" title="Micșorează">－</button><button onclick="zoomFit()" title="Încadrează pagina">⤢</button><button onclick="undo()" title="Anulează">↶</button><button onclick="rotate()" title="Rotește">↻</button><button onclick="quickLink()" title="Leagă / setează circuitul">🔗</button><button onclick="generate()" title="Generează unifilar">⚡</button><button onclick="setMode('nav')" title="Navigare">☝</button><button id="fsticky" onclick="toggleSticky()" title="Păstrează unealta activă">🔒</button><button id="fpan" onclick="togglePan()" title="Deplasare">✋</button><button onclick="fullscreenToggle()" title="Ecran complet (ascunde bara browserului)">⛶</button><button onclick="toggleMenu()" title="Meniu stânga">☰</button><button onclick="toggleBar()" title="Bara de sus">⚙</button></div>
   <div id="help"></div>
 </div>
 
@@ -2329,17 +2329,66 @@ function installApp() {                    // „Instalează / ecran complet”:
   if (isStandalone()) { alert('Aplicația rulează deja ca aplicație instalată.'); return; }
   const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   if (ios) { alert('Pe iPad: în Safari apasă Partajare (pătratul cu săgeată) → „Adaugă pe ecranul principal”, lasă bifat „Deschide ca aplicație web”, apoi deschide aplicația de pe iconiță (nu din Safari).'); return; }
-  if (fullscreenToggle()) return;
-  alert('În Chrome: meniul ⋮ → „Instalează aplicația” (nu „Adaugă pe ecranul principal”). Dacă nu apare, deschide adresa o dată cu internet și reîncarcă pagina.');
+  installDiag();                           // Android fără prompt de instalare: arată exact ce lipsește
+}
+
+async function installDiag() {             // verifică pe dispozitiv tot ce cere Chrome ca să poată instala aplicația
+  const rows = [], ok = (t, d) => rows.push(['✔', '#27ae60', t, d || '']), bad = (t, d) => rows.push(['✖', '#c0392b', t, d || '']), info = (t, d) => rows.push(['ℹ', '#2980b9', t, d || '']);
+  const get = async (u, asJson) => { const r = await fetch(u, { cache:'no-store' }); return { r, ct: r.headers.get('content-type') || '', body: r.ok ? (asJson ? await r.json() : await r.blob()) : null }; };
+  info('Adresa', location.href); info('Versiune pagină', (document.getElementById('ver') || {}).textContent || '?');
+  info('Mod curent', isStandalone() ? 'aplicație instalată' : 'în browser');
+  (location.protocol === 'https:' || location.hostname === 'localhost') ? ok('Conexiune sigură (https)') : bad('Adresa nu e https', 'Chrome instalează doar de pe https');
+  const link = document.querySelector('link[rel=manifest]');
+  if (!link) bad('În pagină lipsește legătura către manifest', 'trikker.html nu este varianta nouă (v 01.11 10:40)');
+  else {
+    try {
+      const m = await get(link.href, true);
+      if (!m.r.ok) bad('Manifest: eroare HTTP ' + m.r.status, link.href + ' – fișierul lipsește sau are alt nume / alt folder');
+      else {
+        const mf = m.body; ok('Manifest găsit', m.ct);
+        (mf.name || mf.short_name) ? ok('Nume: ' + (mf.name || mf.short_name)) : bad('Manifestul nu are nume');
+        mf.display === 'standalone' || mf.display === 'fullscreen' ? ok('Mod afișare: ' + mf.display) : bad('Mod afișare: ' + mf.display, 'trebuie „standalone”');
+        let sc; try { sc = await get(new URL(mf.start_url || './', link.href).href); sc.r.ok ? ok('Pagina de pornire se deschide', mf.start_url) : bad('Pagina de pornire: HTTP ' + sc.r.status, mf.start_url + ' – nu există la adresa asta (nume diferit de fișier?)'); } catch (e) { bad('Pagina de pornire nu se poate încărca', String(e.message || e)); }
+        const icons = mf.icons || []; if (!icons.length) bad('Manifestul nu are iconițe');
+        let has192 = false, has512 = false;
+        for (const ic of icons) {
+          try { const g = await get(new URL(ic.src, link.href).href);
+            if (!g.r.ok) { bad('Iconiță ' + ic.src + ': HTTP ' + g.r.status, 'fișierul nu e urcat pe GitHub'); continue; }
+            if (!/image\/png/.test(g.ct)) bad('Iconiță ' + ic.src + ': tip ' + g.ct, 'trebuie PNG'); else {
+              const bmp = await createImageBitmap(g.body); const w = bmp.width;
+              ok('Iconiță ' + ic.src + ' ' + w + '×' + bmp.height, ic.purpose || 'any');
+              if ((ic.purpose || 'any').includes('any')) { if (w >= 192) has192 = true; if (w >= 512) has512 = true; } }
+          } catch (e) { bad('Iconiță ' + ic.src + ' nu se poate citi', String(e.message || e)); }
+        }
+        if (icons.length && !(has192 && has512)) bad('Lipsește o iconiță PNG de cel puțin 192 și una de 512 px');
+      }
+    } catch (e) { bad('Manifestul nu se poate citi', String(e.message || e)); }
+  }
+  if (!('serviceWorker' in navigator)) bad('Browserul nu acceptă service worker');
+  else {
+    try { const w = await get('sw.js');
+      if (!w.r.ok) bad('sw.js: HTTP ' + w.r.status, 'fișierul lipsește de pe GitHub');
+      else /javascript/.test(w.ct) ? ok('sw.js găsit', w.ct) : bad('sw.js are tip ' + w.ct, 'trebuie JavaScript'); } catch (e) { bad('sw.js nu se poate citi', String(e.message || e)); }
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) bad('Service worker neînregistrat', 'reîncarcă pagina o dată, cu internet');
+    else { const st = reg.active ? reg.active.state : (reg.installing ? 'se instalează' : (reg.waiting ? 'în așteptare' : '?')); st === 'activated' ? ok('Service worker activ', reg.scope) : info('Service worker: ' + st, 'așteaptă câteva secunde și verifică din nou');
+      navigator.serviceWorker.controller ? ok('Service worker controlează pagina') : info('Pagina nu e încă controlată de service worker', 'reîncarc-o o dată'); }
+  }
+  info('Promptul de instalare', deferredInstall ? 'disponibil – apasă 📲' : 'indisponibil încă (Chrome îl dă doar când toate de mai sus sunt ✔)');
+  const bads = rows.filter(r => r[0] === '✖').length;
+  const html = '<div style="max-height:60vh;overflow:auto;font-size:13px">' + rows.map(r => '<div style="margin:5px 0"><b style="color:' + r[1] + '">' + r[0] + '</b> ' + escH(r[2]) + (r[3] ? '<div style="margin-left:20px;color:#666;word-break:break-all">' + escH(r[3]) + '</div>' : '') + '</div>').join('') + '</div>' +
+    '<div style="margin-top:8px;font-weight:bold;color:' + (bads ? '#c0392b' : '#27ae60') + '">' + (bads ? bads + ' probleme de rezolvat (rândurile cu ✖).' : 'Totul e în regulă. Dacă tot nu se instalează: Chrome → ⋮ → Setări → Setări site → Toate site-urile → github.io → „Șterge și resetează”, apoi redeschide adresa.') + '</div><span class="nofocus"></span>';
+  dlg('🔍 Verificare instalare', html, () => true);
 }
 (function () {                             // butonul din galerie și din bara de sus; ascuns când aplicația e deja instalată
   if (GAS || isStandalone()) return;
   const mk = txt => { const b = document.createElement('button'); b.className = 'binst'; b.textContent = txt; b.title = 'Instalează aplicația / ecran complet'; b.onclick = installApp; return b; };
-  const top = document.getElementById('htop'), back = document.getElementById('hback'); if (top && back) top.insertBefore(mk('📲 Instalează / ecran complet'), back);
+  const top = document.getElementById('htop'), back = document.getElementById('hback');
+  if (top && back) { top.insertBefore(mk('📲 Instalează / ecran complet'), back); const d = mk('🔍 Verifică instalarea'); d.onclick = installDiag; d.title = 'Arată ce lipsește ca să se poată instala'; top.insertBefore(d, back); }
 })();
 buildFab2();
 (function () {                             // etichetă de versiune: ca să vezi dacă rulezi fișierul cel mai nou
-  const v = document.createElement('div'); v.id = 'ver'; v.textContent = 'v 01.11 10:20';
+  const v = document.createElement('div'); v.id = 'ver'; v.textContent = 'v 01.11 10:40';
   v.style.cssText = 'position:fixed;right:8px;bottom:3px;font:10px Arial;color:#888;z-index:5;pointer-events:none';
   document.body.appendChild(v);
   const st = document.createElement('style'); st.textContent = '@media print{#ver{display:none}}'; document.head.appendChild(st);
