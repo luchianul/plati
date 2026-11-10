@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Galerie Ioan Carvatchi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="aurora" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div>
+
+<div class="wrap nav-shell">
+  <header class="nav glass">
+    <a class="brand" href="index.html" aria-label="Ioan Carvatchi, electrician"><img class="logo-img" src="logo.png" alt="Ioan Carvatchi Electricien"></a>
+    <nav class="nav-links" aria-label="Meniu principal">
+      <a href="index.html">Acasă</a>
+      <a href="galerie.html" aria-current="page">Galerie</a>
+      <a href="index.html#contact" class="call">Contact</a>
+    </nav>
+  </header>
+</div>
+
+<main class="wrap">
+  <div class="page-head">
+    <span class="pill"><i></i>Lucrări finalizate</span>
+    <h1>Galerie</h1>
+    <p class="lead">Proiecte din locuințe, spații comerciale și instalații de energie verde. Apasă pe un proiect ca să îl vezi mai mare.</p>
+  </div>
+
+  <div class="filters glass" role="group" aria-label="Filtrează lucrările">
+    <button type="button" data-f="toate" aria-pressed="true">Toate</button>
+    <button type="button" data-f="rezidential" aria-pressed="false">Locuințe</button>
+    <button type="button" data-f="tablouri" aria-pressed="false">Tablouri</button>
+    <button type="button" data-f="iluminat" aria-pressed="false">Iluminat</button>
+    <button type="button" data-f="verde" aria-pressed="false">Energie verde</button>
+    <button type="button" data-f="comercial" aria-pressed="false">Comercial</button>
+  </div>
+
+  <div class="gallery" id="gallery"></div>
+
+  <section class="contact">
+    <div class="glass" style="padding:30px;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between">
+      <div class="sec-head" style="margin:0"><h2>Ai o lucrare în minte?</h2><p>Primești ofertă gratuită după o scurtă vizită.</p></div>
+      <a class="btn btn-primary" href="index.html#contact" data-i="phone"> Contactează-ne</a>
+    </div>
+  </section>
+</main>
+
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-label="Detalii lucrare">
+  <div class="lb-card glass">
+    <div class="shot g1"><div class="orb"></div><span class="tag"></span></div>
+    <h3></h3>
+    <p class="lb-text"></p>
+    <div class="lb-bar">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-glass" type="button" data-prev>← Înapoi</button>
+        <button class="btn btn-glass" type="button" data-next>Următoarea →</button>
+      </div>
+      <button class="btn btn-primary" type="button" data-close>Închide</button>
+    </div>
+  </div>
+</div>
+
+<footer class="wrap"><img class="foot-logo" src="logo.png" alt=""><br>© 2026 Ioan Carvatchi · Electrician autorizat</footer>
+<script src="app.js"></script>
+</body>
+</html>
