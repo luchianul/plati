@@ -112,14 +112,16 @@
       var tel = document.getElementById('tel').value.trim();
       var sel = document.getElementById('tip');
       var msg = document.getElementById('msg').value.trim();
+      var mail = document.getElementById('email').value.trim();
       if (!n || !tel) { say(t('f.req'), true); return; }
+      if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mail)) { say(t('f.bad'), true); return; }
       sendBtn.disabled = true; sendBtn.textContent = t('f.sending');
       fetch(ENDPOINT, {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         body: JSON.stringify({
           _subject: t('f.subj') + ' - ' + n,
-          nume: n, telefon: tel, tip: sel.options[sel.selectedIndex].textContent, mesaj: msg,
+          nume: n, telefon: tel, email: mail, tip: sel.options[sel.selectedIndex].textContent, mesaj: msg,
           limba: lang, _gotcha: form.elements['_gotcha'].value
         })
       }).then(function (r) {
