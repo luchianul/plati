@@ -103,10 +103,15 @@
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var n = document.getElementById('nume').value.trim();
+      var tel = document.getElementById('tel').value.trim();
+      var sel = document.getElementById('tip');
+      var msg = document.getElementById('msg').value.trim();
+      var body = t('f.name') + ': ' + n + '\n' + t('f.tel') + ': ' + tel + '\n' + t('f.type') + ': ' + sel.options[sel.selectedIndex].textContent + '\n\n' + msg;
+      var href = 'mailto:ioancarvatchi@gmail.com?subject=' + encodeURIComponent(t('f.subj') + (n ? ' - ' + n : '')) + '&body=' + encodeURIComponent(body);
       var ok = document.getElementById('ok');
-      ok.textContent = t('f.ok').replace('{n}', n ? ', ' + n : '');
+      ok.textContent = t('f.ok').replace('{n}', '');
       ok.hidden = false;
-      form.reset();
+      window.location.href = href;
     });
   }
 
