@@ -157,7 +157,15 @@
     var a = e.target.closest('a[href]');
     if (!a || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank') return;
     var u = new URL(a.href, location.href);
-    if (u.origin !== location.origin || u.pathname === location.pathname) return;
+    var norm = function (p) { return p.replace(/index\.html$/, ''); };
+    var same = u.origin === location.origin && norm(u.pathname) === norm(location.pathname);
+    if (same && (u.hash === '#contact' || (!u.hash && a.closest('.nav')))) {
+      e.preventDefault();
+      var bottom = u.hash === '#contact';
+      window.scrollTo({ top: bottom ? document.documentElement.scrollHeight : 0, behavior: reduce ? 'auto' : 'smooth' });
+      return;
+    }
+    if (u.origin !== location.origin || same) return;
     if (reduce) return;
     e.preventDefault();
     document.body.classList.add('leaving');
@@ -359,4 +367,14 @@
   });
   document.addEventListener('visibilitychange', function () { if (document.hidden) pause(); else resume(); });
   go(0);
+})();
+
+/* venit din altă pagină cu #contact: derulează lin până jos */
+(function () {
+  if (location.hash !== '#contact') return;
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollTo(0, 0);
+  setTimeout(function () {
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: reduce ? 'auto' : 'smooth' });
+  }, 500);
 })();
