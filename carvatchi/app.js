@@ -98,20 +98,39 @@
   }
 
   /* ---------- formular ---------- */
+  var ENDPOINT = 'https://formspree.io/f/xwloepgv';
   var form = document.getElementById('cerere');
   if (form) {
+    var ok = document.getElementById('ok'), sendBtn = document.getElementById('send');
+    function say(msg, bad) {
+      ok.textContent = msg; ok.hidden = false;
+      ok.style.color = bad ? '#a12a1d' : ''; ok.style.background = bad ? 'rgba(255, 120, 100, 0.2)' : ''; ok.style.borderColor = bad ? 'rgba(220, 80, 60, 0.35)' : '';
+    }
     form.addEventListener('submit', function (e) {
       e.preventDefault();
       var n = document.getElementById('nume').value.trim();
       var tel = document.getElementById('tel').value.trim();
       var sel = document.getElementById('tip');
       var msg = document.getElementById('msg').value.trim();
-      var body = t('f.name') + ': ' + n + '\n' + t('f.tel') + ': ' + tel + '\n' + t('f.type') + ': ' + sel.options[sel.selectedIndex].textContent + '\n\n' + msg;
-      var href = 'mailto:ioancarvatchi@gmail.com?subject=' + encodeURIComponent(t('f.subj') + (n ? ' - ' + n : '')) + '&body=' + encodeURIComponent(body);
-      var ok = document.getElementById('ok');
-      ok.textContent = t('f.ok').replace('{n}', '');
-      ok.hidden = false;
-      window.location.href = href;
+      if (!n || !tel) { say(t('f.req'), true); return; }
+      sendBtn.disabled = true; sendBtn.textContent = t('f.sending');
+      fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          _subject: t('f.subj') + ' - ' + n,
+          nume: n, telefon: tel, tip: sel.options[sel.selectedIndex].textContent, mesaj: msg,
+          limba: lang, _gotcha: form.elements['_gotcha'].value
+        })
+      }).then(function (r) {
+        if (!r.ok) throw new Error('http ' + r.status);
+        say(t('f.ok').replace('{n}', ', ' + n), false);
+        form.reset();
+      }).catch(function () {
+        say(t('f.err'), true);
+      }).then(function () {
+        sendBtn.disabled = false; sendBtn.textContent = t('f.send');
+      });
     });
   }
 

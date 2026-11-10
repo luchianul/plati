@@ -119,6 +119,7 @@
         </ul>
       </div>
       <form id="cerere" novalidate>
+        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
         <div class="row2">
           <label for="nume"><span data-t="f.name"></span><input id="nume" name="nume" autocomplete="name"></label>
           <label for="tel"><span data-t="f.tel"></span><input id="tel" name="tel" type="tel" autocomplete="tel"></label>
@@ -127,7 +128,7 @@
           <select id="tip" name="tip"><option data-t="f.o1"></option><option data-t="f.o2"></option><option data-t="f.o3"></option><option data-t="f.o4"></option><option data-t="f.o5"></option><option data-t="f.o6"></option></select>
         </label>
         <label for="msg"><span data-t="f.msg"></span><textarea id="msg" name="msg" data-ph="f.ph"></textarea></label>
-        <button class="btn btn-primary" type="submit" data-t="f.send"></button>
+        <button class="btn btn-primary" type="submit" id="send" data-t="f.send"></button>
         <p class="note" id="ok" role="status" hidden></p>
       </form>
     </div>
