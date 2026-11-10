@@ -47,18 +47,17 @@
   /* ---------- galerie ---------- */
   var grid = document.getElementById('gallery');
   var items = [
-    { c: 'tablouri', cl: 'c.tab', g: 'g1', i: 'panel' },
-    { c: 'iluminat', cl: 'c.light', g: 'g2', i: 'bulb' },
-    { c: 'rezidential', cl: 'c.res', g: 'g3', i: 'home' },
-    { c: 'verde', cl: 'c.green', g: 'g4', i: 'sun' },
-    { c: 'verde', cl: 'c.green', g: 'g6', i: 'car' },
-    { c: 'comercial', cl: 'c.com', g: 'g5', i: 'building' }
+    { c: 'tablouri', cl: 'c.tab', g: 'g1', k: 1, i: 'panel' },
+    { c: 'iluminat', cl: 'c.light', g: 'g2', k: 2, i: 'bulb' },
+    { c: 'rezidential', cl: 'c.res', g: 'g3', k: 3, i: 'home' },
+    { c: 'verde', cl: 'c.green', g: 'g6', k: 5, i: 'car' },
+    { c: 'comercial', cl: 'c.com', g: 'g5', k: 6, i: 'building' }
   ];
   if (grid) {
     grid.innerHTML = items.map(function (it, n) {
       return '<button class="item glass" data-c="' + it.c + '" data-n="' + n + '" type="button">' +
         '<div class="shot ' + it.g + '"><div class="orb">' + svg(it.i) + '</div><span class="tag" data-t="' + it.cl + '"></span></div>' +
-        '<h3 data-t="g' + (n + 1) + 't"></h3><p data-t="g' + (n + 1) + 'd"></p></button>';
+        '<h3 data-t="g' + it.k + 't"></h3><p data-t="g' + it.k + 'd"></p></button>';
     }).join('');
 
     var btns = document.querySelectorAll('.filters button');
@@ -79,8 +78,8 @@
       lb.querySelector('.shot').className = 'shot ' + it.g;
       lb.querySelector('.orb').innerHTML = svg(it.i);
       lb.querySelector('.tag').textContent = t(it.cl);
-      lb.querySelector('h3').textContent = t('g' + (idx + 1) + 't');
-      lb.querySelector('.lb-text').textContent = t('g' + (idx + 1) + 'd');
+      lb.querySelector('h3').textContent = t('g' + it.k + 't');
+      lb.querySelector('.lb-text').textContent = t('g' + it.k + 'd');
       lb.classList.add('open');
       lb.querySelector('[data-close]').focus();
     }

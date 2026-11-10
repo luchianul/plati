@@ -358,3 +358,9 @@ h1 em { background-size: 220% 100%; animation: shimmer 6s ease-in-out infinite a
   /* backdrop-filter pe .nav ar prinde bara fixă în interiorul lui */
   .nav, .nav-shell.scrolled .nav { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 255, 255, 0.95); }
 }
+
+/* servicii: ultimul rând centrat */
+#servicii .grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; }
+#servicii .card { flex: 0 1 calc((100% - 32px) / 3); }
+@media (max-width: 900px) { #servicii .card { flex-basis: calc((100% - 16px) / 2); } }
+@media (max-width: 560px) { #servicii .card { flex-basis: 100%; } }
