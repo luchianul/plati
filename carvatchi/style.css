@@ -207,7 +207,7 @@ footer { padding: 20px 0 40px; text-align: center; color: var(--muted); font-siz
 .progress { position: fixed; top: 0; left: 0; height: 3px; width: 100%; z-index: 60; transform-origin: 0 50%; transform: scaleX(0); background: linear-gradient(90deg, var(--blue), #4fb3ff 50%, var(--volt)); box-shadow: 0 0 12px rgba(10, 124, 255, 0.6); }
 
 /* tranziție între pagini */
-body { animation: pageIn 0.65s cubic-bezier(.2,.7,.2,1) both; }
+body { animation: pageIn 0.65s cubic-bezier(.2,.7,.2,1) backwards; }
 body.leaving { animation: pageOut 0.28s ease-in forwards; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(14px); filter: blur(8px); } to { opacity: 1; transform: none; filter: none; } }
 @keyframes pageOut { to { opacity: 0; transform: translateY(-10px) scale(0.99); filter: blur(8px); } }
@@ -337,4 +337,24 @@ h1 em { background-size: 220% 100%; animation: shimmer 6s ease-in-out infinite a
   .logo-img { height: 52px; }
   .nav-shell.scrolled .logo-img { height: 44px; }
   .slide { padding-bottom: 76px; }
+}
+
+/* ===== selector limbă + meniu iOS jos pe telefon ===== */
+.lang { display: flex; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, 0.55); border: 1px solid var(--glass-line); }
+.lang button { border: 0; background: transparent; font: inherit; font-size: 13px; font-weight: 700; letter-spacing: 0.04em; color: var(--muted); padding: 6px 11px; border-radius: 999px; cursor: pointer; transition: background 0.2s, color 0.2s; }
+.lang button:hover { color: var(--ink); }
+.lang button[aria-pressed="true"] { background: var(--blue); color: #fff; box-shadow: 0 3px 10px rgba(10, 124, 255, 0.35); }
+.nav { padding-right: 10px; }
+.logo-img { height: 58px; }
+@media (max-width: 700px) {
+  body { padding-bottom: 92px; }
+  .nav-links { position: fixed; left: 50%; bottom: 14px; translate: -50% 0; z-index: 30; padding: 6px; border-radius: 999px; background: rgba(255, 255, 255, 0.8); -webkit-backdrop-filter: blur(24px) saturate(180%); backdrop-filter: blur(24px) saturate(180%); border: 1px solid var(--glass-line); box-shadow: 0 10px 34px rgba(31, 60, 120, 0.22); gap: 2px; }
+  .nav-links a:not(.call):not([aria-current]) { display: inline-block; }
+  .nav-links a { padding: 10px 20px; }
+  .logo-img { height: 46px; }
+  .nav-shell.scrolled .logo-img { height: 40px; }
+}
+@media (max-width: 700px) {
+  /* backdrop-filter pe .nav ar prinde bara fixă în interiorul lui */
+  .nav, .nav-shell.scrolled .nav { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(255, 255, 255, 0.95); }
 }

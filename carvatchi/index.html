@@ -9,29 +9,30 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-title="title.home">
 <div class="aurora" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span><span class="d"></span></div>
 
 <div class="wrap nav-shell">
   <header class="nav glass">
-    <a class="brand" href="index.html" aria-label="Ioan Carvatchi, electrician"><img class="logo-img" src="logo.png" alt="Ioan Carvatchi Electricien"></a>
-    <nav class="nav-links" aria-label="Meniu principal">
-      <a href="index.html" aria-current="page">Acasă</a>
-      <a href="galerie.html">Galerie</a>
-      <a href="#contact" class="call">Contact</a>
+    <a class="brand" href="index.html" aria-label="Ioan Carvatchi"><img class="logo-img" src="logo.png" alt="Ioan Carvatchi Electricien"></a>
+    <nav class="nav-links" aria-label="Menu">
+      <a href="index.html" aria-current="page" data-t="nav.home"></a>
+      <a href="galerie.html" data-t="nav.gallery"></a>
+      <a href="#contact" class="call" data-t="nav.contact"></a>
     </nav>
+    <div class="lang" role="group" aria-label="Language"><button type="button" data-l="ro">RO</button><button type="button" data-l="fr">FR</button><button type="button" data-l="en">EN</button></div>
   </header>
 </div>
 
 <main class="wrap">
-  <div class="banner glass" id="banner" role="region" aria-roledescription="carusel" aria-label="Prezentare servicii">
+  <div class="banner glass" id="banner" role="region" aria-roledescription="carousel">
     <div class="track">
-      <article class="slide s1" aria-roledescription="slide" aria-label="1 din 3">
+      <article class="slide s1" aria-roledescription="slide">
         <div class="txt">
-          <span class="pill"><i></i>Disponibil azi pentru intervenții</span>
-          <h1 class="h">Instalații electrice <em>sigure</em>, făcute corect de prima dată.</h1>
-          <p class="lead">Electrician autorizat pentru locuințe, birouri și spații comerciale. Ofertă clară înainte de lucrare.</p>
-          <div class="cta"><a class="btn btn-primary" href="#contact" data-i="phone"> Cere o ofertă gratuită</a><a class="btn btn-glass" href="galerie.html">Vezi lucrările</a></div>
+          <span class="pill"><i></i><span data-t="s1.pill"></span></span>
+          <h1 class="h" data-t="s1.h"></h1>
+          <p class="lead" data-t="s1.p"></p>
+          <div class="cta"><a class="btn btn-primary" href="#contact" data-i="phone"><span data-t="s1.a"></span></a><a class="btn btn-glass" href="galerie.html"><span data-t="s1.b"></span></a></div>
         </div>
         <svg class="scene" viewBox="0 0 520 380" role="img" aria-label="Tablou electric cu siguranțe automate">
           <defs>
@@ -50,13 +51,12 @@
           <g class="fl d2"><circle cx="62" cy="110" r="30" fill="rgba(255,255,255,.7)" stroke="#fff"/><path d="M64 94l-12 20h10l-3 16 16-22h-10z" fill="#0a7cff"/></g>
         </svg>
       </article>
-
-      <article class="slide s2" aria-roledescription="slide" aria-label="2 din 3">
+      <article class="slide s2" aria-roledescription="slide">
         <div class="txt">
-          <span class="pill"><i></i>Iluminat modern</span>
-          <h2 class="h">Lumină potrivită în <em>fiecare</em> cameră.</h2>
-          <p class="lead">Spoturi LED, benzi cu dimmer, corpuri decorative și iluminat exterior cu senzori.</p>
-          <div class="cta"><a class="btn btn-primary" href="#contact" data-i="bulb"> Vreau iluminat nou</a><a class="btn btn-glass" href="galerie.html">Vezi exemple</a></div>
+          <span class="pill"><i></i><span data-t="s2.pill"></span></span>
+          <h2 class="h" data-t="s2.h"></h2>
+          <p class="lead" data-t="s2.p"></p>
+          <div class="cta"><a class="btn btn-primary" href="#contact" data-i="bulb"><span data-t="s2.a"></span></a><a class="btn btn-glass" href="galerie.html"><span data-t="s2.b"></span></a></div>
         </div>
         <svg class="scene" viewBox="0 0 520 380" role="img" aria-label="Living cu lămpi suspendate">
           <defs><linearGradient id="cone" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2a8" stop-opacity=".95"/><stop offset="1" stop-color="#fff2a8" stop-opacity="0"/></linearGradient></defs>
@@ -68,13 +68,12 @@
           <rect x="84" y="268" width="150" height="50" rx="22" fill="#d9c9ff"/><rect x="286" y="268" width="150" height="50" rx="22" fill="#b9e6ff"/>
         </svg>
       </article>
-
-      <article class="slide s3" aria-roledescription="slide" aria-label="3 din 3">
+      <article class="slide s3" aria-roledescription="slide">
         <div class="txt">
-          <span class="pill"><i></i>Energie verde</span>
-          <h2 class="h">Panouri solare și <em>încărcare auto</em>, la cheie.</h2>
-          <p class="lead">Proiectăm, montăm și racordăm sisteme fotovoltaice și wallbox-uri pentru casa ta.</p>
-          <div class="cta"><a class="btn btn-primary" href="#contact" data-i="sun"> Cere o ofertă solară</a><a class="btn btn-glass" href="galerie.html">Vezi lucrări</a></div>
+          <span class="pill"><i></i><span data-t="s3.pill"></span></span>
+          <h2 class="h" data-t="s3.h"></h2>
+          <p class="lead" data-t="s3.p"></p>
+          <div class="cta"><a class="btn btn-primary" href="#contact" data-i="sun"><span data-t="s3.a"></span></a><a class="btn btn-glass" href="galerie.html"><span data-t="s3.b"></span></a></div>
         </div>
         <svg class="scene" viewBox="0 0 520 380" role="img" aria-label="Casă cu panouri solare">
           <g class="spin"><circle cx="420" cy="80" r="34" fill="#ffd84d"/><g stroke="#ffc700" stroke-width="6" stroke-linecap="round"><path d="M420 22v14M420 124v14M362 80h14M464 80h14M379 39l10 10M451 111l10 10M379 121l10-10M451 49l10-10"/></g></g>
@@ -90,105 +89,52 @@
         </svg>
       </article>
     </div>
-    <button class="arrow prev" type="button" aria-label="Slide anterior">‹</button>
-    <button class="arrow next" type="button" aria-label="Slide următor">›</button>
-    <div class="dots" role="tablist" aria-label="Alege slide"></div>
-  </div>
-
-  <div class="stats">
-    <div class="stat glass"><span class="badge" data-i="shield"></span><div><b>Autorizat ANRE</b><span>Lucrări cu proces verbal și garanție</span></div></div>
-    <div class="stat glass"><span class="badge" data-i="clock"></span><div><b>Urgențe 24/7</b><span>Ajungem rapid când a sărit curentul</span></div></div>
-    <div class="stat glass"><span class="badge" data-i="check"></span><div><b>Ofertă fără surprize</b><span>Preț stabilit înainte de lucrare</span></div></div>
+    <button class="arrow prev" type="button" aria-label="Previous">‹</button>
+    <button class="arrow next" type="button" aria-label="Next">›</button>
+    <div class="dots" role="tablist"></div>
   </div>
 
   <section id="servicii">
-    <div class="sec-head">
-      <h2>Ce rezolvăm pentru tine</h2>
-      <p>De la o priză defectă până la o instalație completă într-un apartament nou.</p>
-    </div>
+    <div class="sec-head"><h2 data-t="svc.t"></h2><p data-t="svc.p"></p></div>
     <div class="grid">
-      <article class="card glass"><div class="tile" data-i="home"></div><h3>Instalații în locuințe</h3><p>Trasee noi de cabluri, prize, întrerupătoare și refaceri complete pentru apartamente și case.</p></article>
-      <article class="card glass"><div class="tile" data-i="panel"></div><h3>Tablouri electrice</h3><p>Montaj și modernizare cu siguranțe automate, diferențial și etichetare clară a circuitelor.</p></article>
-      <article class="card glass"><div class="tile" data-i="bulb"></div><h3>Iluminat</h3><p>Spoturi LED, benzi, corpuri decorative și iluminat exterior cu senzori.</p></article>
-      <article class="card glass"><div class="tile" data-i="bolt"></div><h3>Depanări și urgențe</h3><p>Scurtcircuite, siguranțe care sar, prize arse. Găsim cauza și remediem în aceeași vizită.</p></article>
-      <article class="card glass"><div class="tile" data-i="car"></div><h3>Încărcare auto electrică</h3><p>Montaj wallbox cu protecții dedicate, în garaj sau pe parcare.</p></article>
-      <article class="card glass"><div class="tile" data-i="sun"></div><h3>Panouri fotovoltaice</h3><p>Instalare și racordare pentru sisteme solare rezidențiale și mici afaceri.</p></article>
+      <article class="card glass"><div class="tile" data-i="home"></div><h3 data-t="sv.1t"></h3><p data-t="sv.1d"></p></article>
+      <article class="card glass"><div class="tile" data-i="panel"></div><h3 data-t="sv.2t"></h3><p data-t="sv.2d"></p></article>
+      <article class="card glass"><div class="tile" data-i="bulb"></div><h3 data-t="sv.3t"></h3><p data-t="sv.3d"></p></article>
+      <article class="card glass"><div class="tile" data-i="bolt"></div><h3 data-t="sv.4t"></h3><p data-t="sv.4d"></p></article>
+      <article class="card glass"><div class="tile" data-i="car"></div><h3 data-t="sv.5t"></h3><p data-t="sv.5d"></p></article>
+      <article class="card glass"><div class="tile" data-i="sun"></div><h3 data-t="sv.6t"></h3><p data-t="sv.6d"></p></article>
     </div>
-  </section>
-
-  <section>
-    <div class="split">
-      <div class="panel glass">
-        <h3>Cum lucrăm</h3>
-        <ol class="steps">
-          <li><div><b>Ne suni sau ne scrii</b>Descrii problema și stabilim o vizită.</div></li>
-          <li><div><b>Evaluăm la fața locului</b>Primești o ofertă clară, pe puncte.</div></li>
-          <li><div><b>Executăm lucrarea</b>Curat, la termenul promis, cu materiale verificate.</div></li>
-          <li><div><b>Măsurăm și predăm</b>Teste de izolație și continuitate, apoi documentele lucrării.</div></li>
-        </ol>
-      </div>
-      <div class="panel glass">
-        <h3>Zone de intervenție</h3>
-        <div class="chips">
-          <span class="chip">Centru</span><span class="chip">Nord</span><span class="chip">Sud</span><span class="chip">Est</span><span class="chip">Vest</span><span class="chip">Localități limitrofe</span>
-        </div>
-        <h3 style="margin-top:26px">Program</h3>
-        <div class="chips">
-          <span class="chip">Luni – Vineri 8:00 – 19:00</span><span class="chip">Sâmbătă 9:00 – 14:00</span><span class="chip">Urgențe non-stop</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="lucrari">
-    <div class="sec-head">
-      <h2>Lucrări recente</h2>
-      <p>O selecție din proiectele finalizate. Restul le găsești în galerie.</p>
-    </div>
-    <div class="preview">
-      <a href="galerie.html"><div class="shot g1"><div class="orb" data-i="panel"></div><span class="tag">Tablouri</span></div></a>
-      <a href="galerie.html"><div class="shot g2"><div class="orb" data-i="bulb"></div><span class="tag">Iluminat</span></div></a>
-      <a href="galerie.html"><div class="shot g4"><div class="orb" data-i="sun"></div><span class="tag">Energie verde</span></div></a>
-      <a href="galerie.html"><div class="shot g3"><div class="orb" data-i="home"></div><span class="tag">Locuințe</span></div></a>
-    </div>
-    <div class="cta"><a class="btn btn-glass" href="galerie.html">Deschide galeria completă</a></div>
   </section>
 
   <section class="contact" id="contact">
     <div class="contact-card glass">
       <div>
-        <h2>Hai să vorbim despre lucrarea ta</h2>
-        <p>Spune-ne pe scurt ce ai nevoie. Revenim cu un preț estimativ în aceeași zi.</p>
+        <h2 data-t="ct.t"></h2>
+        <p data-t="ct.p"></p>
         <ul class="contact-list">
-          <li><span class="ico-box" data-i="phone"></span><div><small>Telefon</small><b>0700 000 000</b></div></li>
-          <li><span class="ico-box" data-i="mail"></span><div><small>Email</small><b>contact@voltcasa.ro</b></div></li>
-          <li><span class="ico-box" data-i="pin"></span><div><small>Zonă</small><b>București și împrejurimi</b></div></li>
+          <li><span class="ico-box" data-i="phone"></span><div><small data-t="ct.phone"></small><b>0700 000 000</b></div></li>
+          <li><span class="ico-box" data-i="mail"></span><div><small data-t="ct.mail"></small><b>contact@carvatchi.ro</b></div></li>
+          <li><span class="ico-box" data-i="pin"></span><div><small data-t="ct.zone"></small><b data-t="ct.zv"></b></div></li>
         </ul>
       </div>
       <form id="cerere" novalidate>
         <div class="row2">
-          <label for="nume">Nume<input id="nume" name="nume" autocomplete="name" placeholder="Ana Ionescu"></label>
-          <label for="tel">Telefon<input id="tel" name="tel" type="tel" autocomplete="tel" placeholder="07xx xxx xxx"></label>
+          <label for="nume"><span data-t="f.name"></span><input id="nume" name="nume" autocomplete="name"></label>
+          <label for="tel"><span data-t="f.tel"></span><input id="tel" name="tel" type="tel" autocomplete="tel"></label>
         </div>
-        <label for="tip">Tipul lucrării
-          <select id="tip" name="tip">
-            <option>Depanare / urgență</option>
-            <option>Instalație electrică nouă</option>
-            <option>Tablou electric</option>
-            <option>Iluminat</option>
-            <option>Încărcare auto / fotovoltaic</option>
-            <option>Altceva</option>
-          </select>
+        <label for="tip"><span data-t="f.type"></span>
+          <select id="tip" name="tip"><option data-t="f.o1"></option><option data-t="f.o2"></option><option data-t="f.o3"></option><option data-t="f.o4"></option><option data-t="f.o5"></option><option data-t="f.o6"></option></select>
         </label>
-        <label for="msg">Mesaj<textarea id="msg" name="msg" placeholder="Ex: sare siguranța când pornesc cuptorul"></textarea></label>
-        <button class="btn btn-primary" type="submit">Trimite cererea</button>
+        <label for="msg"><span data-t="f.msg"></span><textarea id="msg" name="msg" data-ph="f.ph"></textarea></label>
+        <button class="btn btn-primary" type="submit" data-t="f.send"></button>
         <p class="note" id="ok" role="status" hidden></p>
       </form>
     </div>
   </section>
 </main>
 
-<footer class="wrap"><img class="foot-logo" src="logo.png" alt=""><br>© 2026 Ioan Carvatchi · Electrician autorizat</footer>
+<footer class="wrap"><img class="foot-logo" src="logo.png" alt=""><br><span data-t="foot"></span></footer>
+<script src="i18n.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

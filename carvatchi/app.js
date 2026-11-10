@@ -3,44 +3,62 @@
     bolt: '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
     bulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/>',
     panel: '<rect x="4" y="3" width="16" height="18" rx="3"/><path d="M8 8h3M8 12h3M8 16h3M14 8h2M14 12h2M14 16h2"/>',
-    plug: '<path d="M9 2v5M15 2v5M6 7h12v3a6 6 0 0 1-12 0zM12 16v6"/>',
     sun: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
     car: '<path d="M5 16v-4l2-5h10l2 5v4M3 16h18M7 19v-3M17 19v-3"/><path d="M12 9l-1.5 2.5h3L12 14"/>',
-    shield: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
     phone: '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>',
     mail: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 7l9 6 9-6"/>',
-    clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     pin: '<path d="M12 21s7-6 7-11a7 7 0 0 0-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>',
     home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/>',
-    building: '<path d="M4 21V5l8-2v18M12 9h8v12M7 9h2M7 13h2M7 17h2M15 13h2M15 17h2"/>',
-    check: '<path d="M5 12l4 4 10-10"/>'
+    building: '<path d="M4 21V5l8-2v18M12 9h8v12M7 9h2M7 13h2M7 17h2M15 13h2M15 17h2"/>'
   };
-  function svg(name) {
-    return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + (P[name] || '') + '</svg>';
+  function svg(name) { return '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">' + (P[name] || '') + '</svg>'; }
+  document.querySelectorAll('[data-i]').forEach(function (el) { el.insertAdjacentHTML('afterbegin', svg(el.getAttribute('data-i'))); });
+
+  /* ---------- limbă: RO / FR / EN ---------- */
+  var LANGS = ['ro', 'fr', 'en'];
+  function stored() {
+    try { var v = localStorage.getItem('lang'); if (LANGS.indexOf(v) > -1) return v; } catch (e) {}
+    if (/^lang:/.test(window.name)) { var w = window.name.slice(5); if (LANGS.indexOf(w) > -1) return w; }
+    return null;
   }
-  document.querySelectorAll('[data-i]').forEach(function (el) {
-    el.insertAdjacentHTML('afterbegin', svg(el.getAttribute('data-i')));
+  var lang = stored() || (function () {
+    var n = (navigator.language || 'ro').slice(0, 2).toLowerCase();
+    return LANGS.indexOf(n) > -1 ? n : 'ro';
+  })();
+  function t(k) { var d = window.I18N[lang]; return (d && d[k] != null) ? d[k] : (window.I18N.ro[k] || k); }
+  function apply() {
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-t]').forEach(function (el) { el.innerHTML = t(el.getAttribute('data-t')); });
+    document.querySelectorAll('[data-ph]').forEach(function (el) { el.setAttribute('placeholder', t(el.getAttribute('data-ph'))); });
+    document.querySelectorAll('.lang button').forEach(function (b) { b.setAttribute('aria-pressed', b.getAttribute('data-l') === lang ? 'true' : 'false'); });
+    var k = document.body.getAttribute('data-title'); if (k) document.title = t(k);
+  }
+  function setLang(l) {
+    lang = l;
+    try { localStorage.setItem('lang', l); } catch (e) {}
+    window.name = 'lang:' + l;
+    apply();
+  }
+  document.querySelectorAll('.lang button').forEach(function (b) {
+    b.addEventListener('click', function () { setLang(b.getAttribute('data-l')); });
   });
+  window.name = 'lang:' + lang;
 
   /* ---------- galerie ---------- */
   var grid = document.getElementById('gallery');
+  var items = [
+    { c: 'tablouri', cl: 'c.tab', g: 'g1', i: 'panel' },
+    { c: 'iluminat', cl: 'c.light', g: 'g2', i: 'bulb' },
+    { c: 'rezidential', cl: 'c.res', g: 'g3', i: 'home' },
+    { c: 'verde', cl: 'c.green', g: 'g4', i: 'sun' },
+    { c: 'verde', cl: 'c.green', g: 'g6', i: 'car' },
+    { c: 'comercial', cl: 'c.com', g: 'g5', i: 'building' }
+  ];
   if (grid) {
-    var items = [
-      { c: 'tablouri', g: 'g1', i: 'panel', t: 'Tablou electric modernizat', d: 'Înlocuire tablou vechi cu siguranțe automate și diferențial.' },
-      { c: 'iluminat', g: 'g2', i: 'bulb', t: 'Iluminat LED living', d: 'Spoturi încastrate și bandă LED cu dimmer.' },
-      { c: 'rezidential', g: 'g3', i: 'home', t: 'Instalație completă apartament', d: 'Traseu nou de cabluri, prize și întrerupătoare, la cheie.' },
-      { c: 'verde', g: 'g4', i: 'sun', t: 'Sistem fotovoltaic', d: 'Panouri solare cu invertor și racordare la rețea.' },
-      { c: 'verde', g: 'g6', i: 'car', t: 'Stație încărcare mașină electrică', d: 'Wallbox montat în garaj cu protecții dedicate.' },
-      { c: 'comercial', g: 'g5', i: 'building', t: 'Spațiu comercial', d: 'Iluminat, prize și tablou pentru un magazin nou.' },
-      { c: 'rezidential', g: 'g1', i: 'plug', t: 'Prize și întrerupătoare', d: 'Montaj de prize smart și USB-C în bucătărie.' },
-      { c: 'iluminat', g: 'g3', i: 'sun', t: 'Iluminat exterior grădină', d: 'Corpuri de iluminat cu senzor de mișcare și crepuscular.' },
-      { c: 'tablouri', g: 'g5', i: 'shield', t: 'Protecție la supratensiune', d: 'Descărcătoare și împământare verificate cu măsurători.' }
-    ];
-    var labels = { tablouri: 'Tablouri', iluminat: 'Iluminat', rezidential: 'Locuințe', verde: 'Energie verde', comercial: 'Comercial' };
     grid.innerHTML = items.map(function (it, n) {
-      return '<button class="item glass" data-c="' + it.c + '" data-n="' + n + '" type="button" aria-label="Deschide: ' + it.t + '">' +
-        '<div class="shot ' + it.g + '"><div class="orb">' + svg(it.i) + '</div><span class="tag">' + labels[it.c] + '</span></div>' +
-        '<h3>' + it.t + '</h3><p>' + it.d + '</p></button>';
+      return '<button class="item glass" data-c="' + it.c + '" data-n="' + n + '" type="button">' +
+        '<div class="shot ' + it.g + '"><div class="orb">' + svg(it.i) + '</div><span class="tag" data-t="' + it.cl + '"></span></div>' +
+        '<h3 data-t="g' + (n + 1) + 't"></h3><p data-t="g' + (n + 1) + 'd"></p></button>';
     }).join('');
 
     var btns = document.querySelectorAll('.filters button');
@@ -48,33 +66,25 @@
       b.addEventListener('click', function () {
         btns.forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
         var f = b.getAttribute('data-f');
-        grid.querySelectorAll('.item').forEach(function (el) {
-          el.hidden = !(f === 'toate' || el.getAttribute('data-c') === f);
-        });
+        grid.querySelectorAll('.item').forEach(function (el) { el.hidden = !(f === 'toate' || el.getAttribute('data-c') === f); });
       });
     });
 
-    var lb = document.getElementById('lb');
-    var cur = 0;
+    var lb = document.getElementById('lb'), cur = 0;
+    function vis() { return Array.prototype.filter.call(grid.querySelectorAll('.item'), function (e) { return !e.hidden; }); }
     function show(n) {
-      var vis = Array.prototype.filter.call(grid.querySelectorAll('.item'), function (e) { return !e.hidden; });
-      if (!vis.length) return;
-      cur = (n + vis.length) % vis.length;
-      var it = items[+vis[cur].getAttribute('data-n')];
+      var v = vis(); if (!v.length) return;
+      cur = (n + v.length) % v.length;
+      var idx = +v[cur].getAttribute('data-n'), it = items[idx];
       lb.querySelector('.shot').className = 'shot ' + it.g;
       lb.querySelector('.orb').innerHTML = svg(it.i);
-      lb.querySelector('.tag').textContent = labels[it.c];
-      lb.querySelector('h3').textContent = it.t;
-      lb.querySelector('.lb-text').textContent = it.d;
+      lb.querySelector('.tag').textContent = t(it.cl);
+      lb.querySelector('h3').textContent = t('g' + (idx + 1) + 't');
+      lb.querySelector('.lb-text').textContent = t('g' + (idx + 1) + 'd');
       lb.classList.add('open');
       lb.querySelector('[data-close]').focus();
     }
-    grid.addEventListener('click', function (e) {
-      var el = e.target.closest('.item');
-      if (!el) return;
-      var vis = Array.prototype.filter.call(grid.querySelectorAll('.item'), function (x) { return !x.hidden; });
-      show(vis.indexOf(el));
-    });
+    grid.addEventListener('click', function (e) { var el = e.target.closest('.item'); if (el) show(vis().indexOf(el)); });
     lb.addEventListener('click', function (e) {
       if (e.target === lb || e.target.hasAttribute('data-close')) lb.classList.remove('open');
       if (e.target.hasAttribute('data-prev')) show(cur - 1);
@@ -95,11 +105,13 @@
       e.preventDefault();
       var n = document.getElementById('nume').value.trim();
       var ok = document.getElementById('ok');
-      ok.textContent = 'Mulțumim' + (n ? ', ' + n : '') + '! Formularul este demonstrativ. Până îl conectezi la un serviciu de email, sună la numărul de mai sus.';
+      ok.textContent = t('f.ok').replace('{n}', n ? ', ' + n : '');
       ok.hidden = false;
       form.reset();
     });
   }
+
+  apply();
 })();
 
 /* ================= EFECTE ================= */
